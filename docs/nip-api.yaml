@@ -1,0 +1,346 @@
+openapi: 3.0.0
+info:
+  title: Authenticated Anonymity Architecture (AAA) Backend API
+  description: |
+    API specification for the Authenticated Anonymity Architecture (AAA), a blockchain-based solution
+    providing robust and ethical authenticated anonymous identities with deanonymization capabilities
+    for criminal activity cases.
+
+    **Version:** 0.0.1
+
+    **Authors:** Michele Dinelli, Luca Sciullo, Lorenzo Gigli
+
+    **Date:** 21/05/2025
+
+    This specification outlines the backend API endpoints.
+  version: 0.0.1
+  contact:
+    name: AAA Backend Team
+    email: m.dinelli@unibo.it
+
+servers:
+  - url: https://prod.aaa.com
+    description: Production server
+  - url: https://dev.aaa.com
+    description: Development server
+
+tags:
+  - name: Identity Management
+    description: Operations related to user registration and PID issuance.
+  - name: Authentication Services
+    description: Endpoints for Public Authentication Code (PAC) and Secret Authentication Code (SAC) issuance and anonymous login.
+
+paths:
+  /identity/pid:
+    post:
+      summary: PID Issuance Request
+      operationId: pidIssuance
+      tags:
+        - Identity Management
+      description: |
+        Allows a user to submit a request to their National Identity Provider (NIP) with
+        personal data (e.g., ID card, passport details) and a Public Key (PK) to initiate
+        the Public Identity Data (PID) issuance. The NIP verifies the user's real identity and issues a PID.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserRegistrationRequest"
+      responses:
+        "201":
+          description: PID successfully issued.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PIDResponse"
+        "400":
+          description: Invalid request or missing data.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse400"
+        "409":
+          description: User already registered.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse400"
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse500"
+
+  /auth/pac:
+    post:
+      summary: Request Public Authentication Code (PAC)
+      operationId: requestPAC
+      tags:
+        - Authentication Services
+      description: |
+        Allows a user to request a PAC (a one-time code) for services requiring an authenticated public identity.
+        The user provide a payload namely `SIGN(PID, SK)` (PID signed with the Secret Key used to obtained the PID). PAC is temporarily stored locally.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - signed_pid
+              properties:
+                signed_pid:
+                  type: string
+                  description: PID signed with the user's Secret Key (SK) used to obtain with the PID.
+                  example: "signed_pid_payload_base64"
+      responses:
+        "200":
+          description: PAC successfully issued.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PACResponse"
+        "400":
+          description: Invalid request or invalid payload.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse400"
+        "401":
+          description: Unauthorized - PID/SK mismatch.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse401"
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse500"
+
+  /auth/sac:
+    post:
+      summary: Request Secret Authentication Code (SAC)
+      operationId: requestSAC
+      tags:
+        - Authentication Services
+      description: |
+        Allows a user to request a SAC (one-time code) for services accepting an authenticated anonymous identity.
+        The user queries the NIP by sending a message containing `ENC(SID, SK)` (SID signed with the Secret Key
+        associated with the PK used for SID storage at seed generation time). The NIP verifies ownership and issues the SAC storing the mapping SAC:SID.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - signedSid
+              properties:
+                signed_sid:
+                  type: string
+                  description: SID signed with the Secret Key (SK) associated with the PK used for SID storage.
+                  example: "signed_sid_payload_base64"
+      responses:
+        "200":
+          description: SAC successfully issued.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SACResponse"
+        "400":
+          description: Invalid request or signature verification failed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse400"
+        "401":
+          description: Unauthorized - SID/SK mismatch.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse401"
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse500"
+
+components:
+  schemas:
+    UserRegistrationRequest:
+      type: object
+      required:
+        - personalData
+        - publicKey
+      properties:
+        personal_data:
+          type: object
+          description: Placeholder for actual personal data required by the NIP (e.g., hashed ID, partial passport info).
+          properties:
+            national_id_hash:
+              type: string
+              example: "hashed_national_id_string"
+            date_of_birth:
+              type: string
+              format: date
+              example: "1990-01-01"
+            additional_info:
+              type: string
+              description: Any additional information required by the NIP.
+              example: "Additional verification data"
+        public_key:
+          type: string
+          description: User's Public Key (PK) to be associated with their identity.
+          example: "-----BEGIN PUBLIC KEY-----MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA..."
+    PIDResponse:
+      type: object
+      required:
+        - pid
+        - message
+      properties:
+        pid:
+          type: string
+          description: The issued Public Identity Data (anonymous token).
+          format: uuid
+          example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+        message:
+          type: string
+          description: Confirmation message.
+          example: "PID successfully issued and saved."
+
+    SeedPhraseRequest:
+      type: object
+      required:
+        - pid
+        - publicKey
+      properties:
+        pid:
+          type: string
+          description: The user's Public Identity Data.
+          format: uuid
+          example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+        public_key:
+          type: string
+          description: User's Public Key (PK) for encrypting the SID on the blockchain.
+          example: "-----BEGIN PUBLIC KEY-----MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA..."
+
+    AsyncOperationStatus:
+      type: object
+      required:
+        - status
+        - message
+      properties:
+        status:
+          type: string
+          description: Status of the asynchronous operation.
+          example: "PENDING"
+        message:
+          type: string
+          description: Details about the operation's status.
+          example: "Seed phrase generation initiated. You can retrieve it shortly."
+
+    PACResponse:
+      type: object
+      required:
+        - pac
+        - message
+      properties:
+        pac:
+          type: string
+          description: The issued Public Authentication Code (one-time code).
+          example: "abc123def456ghi789"
+        message:
+          type: string
+          description: Confirmation message.
+          example: "PAC issued successfully."
+
+    SACResponse:
+      type: object
+      required:
+        - sac
+        - message
+      properties:
+        sac:
+          type: string
+          description: The issued Secret Authentication Code (one-time code).
+          example: "def456ghi789jkl012"
+        message:
+          type: string
+          description: Confirmation message.
+          example: "SAC issued successfully."
+
+    ErrorResponse400:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: An application-specific error code.
+          example: "INVALID_REQUEST"
+        message:
+          type: string
+          description: A human-readable explanation of the error.
+          example: "A human-readable explanation of the error."
+
+    ErrorResponse401:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: An application-specific error code.
+          example: "UNAUTHORIZED"
+        message:
+          type: string
+          description: A human-readable explanation of the error.
+          example: "A human-readable explanation of the error."
+
+    ErrorResponse403:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: An application-specific error code.
+          example: "FORBIDDEN"
+        message:
+          type: string
+          description: A human-readable explanation of the error.
+          example: "A human-readable explanation of the error."
+
+    ErrorResponse404:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: An application-specific error code.
+          example: "NOT_FOUND"
+        message:
+          type: string
+          description: A human-readable explanation of the error.
+          example: "A human-readable explanation of the error."
+
+    ErrorResponse500:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: An application-specific error code.
+          example: "SERVER_ERROR"
