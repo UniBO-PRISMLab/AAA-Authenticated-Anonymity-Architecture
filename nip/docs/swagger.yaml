@@ -1,0 +1,169 @@
+basePath: /
+definitions:
+  models.ErrorResponseModel:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
+  models.PACRequestModel:
+    properties:
+      signed_pid:
+        example: signed_pid_payload_base64
+        type: string
+    type: object
+  models.PACResponseModel:
+    properties:
+      pac:
+        example: signed_sid_payload_base64
+        type: string
+    type: object
+  models.PIDRequestModel:
+    properties:
+      public_key:
+        example: |-
+          -----BEGIN PUBLIC KEY-----
+          MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQ...
+          -----END PUBLIC KEY-----
+        type: string
+    type: object
+  models.PIDResponseModel:
+    properties:
+      message:
+        example: PID successfully issued and saved
+        type: string
+      pid:
+        example: a1b2c3d4-e5f6-7890-1234-567890abcdef
+        type: string
+    type: object
+  models.SACRequestModel:
+    properties:
+      signed_sid:
+        example: signed_sid_payload_base64
+        type: string
+    type: object
+  models.SACResponseModel:
+    properties:
+      sac:
+        example: abc123def456ghci78
+        type: string
+    type: object
+host: localhost:8888
+info:
+  contact:
+    email: m.dinelli@unibo.it
+    name: Michele Dinelli
+  description: API specification for the Authenticated Anonymity Architecture (AAA),
+    a blockchain-based solution providing robust and ethical authenticated anonymous
+    identities with deanonymization capabilities for criminal activity cases.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: National Identity Provider (NIP)
+  version: 0.0.1
+paths:
+  /v1/auth/pac:
+    post:
+      consumes:
+      - application/json
+      description: Allows a user to request a PAC (a one-time code) for services requiring
+        an authenticated public identity. The user provide a payload namely `SIGN(PID,
+        SK)` (PID signed with the Secret Key used to obtained the PID). PAC is temporarily
+        stored locally.
+      parameters:
+      - description: PAC Request Model
+        in: body
+        name: models.PACRequestModel
+        required: true
+        schema:
+          $ref: '#/definitions/models.PACRequestModel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: The Public Authentication Code
+          schema:
+            $ref: '#/definitions/models.PACResponseModel'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/models.ErrorResponseModel'
+        "500":
+          description: An error occurred
+          schema:
+            $ref: '#/definitions/models.ErrorResponseModel'
+      summary: PAC issuance request
+      tags:
+      - auth
+  /v1/auth/sac:
+    post:
+      consumes:
+      - application/json
+      description: Allows a user to request a SAC (one-time code) for services accepting
+        an authenticated anonymous identity.        The user queries the NIP by sending
+        a message containing `ENC(SID, SK)` (SID signed with the Secret Key associated
+        with the PK used for SID storage at seed generation time). The NIP verifies
+        ownership and issues the SAC storing the mapping SAC:SID.
+      parameters:
+      - description: SAC Request Model
+        in: body
+        name: models.SACRequestModel
+        required: true
+        schema:
+          $ref: '#/definitions/models.SACRequestModel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: The Secret Authentication Code
+          schema:
+            $ref: '#/definitions/models.SACResponseModel'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/models.ErrorResponseModel'
+        "500":
+          description: An error occurred
+          schema:
+            $ref: '#/definitions/models.ErrorResponseModel'
+      summary: SAC issuance request
+      tags:
+      - auth
+  /v1/identity/pid:
+    post:
+      consumes:
+      - application/json
+      description: Allows a user to submit a request to their National Identity Provider
+        (NIP) with personal data (e.g., ID card, passport details) and a Public Key
+        (PK) to initiate the Public Identity Data (PID) issuance. The NIP verifies
+        the user's real identity and issues a PID.
+      parameters:
+      - description: PID Request Model
+        in: body
+        name: models.PIDRequestModel
+        required: true
+        schema:
+          $ref: '#/definitions/models.PIDRequestModel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: The PID
+          schema:
+            $ref: '#/definitions/models.PIDResponseModel'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/models.ErrorResponseModel'
+        "500":
+          description: An error occurred
+          schema:
+            $ref: '#/definitions/models.ErrorResponseModel'
+      summary: PID issuance request
+      tags:
+      - identity
+schemes:
+- http
+- https
+swagger: "2.0"
