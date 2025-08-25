@@ -10,6 +10,8 @@ import (
 	"github.com/UniBO-PRISMLab/nip/db"
 	_ "github.com/UniBO-PRISMLab/nip/docs"
 	"github.com/UniBO-PRISMLab/nip/models"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/rs/zerolog/log"
 )
 
 //	@title			National Identity Provider (NIP)
@@ -34,10 +36,16 @@ func main() {
 
 	configuration := models.NewConfiguration()
 
-	// mongo, err := db.InitDatabase(ctx, configuration.DB.MongoUri)
-	// if err != nil {
-	// 	os.Exit(1)
-	// }
+	dbpool, err := pgxpool.New(context.Background(), configuration.DB.DatabaseURL)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Unable to create connection pool")
+		os.Exit(1)
+	}
+	defer dbpool.Close()
+
+	db := &db.DB{
+		Pool: dbpool,
+	}
 
 	repos := db.InitRepositories()
 

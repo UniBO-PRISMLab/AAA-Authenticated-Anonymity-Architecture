@@ -52,13 +52,13 @@ func (c *IdentityController) injectUnAuthenticatedRoutes() {
 	{
 		v1.POST(
 			"identity/pid",
-			c.getPID(),
+			c.postPID,
 		)
 
 	}
 }
 
-// getPID godoc
+// postPID godoc
 //
 //	@Tags			identity
 //	@Schemes		http
@@ -71,18 +71,24 @@ func (c *IdentityController) injectUnAuthenticatedRoutes() {
 //	@Success		200						{object}	models.PIDResponseModel		"The PID"
 //	@Failure		400						{object}	models.ErrorResponseModel	"Bad request"
 //	@Failure		500						{object}	models.ErrorResponseModel	"An error occurred"
-func (c *IdentityController) getPID() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		var PID *models.PIDResponseModel
-		var err error
+func (c *IdentityController) postPID(ctx *gin.Context) {
+	var PID *models.PIDResponseModel
+	var err error
 
-		PID, err = c.identityService.GetPID(ctx)
-		if err != nil {
-			c.logger.Error().Err(err).Msg("Error during PID issuance")
-			ctx.JSON(500, models.ErrorInternalServerErrorResponseModel)
-			return
-		}
+	req := models.PIDRequestModel{}
 
-		ctx.JSON(200, PID)
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		c.logger.Error().Err(err).Msg("Error during PID issuance")
+		ctx.JSON(400, models.ErrorBadRequestResponseModel)
+		return
 	}
+
+	PID, err = c.identityService.IssuePID(ctx, &req)
+	if err != nil {
+		c.logger.Error().Err(err).Msg("Error during PID issuance")
+		ctx.JSON(500, models.ErrorInternalServerErrorResponseModel)
+		return
+	}
+
+	ctx.JSON(200, PID)
 }

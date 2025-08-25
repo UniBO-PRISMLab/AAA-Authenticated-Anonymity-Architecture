@@ -8,10 +8,13 @@ import (
 )
 
 type AuthRepository struct {
+	DB *DB
 }
 
-func NewAuthRepository() *AuthRepository {
-	return &AuthRepository{}
+func NewAuthRepository(DB *DB) *AuthRepository {
+	return &AuthRepository{
+		DB: DB,
+	}
 }
 
 func (r *AuthRepository) GetPAC(ctx context.Context) (*models.PACResponseModel, error) {

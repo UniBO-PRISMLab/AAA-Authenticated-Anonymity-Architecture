@@ -1,6 +1,11 @@
 package db
 
+import (
+	"github.com/jackc/pgx/v5/pgxpool"
+)
+
 type DB struct {
+	Pool *pgxpool.Pool
 }
 
 type Repositories struct {
@@ -8,9 +13,9 @@ type Repositories struct {
 	Identity *IdentityRepository
 }
 
-func InitRepositories() *Repositories {
+func (db *DB) InitRepositories() *Repositories {
 	return &Repositories{
-		Auth:     NewAuthRepository(),
-		Identity: NewIdentityRepository(),
+		Auth:     NewAuthRepository(db),
+		Identity: NewIdentityRepository(db),
 	}
 }

@@ -17,7 +17,7 @@ const (
 )
 
 type DBConfiguration struct {
-	MongoUri string
+	DatabaseURL string
 }
 
 type Configuration struct {
@@ -41,17 +41,17 @@ func NewConfiguration() Configuration {
 		log.Println("Couldn't load .env file")
 	}
 
-	string_environment := stringOrPanic("GIN_MODE")
+	os.Setenv("GIN_MODE", stringFromEnv("GIN_MODE", "development"))
+	os.Setenv("HTTP_HOST", "0.0.0.0")
+	os.Setenv("HTTP_PORT", "8888")
 
-	os.Setenv("GIN_MODE", "development")
-	os.Setenv("ACULEI_BE_HTTP_HOST", "0.0.0.0")
-	os.Setenv("ACULEI_BE_HTTP_PORT", "8888")
+	httpHost := stringOrPanic("HTTP_HOST")
+	httpPort := intOrPanic("HTTP_PORT")
 
-	httpHost := stringOrPanic("ACULEI_BE_HTTP_HOST")
-	httpPort := intOrPanic("ACULEI_BE_HTTP_PORT")
+	databaseURL := stringOrPanic("DATABASE_URL")
 	// mongoUri := stringOrPanic("MONGO_URI")
 
-	if string_environment == "production" {
+	if stringFromEnv("GIN_MODE", "development") == "production" {
 		env = Production
 	} else {
 		env = Development
@@ -66,9 +66,17 @@ func NewConfiguration() Configuration {
 			AllowHeaders: []string{},
 		},
 		DB: DBConfiguration{
-			MongoUri: "",
+			DatabaseURL: databaseURL,
 		},
 	}
+}
+
+func stringFromEnv(key string, defaultValue string) string {
+	var result, found = os.LookupEnv(key)
+	if !found {
+		return defaultValue
+	}
+	return result
 }
 
 func stringOrPanic(key string) string {
