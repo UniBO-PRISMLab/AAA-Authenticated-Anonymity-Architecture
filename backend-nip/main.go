@@ -41,6 +41,13 @@ func main() {
 		log.Fatal().Err(err).Msg("Unable to create connection pool")
 		os.Exit(1)
 	}
+
+	err = dbpool.Ping(ctx)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Unable to ping database")
+		os.Exit(1)
+	}
+
 	defer dbpool.Close()
 
 	db := &db.DB{
