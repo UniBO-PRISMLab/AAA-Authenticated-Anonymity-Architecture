@@ -26,6 +26,7 @@ type Configuration struct {
 	HTTPPort    int
 	CORS        CORSConfiguration
 	DB          DBConfiguration
+	SK          []byte
 }
 
 type CORSConfiguration struct {
@@ -49,7 +50,9 @@ func NewConfiguration() Configuration {
 	httpPort := intOrPanic("HTTP_PORT")
 
 	databaseURL := stringOrPanic("DATABASE_URL")
-	// mongoUri := stringOrPanic("MONGO_URI")
+
+	secretKey := [32]byte{}
+	copy(secretKey[:], stringOrPanic("SK"))
 
 	if stringFromEnv("GIN_MODE", "development") == "production" {
 		env = Production

@@ -20,7 +20,11 @@ func NewIdentityRepository(db *DB) *IdentityRepository {
 	}
 }
 
-func (r *IdentityRepository) IssuePID(ctx context.Context, publicKey string, pid string) (*models.PIDResponseModel, error) {
+func (r *IdentityRepository) IssuePID(
+	ctx context.Context,
+	publicKey string,
+	pid string,
+	nonce string) (*models.PIDResponseModel, error) {
 	tx, err := r.DB.Pool.Begin(ctx)
 	if err != nil {
 		return nil, err
@@ -29,8 +33,9 @@ func (r *IdentityRepository) IssuePID(ctx context.Context, publicKey string, pid
 
 	var insertedPID string
 	var insertedPublicKey string
+	var insertedNonce string
 
-	err = tx.QueryRow(ctx, insertPIDQuery, pid, publicKey).Scan(&insertedPID, &insertedPublicKey)
+	err = tx.QueryRow(ctx, insertPIDQuery, pid, publicKey, nonce).Scan(&insertedPID, &insertedPublicKey, &insertedNonce)
 	if err != nil {
 		return nil, err
 	}
