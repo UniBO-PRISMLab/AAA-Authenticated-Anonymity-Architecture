@@ -7,8 +7,11 @@ import (
 	"github.com/UniBO-PRISMLab/nip/models"
 )
 
-//go:embed sql/auth/insert_pid.sql
+//go:embed sql/identity/insert_pid.sql
 var insertPIDQuery string
+
+//go:embed sql/identity/get_by_pid.sql
+var getByPIDQuery string
 
 type IdentityRepository struct {
 	DB *DB
@@ -37,6 +40,9 @@ func (r *IdentityRepository) IssuePID(
 
 	err = tx.QueryRow(ctx, insertPIDQuery, pid, publicKey, nonce).Scan(&insertedPID, &insertedPublicKey, &insertedNonce)
 	if err != nil {
+		if r.DB.IsUniqueConstraintError(err) {
+			return nil, models.ErrorPKAlreadyAssociated
+		}
 		return nil, err
 	}
 
@@ -47,5 +53,22 @@ func (r *IdentityRepository) IssuePID(
 	return &models.PIDResponseModel{
 		PID:     insertedPID,
 		Message: models.MsgPIDCreated,
+	}, nil
+}
+
+func (r *IdentityRepository) GetUserByPID(ctx context.Context, PID *string) (*models.User, error) {
+	var pid string
+	var publicKey string
+	var nonce string
+
+	err := r.DB.Pool.QueryRow(ctx, getByPIDQuery, &PID).Scan(&pid, &publicKey, &nonce)
+	if err != nil {
+		return nil, err
+	}
+
+	return &models.User{
+		PID:       pid,
+		PublicKey: publicKey,
+		Nonce:     nonce,
 	}, nil
 }

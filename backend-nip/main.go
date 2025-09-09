@@ -42,12 +42,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	err = dbpool.Ping(ctx)
-	if err != nil {
-		log.Fatal().Err(err).Msg("Unable to ping database")
-		os.Exit(1)
-	}
-
 	defer dbpool.Close()
 
 	db := &db.DB{
@@ -56,8 +50,8 @@ func main() {
 
 	repos := db.InitRepositories()
 
-	authService := auth.NewService(configuration, repos.Auth)
 	identityService := identity.NewService(configuration, repos.Identity)
+	authService := auth.NewService(configuration, repos.Auth, identityService)
 
 	if err = api.NewServer(
 		configuration,

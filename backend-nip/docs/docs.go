@@ -59,6 +59,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/models.ErrorResponseModel"
                         }
                     },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponseModel"
+                        }
+                    },
                     "500": {
                         "description": "An error occurred",
                         "schema": {
@@ -101,6 +107,58 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponseModel"
+                        }
+                    },
+                    "500": {
+                        "description": "An error occurred",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponseModel"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/auth/verify-pac": {
+            "post": {
+                "description": "Allows a user to verify a PAC (Public Authentication Code) for services accepting an authenticated anonymous identity.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "PAC verification request",
+                "parameters": [
+                    {
+                        "description": "PAC Verification Request Model",
+                        "name": "models.PACVerificationRequestModel",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.PACVerificationRequestModel"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The Public Authentication Code Verification Response",
+                        "schema": {
+                            "$ref": "#/definitions/models.PACVerificationResponseModel"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponseModel"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorResponseModel"
                         }
@@ -175,28 +233,73 @@ const docTemplate = `{
         },
         "models.PACRequestModel": {
             "type": "object",
+            "required": [
+                "pid",
+                "signed_pid"
+            ],
             "properties": {
+                "pid": {
+                    "type": "string",
+                    "example": "DmIq8x2JNs+E2qGBr16LxP6lUK+i/5nJRLuzvYEymtY="
+                },
                 "signed_pid": {
                     "type": "string",
-                    "example": "signed_pid_payload_base64"
+                    "example": "fzLD1/PAJoq7EtWqIXLOYMhxNJCK9L4w4yniXZSxu0r3+oZ84jreOAhAIlrodSdg0/4EaKYWLmyf0D0uD0eozzwhvVYPDZIrLSxllH+HeEWWuOm1hnPVOOUwo7G4ROemojqwNQ6uvSB+AxoAPiSfm01Rgi0BPoaH9X8H6r94O9Hm3ZrgA9zoxQhMTx/eDpsW2yNbfPFXd18IAuHqLJSCBOSl3U4PfHEad3xFw6H04s2hr3Rqlsb2WsJmS6rf0mPEPAKjq1fSvBIcxg6PCJdfw/GhZEByrP0qc5DllkYSYZaddM/pAh+8LA16YmN1eO9VthsQxGt/WHma/5xsChOaCMd+fgk+Yjio56LoHrC86SqKsS4gkfa2jZoyagwNCah/nKAQkeVzQjk5+WLdCfMh71v82lw9L3rwlng2KhLC4z19k7wheoKQipJaxFR72T7PDftt1TvttK5q6F8x+sV6cTC6roRkgZG03X4tgLJrkBLjF9w3KbcKhPzLyu9ehYtTqFe9hBuR11UXirTi96bvmT9wWDVoTxv+ZGvn59e0VLBcQp67W2m3CZgmIs5eksQPhsFufRwYq49kXxFqnX5OZdqmVVhbQM8X9b8dTpgxd+tIuPzrYcG3ts5ApPCdXMoM/s1Tp6x+QQtq6uOD44V5v5E9tHd9GAH5cYKDfPvdA/w="
                 }
             }
         },
         "models.PACResponseModel": {
             "type": "object",
             "properties": {
-                "pac": {
+                "expiration": {
                     "type": "string",
-                    "example": "signed_sid_payload_base64"
+                    "example": "2024-12-31T23:59:59Z"
+                },
+                "pac": {
+                    "type": "integer",
+                    "example": 874532
+                }
+            }
+        },
+        "models.PACVerificationRequestModel": {
+            "type": "object",
+            "required": [
+                "pac",
+                "pid"
+            ],
+            "properties": {
+                "pac": {
+                    "type": "integer",
+                    "example": 874532
+                },
+                "pid": {
+                    "type": "string",
+                    "example": "DmIq8x2JNs+E2qGBr16LxP6lUK+i/5nJRLuzvYEymtY="
+                }
+            }
+        },
+        "models.PACVerificationResponseModel": {
+            "type": "object",
+            "properties": {
+                "expiration": {
+                    "type": "string",
+                    "example": "2024-12-31T23:59:59Z"
+                },
+                "valid": {
+                    "type": "boolean",
+                    "example": true
                 }
             }
         },
         "models.PIDRequestModel": {
             "type": "object",
+            "required": [
+                "public_key"
+            ],
             "properties": {
                 "public_key": {
                     "type": "string",
-                    "example": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQ...\n-----END PUBLIC KEY-----"
+                    "example": "abc123def456ghci78"
                 }
             }
         },

@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"errors"
+
 	"github.com/UniBO-PRISMLab/nip/models"
 	"github.com/UniBO-PRISMLab/nip/utils"
 	"github.com/gin-gonic/gin"
@@ -52,7 +54,7 @@ func (c *AuthController) injectUnAuthenticatedRoutes() {
 	{
 		v1.POST(
 			"auth/pac",
-			c.getPAC(),
+			c.issuePAC(),
 		)
 
 		v1.POST(
@@ -60,10 +62,14 @@ func (c *AuthController) injectUnAuthenticatedRoutes() {
 			c.getSAC(),
 		)
 
+		v1.POST(
+			"auth/verify-pac",
+			c.verifyPAC(),
+		)
 	}
 }
 
-// getPAC godoc
+// issuePAC godoc
 //
 //	@Tags			auth
 //	@Schemes		http
@@ -75,14 +81,27 @@ func (c *AuthController) injectUnAuthenticatedRoutes() {
 //	@Param			models.PACRequestModel	body		models.PACRequestModel		true	"PAC Request Model"
 //	@Success		200						{object}	models.PACResponseModel		"The Public Authentication Code"
 //	@Failure		400						{object}	models.ErrorResponseModel	"Bad request"
+//	@Failure		404						{object}	models.ErrorResponseModel	"Not found"
 //	@Failure		500						{object}	models.ErrorResponseModel	"An error occurred"
-func (c *AuthController) getPAC() gin.HandlerFunc {
+func (c *AuthController) issuePAC() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var PAC *models.PACResponseModel
 		var err error
 
-		PAC, err = c.authService.GetPAC(ctx)
+		req := models.PACRequestModel{}
+
+		if err := ctx.ShouldBindJSON(&req); err != nil {
+			c.logger.Error().Err(err).Msg("Error during PAC issuance")
+			ctx.JSON(400, models.ErrorBadRequestResponseModel)
+			return
+		}
+
+		PAC, err = c.authService.IssuePAC(ctx, &req)
 		if err != nil {
+			if errors.Is(err, models.ErrorUserWithPIDNotFound) {
+				ctx.JSON(404, models.ErrorResponseModelWithMsg(404, err.Error()))
+				return
+			}
 			c.logger.Error().Err(err).Msg("Error during PAC issuance")
 			ctx.JSON(500, models.ErrorInternalServerErrorResponseModel)
 			return
@@ -118,5 +137,51 @@ func (c *AuthController) getSAC() gin.HandlerFunc {
 		}
 
 		ctx.JSON(200, SAC)
+	}
+}
+
+// verifyPAC godoc
+//
+//	@Tags			auth
+//	@Schemes		http
+//	@Router			/v1/auth/verify-pac [post]
+//	@Summary		PAC verification request
+//	@Description	Allows a user to verify a PAC (Public Authentication Code) for services accepting an authenticated anonymous identity.
+//	@Accept			json
+//	@Produce		json
+//	@Param			models.PACVerificationRequestModel	body		models.PACVerificationRequestModel	true	"PAC Verification Request Model"
+//	@Success		200									{object}	models.PACVerificationResponseModel	"The Public Authentication Code Verification Response"
+//	@Failure		400									{object}	models.ErrorResponseModel			"Bad request"
+//	@Failure		404									{object}	models.ErrorResponseModel			"Not found"
+//	@Failure		500									{object}	models.ErrorResponseModel			"An error occurred"
+func (c *AuthController) verifyPAC() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		var req models.PACVerificationRequestModel
+		var resp *models.PACVerificationResponseModel
+		var err error
+
+		if err := ctx.ShouldBindJSON(&req); err != nil {
+			c.logger.Error().Err(err).Msg("Error during PAC verification")
+			ctx.JSON(400, models.ErrorBadRequestResponseModel)
+			return
+		}
+
+		if resp, err = c.authService.VerifyPAC(ctx, &req); err != nil {
+			if errors.Is(err, models.ErrorUserWithPIDNotFound) {
+				ctx.JSON(404, models.ErrorResponseModelWithMsg(404, err.Error()))
+				return
+			}
+
+			if errors.Is(err, models.ErrorPACNotValid) {
+				ctx.JSON(404, models.ErrorResponseModelWithMsg(404, err.Error()))
+				return
+			}
+
+			c.logger.Error().Err(err).Msg("Error during PAC verification")
+			ctx.JSON(500, models.ErrorInternalServerErrorResponseModel)
+			return
+		}
+
+		ctx.JSON(200, resp)
 	}
 }

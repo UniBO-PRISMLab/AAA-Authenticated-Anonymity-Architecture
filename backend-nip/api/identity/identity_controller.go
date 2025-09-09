@@ -1,6 +1,8 @@
 package identity
 
 import (
+	"errors"
+
 	"github.com/UniBO-PRISMLab/nip/models"
 	"github.com/UniBO-PRISMLab/nip/utils"
 	"github.com/gin-gonic/gin"
@@ -85,6 +87,15 @@ func (c *IdentityController) postPID(ctx *gin.Context) {
 
 	PID, err = c.identityService.IssuePID(ctx, &req)
 	if err != nil {
+		if errors.Is(err, models.ErrorInvalidPublicKeyHeader) ||
+			errors.Is(err, models.ErrorInvalidPublicKey) ||
+			errors.Is(err, models.ErrorPublicKeyDecoding) ||
+			errors.Is(err, models.ErrorPKAlreadyAssociated) {
+			c.logger.Error().Err(err).Msg("Error during PID issuance")
+			ctx.JSON(400, models.ErrorResponseModelWithMsg(400, err.Error()))
+			return
+		}
+
 		c.logger.Error().Err(err).Msg("Error during PID issuance")
 		ctx.JSON(500, models.ErrorInternalServerErrorResponseModel)
 		return
