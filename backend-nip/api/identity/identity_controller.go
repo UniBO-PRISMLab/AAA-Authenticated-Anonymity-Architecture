@@ -54,26 +54,25 @@ func (c *IdentityController) injectUnAuthenticatedRoutes() {
 	{
 		v1.POST(
 			"identity/pid",
-			c.postPID,
+			c.issuePID,
 		)
-
 	}
 }
 
-// postPID godoc
+// issuePID godoc
 //
 //	@Tags			identity
 //	@Schemes		http
 //	@Router			/v1/identity/pid [post]
 //	@Summary		PID issuance request
-//	@Description	Allows a user to submit a request to their National Identity Provider (NIP) with personal data (e.g., ID card, passport details) and a Public Key (PK) to initiate the Public Identity Data (PID) issuance. The NIP verifies the user's real identity and issues a PID.
+//	@Description	The NIP issues a Public Identity Data (PID), i.e., an anonymous token that identifies the user without explicitly sharing information, saves it on its local database, and shares it with the user. The real identity of the user is carried by the PID alone, since it has been officially issued by an NIP that verified the identity of the user. Additionally, the NIP will be the only one able to connect a PID to the real information of the respective user.
 //	@Accept			json
 //	@Produce		json
 //	@Param			models.PIDRequestModel	body		models.PIDRequestModel		true	"PID Request Model"
 //	@Success		200						{object}	models.PIDResponseModel		"The PID"
 //	@Failure		400						{object}	models.ErrorResponseModel	"Bad request"
 //	@Failure		500						{object}	models.ErrorResponseModel	"An error occurred"
-func (c *IdentityController) postPID(ctx *gin.Context) {
+func (c *IdentityController) issuePID(ctx *gin.Context) {
 	var PID *models.PIDResponseModel
 	var err error
 

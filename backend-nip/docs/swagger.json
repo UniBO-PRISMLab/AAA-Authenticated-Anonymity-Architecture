@@ -22,7 +22,7 @@
     "paths": {
         "/v1/auth/pac": {
             "post": {
-                "description": "Allows a user to request a PAC (a one-time code) for services requiring an authenticated public identity. The user provide a payload namely `SIGN(PID, SK)` (PID signed with the Secret Key used to obtained the PID). PAC is temporarily stored locally.",
+                "description": "Allows a user to request a Public Authentication Code (PAC) from the NIP. It's used to authenticate the user as an identified user in the system without sharing any information about her identity. The user sends a message to the NIP containing `SIGN(PID, SK)`, namely the PID signed with the private key of the public-private key pair used to obtain the PID. The NIP verifies that the user is indeed the key holder and returns the PAC, saving it in its local repository. When logging onto the public service, the user can show the PAC, and the service has only to query the NIP to verify that the code is associated with an authenticated user.",
                 "consumes": [
                     "application/json"
                 ],
@@ -74,7 +74,7 @@
         },
         "/v1/auth/sac": {
             "post": {
-                "description": "Allows a user to request a SAC (one-time code) for services accepting an authenticated anonymous identity.        The user queries the NIP by sending a message containing `ENC(SID, SK)` (SID signed with the Secret Key associated with the PK used for SID storage at seed generation time). The NIP verifies ownership and issues the SAC storing the mapping SAC:SID.",
+                "description": "The SAC (Secret Authentication Code) is a one-time code used to authenticate the user as an anonymous user, at the same time guaranteeing that a real user—one that has been registered within the system—exists behind the anonymous identity. To obtain the SAC, the user queries the NIP by sending a message containing `ENC(SID, SK)`, i.e., her SID signed with the private key associated with the public key saved on the blockchain at the moment of seed phrase creation and used in the record where the SID was stored. The NIP retrieves the SID record from the blockchain and checks that it was actually signed by that user via the PK saved in the record. This certifies that the user is the true owner of that SID.",
                 "consumes": [
                     "application/json"
                 ],
@@ -172,7 +172,7 @@
         },
         "/v1/identity/pid": {
             "post": {
-                "description": "Allows a user to submit a request to their National Identity Provider (NIP) with personal data (e.g., ID card, passport details) and a Public Key (PK) to initiate the Public Identity Data (PID) issuance. The NIP verifies the user's real identity and issues a PID.",
+                "description": "The NIP issues a Public Identity Data (PID), i.e., an anonymous token that identifies the user without explicitly sharing information, saves it on its local database, and shares it with the user. The real identity of the user is carried by the PID alone, since it has been officially issued by an NIP that verified the identity of the user. Additionally, the NIP will be the only one able to connect a PID to the real information of the respective user.",
                 "consumes": [
                     "application/json"
                 ],

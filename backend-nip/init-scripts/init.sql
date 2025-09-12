@@ -13,8 +13,8 @@ CREATE UNIQUE INDEX idx_pid_public_key_hash ON pid (public_key_hash);
 CREATE TABLE IF NOT EXISTS pac (
     id SERIAL PRIMARY KEY,
     pac INTEGER NOT NULL,
-    expiration TIMESTAMP NOT NULL,
     pid TEXT NOT NULL REFERENCES pid(pid),
+    expiration TIMESTAMP NOT NULL,
     timestamp TIMESTAMP DEFAULT current_timestamp
 );
 
@@ -24,3 +24,18 @@ FROM pac
 WHERE expiration > now();
 
 CREATE INDEX idx_pac_pid ON pac (pid);
+
+CREATE TABLE IF NOT EXISTS sac (
+    id SERIAL PRIMARY KEY,
+    sac INTEGER NOT NULL,
+    sid TEXT NOT NULL,
+    expiration TIMESTAMP NOT NULL,
+    timestamp TIMESTAMP DEFAULT current_timestamp
+);
+
+CREATE VIEW active_sac AS
+SELECT *
+FROM sac
+WHERE expiration > now();
+
+CREATE INDEX idx_sac_sid ON sac (sid);

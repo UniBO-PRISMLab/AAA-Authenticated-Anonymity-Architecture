@@ -14,6 +14,7 @@ import (
 	"github.com/UniBO-PRISMLab/nip/api/identity"
 	"github.com/UniBO-PRISMLab/nip/db"
 	"github.com/UniBO-PRISMLab/nip/models"
+	"github.com/jackc/pgx/v5"
 )
 
 type Service struct {
@@ -77,8 +78,40 @@ func (s *Service) IssuePAC(ctx context.Context, req *models.PACRequestModel) (*m
 	return s.authRepo.IssuePAC(ctx, &user.PID, pac, expiration)
 }
 
-func (s *Service) GetSAC(ctx context.Context) (*models.SACResponseModel, error) {
-	return s.authRepo.GetSAC(ctx)
+func (s *Service) IssueSAC(ctx context.Context) (*models.SACResponseModel, error) {
+	var err error
+	var tx pgx.Tx
+	var sid string
+	var resp *models.SACResponseModel
+
+	// TODO: retrieve form the blockchain the SID record SID : ENC(PID, symK), PK
+
+	// TODO: check that the received payload was actually signed by that user via the PK saved in the record
+
+	tx, err = s.authRepo.DB.Pool.Begin(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	defer tx.Rollback(ctx)
+
+	a, _ := rand.Int(rand.Reader, big.NewInt(900000))
+	sac := a.Int64() + 100000
+
+	expiration := time.Now().Add(2 * time.Minute).UTC()
+
+	resp, err = s.authRepo.IssueSAC(ctx, &tx, sac, &sid, expiration)
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO: store the mapping SAC on the blockchain
+
+	if err := tx.Commit(ctx); err != nil {
+		return nil, err
+	}
+
+	return resp, nil
 }
 
 func (s *Service) VerifyPAC(ctx context.Context, req *models.PACVerificationRequestModel) (*models.PACVerificationResponseModel, error) {

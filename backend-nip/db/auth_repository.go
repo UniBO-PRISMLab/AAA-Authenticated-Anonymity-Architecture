@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/UniBO-PRISMLab/nip/models"
+	"github.com/jackc/pgx/v5"
 )
 
 //go:embed sql/auth/insert_pac.sql
@@ -13,6 +14,9 @@ var insertPACQuery string
 
 //go:embed sql/auth/get_active_pac.sql
 var getActivePACQuery string
+
+//go:embed sql/auth/insert_sac.sql
+var inserSACQuery string
 
 type AuthRepository struct {
 	DB *DB
@@ -53,13 +57,37 @@ func (r *AuthRepository) IssuePAC(ctx context.Context, pid *string, pac int64, e
 	}, nil
 }
 
-func (r *AuthRepository) GetSAC(ctx context.Context) (*models.SACResponseModel, error) {
-	return &models.SACResponseModel{}, nil
+func (r *AuthRepository) IssueSAC(ctx context.Context,
+	tx *pgx.Tx,
+	sac int64,
+	sid *string,
+	expiration time.Time) (*models.SACResponseModel, error) {
+	var err error
+	var insertedSAC int64
+	var insertedSID string
+
+	if tx == nil {
+		if t, err := r.DB.Pool.Begin(ctx); err != nil {
+			return nil, err
+		} else {
+			tx = &t
+		}
+	}
+
+	err = (*tx).QueryRow(ctx, inserSACQuery, sac, expiration, sid).Scan(&insertedSAC, &expiration, &insertedSID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &models.SACResponseModel{
+		SAC:        insertedSAC,
+		Expiration: expiration,
+	}, nil
 }
 
 func (r *AuthRepository) VerifyPAC(ctx context.Context, pid *string, pac int64) (*models.PACVerificationResponseModel, error) {
 	var expiration time.Time
-	foundPAC := 0
+	var foundPAC int64
 
 	err := r.DB.Pool.QueryRow(ctx, getActivePACQuery, pid, pac).Scan(&foundPAC, &expiration)
 	if err != nil {
@@ -67,7 +95,7 @@ func (r *AuthRepository) VerifyPAC(ctx context.Context, pid *string, pac int64) 
 	}
 
 	return &models.PACVerificationResponseModel{
-		Valid:      foundPAC != 0,
+		Valid:      foundPAC == pac,
 		Expiration: expiration,
 	}, nil
 }

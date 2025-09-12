@@ -59,7 +59,7 @@ func (c *AuthController) injectUnAuthenticatedRoutes() {
 
 		v1.POST(
 			"auth/sac",
-			c.getSAC(),
+			c.issueSAC(),
 		)
 
 		v1.POST(
@@ -75,7 +75,7 @@ func (c *AuthController) injectUnAuthenticatedRoutes() {
 //	@Schemes		http
 //	@Router			/v1/auth/pac [post]
 //	@Summary		PAC issuance request
-//	@Description	Allows a user to request a PAC (a one-time code) for services requiring an authenticated public identity. The user provide a payload namely `SIGN(PID, SK)` (PID signed with the Secret Key used to obtained the PID). PAC is temporarily stored locally.
+//	@Description	Allows a user to request a Public Authentication Code (PAC) from the NIP. It's used to authenticate the user as an identified user in the system without sharing any information about her identity. The user sends a message to the NIP containing `SIGN(PID, SK)`, namely the PID signed with the private key of the public-private key pair used to obtain the PID. The NIP verifies that the user is indeed the key holder and returns the PAC, saving it in its local repository. When logging onto the public service, the user can show the PAC, and the service has only to query the NIP to verify that the code is associated with an authenticated user.
 //	@Accept			json
 //	@Produce		json
 //	@Param			models.PACRequestModel	body		models.PACRequestModel		true	"PAC Request Model"
@@ -88,7 +88,7 @@ func (c *AuthController) issuePAC() gin.HandlerFunc {
 		var PAC *models.PACResponseModel
 		var err error
 
-		req := models.PACRequestModel{}
+		var req models.PACRequestModel
 
 		if err := ctx.ShouldBindJSON(&req); err != nil {
 			c.logger.Error().Err(err).Msg("Error during PAC issuance")
@@ -108,35 +108,6 @@ func (c *AuthController) issuePAC() gin.HandlerFunc {
 		}
 
 		ctx.JSON(200, PAC)
-	}
-}
-
-// getSAC godoc
-//
-//	@Tags			auth
-//	@Schemes		http
-//	@Router			/v1/auth/sac [post]
-//	@Summary		SAC issuance request
-//	@Description	Allows a user to request a SAC (one-time code) for services accepting an authenticated anonymous identity.        The user queries the NIP by sending a message containing `ENC(SID, SK)` (SID signed with the Secret Key associated with the PK used for SID storage at seed generation time). The NIP verifies ownership and issues the SAC storing the mapping SAC:SID.
-//	@Accept			json
-//	@Produce		json
-//	@Param			models.SACRequestModel	body		models.SACRequestModel		true	"SAC Request Model"
-//	@Success		200						{object}	models.SACResponseModel		"The Secret Authentication Code"
-//	@Failure		400						{object}	models.ErrorResponseModel	"Bad request"
-//	@Failure		500						{object}	models.ErrorResponseModel	"An error occurred"
-func (c *AuthController) getSAC() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		var SAC *models.SACResponseModel
-		var err error
-
-		SAC, err = c.authService.GetSAC(ctx)
-		if err != nil {
-			c.logger.Error().Err(err).Msg("Error during SAC issuance")
-			ctx.JSON(500, models.ErrorInternalServerErrorResponseModel)
-			return
-		}
-
-		ctx.JSON(200, SAC)
 	}
 }
 
@@ -178,6 +149,35 @@ func (c *AuthController) verifyPAC() gin.HandlerFunc {
 			}
 
 			c.logger.Error().Err(err).Msg("Error during PAC verification")
+			ctx.JSON(500, models.ErrorInternalServerErrorResponseModel)
+			return
+		}
+
+		ctx.JSON(200, resp)
+	}
+}
+
+// issueSAC godoc
+//
+//	@Tags			auth
+//	@Schemes		http
+//	@Router			/v1/auth/sac [post]
+//	@Summary		SAC issuance request
+//	@Description	The SAC (Secret Authentication Code) is a one-time code used to authenticate the user as an anonymous user, at the same time guaranteeing that a real user exists behind the anonymous identity. To obtain the SAC, the user queries the NIP by sending a message containing `ENC(SID, SK)`, i.e., her SID signed with the private key associated with the public key saved on the blockchain at the moment of seed phrase creation and used in the record where the SID was stored. The NIP retrieves the SID record from the blockchain and checks that it was actually signed by that user via the PK saved in the record. This certifies that the user is the true owner of that SID.
+//	@Accept			json
+//	@Produce		json
+//	@Param			models.SACRequestModel	body		models.SACRequestModel		true	"SAC Request Model"
+//	@Success		200						{object}	models.SACResponseModel		"The Secret Authentication Code"
+//	@Failure		400						{object}	models.ErrorResponseModel	"Bad request"
+//	@Failure		500						{object}	models.ErrorResponseModel	"An error occurred"
+func (c *AuthController) issueSAC() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		var resp *models.SACResponseModel
+		var err error
+
+		resp, err = c.authService.IssueSAC(ctx)
+		if err != nil {
+			c.logger.Error().Err(err).Msg("Error during SAC issuance")
 			ctx.JSON(500, models.ErrorInternalServerErrorResponseModel)
 			return
 		}

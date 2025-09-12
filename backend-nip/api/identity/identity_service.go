@@ -33,27 +33,17 @@ func (s *Service) IssuePID(ctx context.Context, req *models.PIDRequestModel) (*m
 	var pkBytes []byte
 	var err error
 
-	// convert the public key from base64 to bytes
+	// TODO: validate user personal data with public key
+
 	pkBytes, err = base64.StdEncoding.DecodeString(req.PublicKey)
 	if err != nil {
 		return nil, models.ErrorPublicKeyDecoding
 	}
 
-	// Check if the public key is valid
 	pemBlock, _ = pem.Decode(pkBytes)
 	if pemBlock == nil || pemBlock.Type != "PUBLIC KEY" {
 		return nil, models.ErrorInvalidPublicKeyHeader
 	}
-
-	// pub, err := x509.ParsePKIXPublicKey(pemBlock.Bytes)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// pkBytes, err = x509.MarshalPKIXPublicKey(pub)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
 
 	h := sha256.New()
 	h.Write(pkBytes)
