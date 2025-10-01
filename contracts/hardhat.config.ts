@@ -38,6 +38,10 @@ const config: HardhatUserConfig = {
     outDir: "types",
     target: "ethers-v6",
   },
+  docgen: {
+    outputDir: "./docs",
+    pages: "files",
+  },
 };
 
 export default config;

@@ -10,7 +10,7 @@ _AAAContract is a smart contract that manages the blockchain interactions for th
 mapping(bytes32 => bytes[]) encryptedWords
 ```
 
-_stores the encrypted words submitted by nodes for each pid_
+_Stores the encrypted words submitted by nodes for each pid_
 
 ### phraseHashes
 
@@ -18,7 +18,7 @@ _stores the encrypted words submitted by nodes for each pid_
 mapping(bytes32 => bytes32) phraseHashes
 ```
 
-_stores the hash of the complete seed phrase for verification_
+_Stores the hash of the complete seed phrase for verification_
 
 ### WordRequestedToUIPNode
 
@@ -26,7 +26,7 @@ _stores the hash of the complete seed phrase for verification_
 event WordRequestedToUIPNode(bytes32 pid, address node, bytes publicKey)
 ```
 
-_a word is requested from a UIP node_
+_A word is requested from a UIP node_
 
 ### PhraseComplete
 
@@ -34,7 +34,7 @@ _a word is requested from a UIP node_
 event PhraseComplete(bytes32 pid)
 ```
 
-_the seed phrase is completed_
+_The seed phrase is completed_
 
 ### SeedPhraseProtocoloInitiated
 
@@ -42,7 +42,7 @@ _the seed phrase is completed_
 event SeedPhraseProtocoloInitiated(bytes32 pid)
 ```
 
-_the seed phrase generation protocol is initiated_
+_The seed phrase generation protocol is initiated_
 
 ### constructor
 
@@ -56,13 +56,17 @@ constructor(address[] _nodes) public
 function seedPhraseGenerationProtocol(bytes32 pid, bytes publicKey) external
 ```
 
-_Initiates the seed phrase generation protocol by selecting nodes and emitting {WordRequestedToUIPNode} events._
+_Initiates the seed phrase generation protocol
+by selecting nodes and emitting {WordRequestedToUIPNode} events._
 
 ### submitEncryptedWord
 
 ```solidity
 function submitEncryptedWord(bytes32 pid, bytes encryptedWord) external
 ```
+
+_Submits an encrypted word for a given pid.
+When the required number of words is reached, emits {PhraseComplete} event._
 
 ## selectNodes
 
