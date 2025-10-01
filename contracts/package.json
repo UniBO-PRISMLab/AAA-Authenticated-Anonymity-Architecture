@@ -1,16 +1,24 @@
 {
-  "name": "y",
+  "name": "aaa-contracts",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "clean": "npx hardhat clean",
+    "compile": "npx hardhat compile",
+    "docs": "npx hardhat docgen",
+    "request-seed-phrase": "npx hardhat run scripts/seedPhrase.js"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^6.1.0",
-    "hardhat": "^2.26.3"
+    "@typechain/hardhat": "^9.1.0",
+    "@types/minimatch": "^5.1.2",
+    "ethers": "^6.15.0",
+    "hardhat": "^2.26.3",
+    "solidity-docgen": "^0.6.0-beta.36",
+    "typechain": "^8.3.2"
   },
   "dependencies": {
     "hardhat-gas-reporter": "^2.3.0"
