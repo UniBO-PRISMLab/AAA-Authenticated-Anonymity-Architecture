@@ -1,10 +1,10 @@
-const { ethers } = require("hardhat");
+import { ethers } from "hardhat";
 
 async function main() {
-  console.log("Deploying AAAContract.sol");
+  console.log("Deploying AAAContract.sol...");
 
   const [deployer] = await ethers.getSigners();
-  console.log("Deploying contracts with the account:", deployer.address);
+  console.log("Deploying contracts with account:", await deployer.getAddress());
 
   const nodeAddresses = [
     "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720",
@@ -23,15 +23,14 @@ async function main() {
 
   const AAAContract = await ethers.getContractFactory("AAAContract");
   const aaaContract = await AAAContract.deploy(nodeAddresses);
+
   await aaaContract.waitForDeployment();
 
   console.log("AAAContract deployed to:", await aaaContract.getAddress());
   console.log(`Initialized with ${nodeAddresses.length} nodes`);
 }
 
-main()
-  .then(() => process.exit(0))
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});
