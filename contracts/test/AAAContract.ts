@@ -1,18 +1,25 @@
-const { expect } = require("chai");
-const { ethers } = require("hardhat");
+import { expect } from "chai";
+import { ethers } from "hardhat";
+import { Signer } from "ethers";
+import { AAAContract } from "../types";
 
 describe("AAAContract", function () {
-  let AAAContract, aaa, owner, nodes;
+  let aaa: AAAContract;
+  let owner: Signer;
+  let nodes: Signer[];
 
   const WORDS_NEEDED = 6;
 
   beforeEach(async function () {
-    [owner, ...addrs] = await ethers.getSigners();
+    const signers = await ethers.getSigners();
+    owner = signers[0];
+    nodes = signers.slice(1, WORDS_NEEDED + 1);
 
-    nodes = addrs.slice(0, WORDS_NEEDED);
-
-    AAAContract = await ethers.getContractFactory("AAAContract");
-    aaa = await AAAContract.deploy(nodes.map((n) => n.address));
+    const AAAContractFactory = await ethers.getContractFactory("AAAContract");
+    const nodeAddresses = await Promise.all(nodes.map((n) => n.getAddress()));
+    aaa = (await AAAContractFactory.deploy(
+      nodeAddresses
+    )) as unknown as AAAContract;
     await aaa.waitForDeployment();
   });
 
@@ -21,7 +28,7 @@ describe("AAAContract", function () {
   });
 
   it("should fail deployment if not enough nodes", async function () {
-    const fewerNodes = [nodes[0].address];
+    const fewerNodes = [await nodes[0].getAddress()];
     const Factory = await ethers.getContractFactory("AAAContract");
     await expect(Factory.deploy(fewerNodes)).to.be.revertedWith(
       "Not enough nodes in the pool"
@@ -34,7 +41,7 @@ describe("AAAContract", function () {
 
     await expect(aaa.seedPhraseGenerationProtocol(pid, pubKey))
       .to.emit(aaa, "WordRequestedToUIPNode")
-      .withArgs(pid, nodes[0].address, pubKey);
+      .withArgs(pid, await nodes[0].getAddress(), pubKey);
   });
 
   it("should store encrypted words", async function () {
