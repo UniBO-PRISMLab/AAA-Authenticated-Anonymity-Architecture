@@ -8,7 +8,7 @@ const config: HardhatUserConfig = {
     enabled: true,
     currency: "EUR",
     reportFormat: "markdown",
-    outputFile: "../docs/gas-report.md",
+    outputFile: "./docs/gas-report.md",
     coinmarketcap: process.env.COINMARKETCAP_API_KEY || "",
     etherscan: process.env.ETHERSCAN_API_KEY || "",
   },

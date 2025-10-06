@@ -1,0 +1,29 @@
+name: Contracts Tests
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "contracts/**"
+
+jobs:
+  hardhat-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.2.0"
+
+      - name: Install dependencies
+        working-directory: ./contracts
+        run: bun install
+
+      - name: Run Hardhat tests
+        working-directory: ./contracts
+        run: bun run test
