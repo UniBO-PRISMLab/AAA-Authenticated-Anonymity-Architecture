@@ -55,10 +55,10 @@ contract AAAContract {
         encryptedWords[pid].push(encryptedWord);
 
         if (encryptedWords[pid].length == WORDS_NEEDED) {
-            string memory completePhrase = "";
+            bytes memory full;
             for (uint i = 0; i < encryptedWords[pid].length; i++) {
-                completePhrase = string(abi.encodePacked(completePhrase, encryptedWords[pid][i]));
-            }                
+                full = bytes.concat(full, encryptedWords[pid][i]);
+            }
             emit PhraseComplete(pid);
         }
     }
