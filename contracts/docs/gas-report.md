@@ -4,16 +4,16 @@
 |    **◯**   | Execution gas for this method does not include intrinsic gas overhead                    |
 |    **△**   | Cost was non-zero but below the precision setting for the currency display (see options) |
 
-|                                       |    Min |    Max |    Avg | Calls | eur avg |
-| :------------------------------------ | -----: | -----: | -----: | ----: | ------: |
-| **AAAContract**                       |        |        |        |       |         |
-|        *seedPhraseGenerationProtocol* |      - |      - | 61,251 |     2 |       - |
-|        *submitEncryptedWord*          | 50,307 | 68,150 | 59,049 |     8 |       - |
+|                                       |     Min |     Max |     Avg | Calls | eur avg |
+| :------------------------------------ | ------: | ------: | ------: | ----: | ------: |
+| **AAAContract**                       |         |         |         |       |         |
+|        *seedPhraseGenerationProtocol* |       - |       - |  98,804 |     2 |       - |
+|        *submitEncryptedWord*          | 331,412 | 512,716 | 365,523 |    26 |       - |
 
 ## Deployments
 |                 | Min | Max  |     Avg | Block % | eur avg |
 | :-------------- | --: | ---: | ------: | ------: | ------: |
-| **AAAContract** |   - |    - | 751,107 |   2.5 % |       - |
+| **AAAContract** |   - |    - | 996,314 |   3.3 % |       - |
 
 ## Solidity and Network Config
 | **Settings**        | **Value**  |
