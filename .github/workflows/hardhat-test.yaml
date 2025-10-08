@@ -15,15 +15,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up bun
-        uses: oven-sh/setup-bun@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          bun-version: "1.2.0"
+          node-version: "22"
 
       - name: Install dependencies
         working-directory: ./contracts
-        run: bun install
+        run: npm install
 
       - name: Run Hardhat tests
         working-directory: ./contracts
-        run: bun run test
+        run: npm run test
