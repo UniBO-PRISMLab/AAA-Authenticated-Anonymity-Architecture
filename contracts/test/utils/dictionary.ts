@@ -3,7 +3,7 @@ import * as readline from "readline";
 import path from "path";
 import Enigma from "@cubbit/enigma";
 
-const WORDS_PATH = path.join(__dirname, "../words.txt");
+const WORDS_PATH = path.join(__dirname, "./words.txt");
 
 /**
  * Gets a random word from a English word list https://github.com/dwyl/english-words/blob/master/words_alpha.txt.

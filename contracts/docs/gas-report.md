@@ -7,13 +7,21 @@
 |                                       |     Min |     Max |     Avg | Calls | eur avg |
 | :------------------------------------ | ------: | ------: | ------: | ----: | ------: |
 | **AAAContract**                       |         |         |         |       |         |
-|        *seedPhraseGenerationProtocol* |       - |       - |  98,804 |     2 |       - |
-|        *submitEncryptedWord*          | 331,412 | 512,716 | 365,523 |    26 |       - |
+|        *seedPhraseGenerationProtocol* | 614,528 | 614,540 | 614,538 |    11 |       - |
+|        *submitEncryptedWord*          | 233,683 | 421,558 | 307,801 |    21 |       - |
+|        *submitRedundantEncryptedWord* |       - |       - | 278,651 |     2 |       - |
+| **MockUIPRegistry**                   |         |         |         |       |         |
+|        *addNode*                      |       - |       - |  74,499 |     5 |       - |
+|        *onlyNodeFn*                   |       - |       - |  23,465 |     2 |       - |
+|        *onlyOwnerFn*                  |       - |       - |  23,393 |     2 |       - |
+|        *removeNode*                   |       - |       - |  37,324 |     2 |       - |
 
 ## Deployments
-|                 | Min | Max  |     Avg | Block % | eur avg |
-| :-------------- | --: | ---: | ------: | ------: | ------: |
-| **AAAContract** |   - |    - | 996,314 |   3.3 % |       - |
+|                     |     Min |    Max  |       Avg | Block % | eur avg |
+| :------------------ | ------: | ------: | --------: | ------: | ------: |
+| **AAAContract**     |       - |       - | 1,900,818 |   6.3 % |       - |
+| **MockAAALib**      |       - |       - |   408,762 |   1.4 % |       - |
+| **MockUIPRegistry** | 489,686 | 536,172 |   495,749 |   1.7 % |       - |
 
 ## Solidity and Network Config
 | **Settings**        | **Value**  |

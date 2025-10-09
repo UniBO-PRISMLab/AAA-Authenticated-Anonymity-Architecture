@@ -1,13 +1,27 @@
 import Enigma from "@cubbit/enigma";
 import * as dotenv from "dotenv";
 
-/** Encrypts a message using the loaded RSA public key.
+/**
+ * Encrypts a message using the loaded RSA public key.
  * @param msg The message to encrypt
  * @returns a Promise that resolves to the encrypted message
  */
 export async function encrypt(msg: string): Promise<Buffer> {
   const rsa = await loadRSA();
   return Enigma.RSA.encrypt(msg, rsa.keypair.public_key);
+}
+
+/**
+ * Encrypts a message using the provided RSA public key.
+ * @param msg The message to encrypt
+ * @param publicKey The RSA public key to use for encryption
+ * @returns a Promise that resolves to the encrypted message
+ */
+export async function encryptWithKey(
+  msg: string,
+  publicKey: Buffer
+): Promise<Buffer> {
+  return Enigma.RSA.encrypt(msg, publicKey);
 }
 
 /**
@@ -24,6 +38,31 @@ export async function decrypt(msg: Buffer): Promise<string | void> {
 export async function loadPublicKey(): Promise<Buffer> {
   const keypair = await loadKeypair();
   return keypair.public_key;
+}
+
+/**
+ * Generates a new RSA public key.
+ * @param size The size of the key in bits (default: 2048)
+ * @param exponent The public exponent (default: 0x10001)
+ * @returns a Promise that resolves to the generated public key as a Buffer
+ */
+export async function generatePublicKey(
+  size: number = 2048,
+  exponent: number = 0x10001
+): Promise<Buffer> {
+  const keypair = await Enigma.RSA.create_keypair({
+    size,
+    exponent,
+  });
+  return keypair.public_key;
+}
+
+/** Generates random bytes of specified length.
+ * @param length The number of random bytes to generate
+ * @returns A Buffer containing the random bytes
+ */
+export function generateRandomBytes(length: number): Buffer {
+  return Enigma.Random.bytes(length);
 }
 
 /**
