@@ -137,10 +137,7 @@ _Initiates the seed phrase generation protocol.
 
 Requirements:
 - The phrase must not be finalized.
-- The phrase must not have been started.
-
-Emits {SeedPhraseProtocolInitiated} event.
-Emits {WordRequestedToUIPNode} event for each selected node._
+- The phrase must not have been started._
 
 #### Parameters
 
@@ -163,11 +160,7 @@ Requirements:
 - The phrase must have been initiated.
 - The phrase must not be finalized.
 - The sender must be one of the selected nodes.
-- The sender must not have already submitted their original word.
-
-Emits {WordSubmitted} event.
-Emits {RedundancyRequested} event if redundancy is requested.
-Emits {PhraseComplete} event when the phrase is complete._
+- The sender must not have already submitted their original word._
 
 #### Parameters
 
@@ -187,9 +180,7 @@ _Submits a redundant encrypted word for a given pid and index.
 Requirements:
 - The phrase must be finalized.
 - The sender must be a UIP node.
-- The sender must not have already submitted a redundant word for the given index.
-
-Emits {RedundantWordSubmitted} event._
+- The sender must not have already submitted a redundant word for the given index._
 
 #### Parameters
 
@@ -205,7 +196,9 @@ Emits {RedundantWordSubmitted} event._
 function getSelectedNodes(bytes32 pid) external view returns (address[])
 ```
 
-_Returns the selected nodes for a given pid._
+_Returns the selected nodes for a given pid.
+This will be probably removed since the determinism of node selection
+is not something that we want._
 
 #### Parameters
 

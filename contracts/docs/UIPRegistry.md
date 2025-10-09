@@ -75,9 +75,7 @@ function addNode(address node) external
 _Adds a new UIP node to the registry.
 
 Requirements:
-- Only the contract owner can add a node.
-
-Emits {NodeAdded} event._
+- Only the contract owner can add a node._
 
 #### Parameters
 
@@ -94,9 +92,7 @@ function removeNode(address node) external
 _Removes a UIP node from the registry.
 
 Requirements:
-- Only the contract owner can remove a node.
-
-Emits {NodeRemoved} event._
+- Only the contract owner can remove a node._
 
 #### Parameters
 
