@@ -16,7 +16,7 @@ async function main() {
   ];
 
   const AAAContract = await ethers.getContractFactory("AAAContract");
-  const aaaContract = await AAAContract.deploy(nodeAddresses);
+  const aaaContract = await AAAContract.deploy(nodeAddresses, 6, 1);
   await aaaContract.waitForDeployment();
 
   console.log("AAAContract deployed to:", await aaaContract.getAddress());

@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { getRandomWord } from "./utils/dictionary";
+import { getRandomWord } from "../utils/dictionary";
 
 describe("AAALib", function () {
   let harness: any;
@@ -52,6 +52,28 @@ describe("AAALib", function () {
       );
       const selected = await harness.testSelectNodes(PID, pool, 4);
       selected.forEach((a: string) => expect(pool).to.include(a));
+    });
+  });
+
+  describe("selectNode()", function () {
+    it("should select deterministic node", async function () {
+      const pool = Array.from(
+        { length: 5 },
+        (_, i) => ethers.Wallet.createRandom().address
+      );
+
+      const result1 = await harness.testSelectNode(PID, pool);
+      const result2 = await harness.testSelectNode(PID, pool);
+
+      expect(result1).to.equal(result2);
+      expect(pool).to.include(result1);
+    });
+
+    it("should revert when pool is empty", async function () {
+      const pool: string[] = [];
+      await expect(harness.testSelectNode(PID, pool)).to.be.revertedWith(
+        "pool too small"
+      );
     });
   });
 

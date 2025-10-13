@@ -1,11 +1,14 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { getRandomWord } from "./utils/dictionary";
+import { getRandomWord } from "../utils/dictionary";
 import {
   generatePublicKey,
   generateRandomBytes,
   encryptWithKey,
-} from "./utils/crypto";
+  decryptWithKey,
+  recoverPublicKey,
+  generateKeypair,
+} from "../utils/crypto";
 
 describe("AAAContract", function () {
   const WORDS_NEEDED = 4;
@@ -89,6 +92,9 @@ describe("AAAContract", function () {
       const pk = await generatePublicKey();
       const pkBytes = ethers.toUtf8Bytes(pk.toString("base64"));
 
+      const nodePk = await generatePublicKey();
+      const nodePkBytes = ethers.toUtf8Bytes(nodePk.toString("base64"));
+
       await aaa.seedPhraseGenerationProtocol(pid, pkBytes);
 
       const word = await getRandomWord()
@@ -96,7 +102,7 @@ describe("AAAContract", function () {
         .then((enc) => ethers.toUtf8Bytes(enc.toString("base64")));
 
       await expect(
-        aaa.connect(nonNode).submitEncryptedWord(pid, word)
+        aaa.connect(nonNode).submitEncryptedWord(pid, word, nodePkBytes)
       ).to.be.revertedWith("Not UIP node");
     });
 
@@ -109,8 +115,13 @@ describe("AAAContract", function () {
         .then(ethers.toUtf8Bytes);
       await aaa.seedPhraseGenerationProtocol(pid, pk);
 
+      const nodePk = await generatePublicKey();
+      const nodePkBytes = ethers.toUtf8Bytes(nodePk.toString("base64"));
+
       await expect(
-        aaa.connect(nodes[0]).submitEncryptedWord(pid, new Uint8Array())
+        aaa
+          .connect(nodes[0])
+          .submitEncryptedWord(pid, new Uint8Array(), nodePkBytes)
       ).to.be.revertedWith("empty");
     });
 
@@ -120,6 +131,9 @@ describe("AAAContract", function () {
       const pkBytes = ethers.toUtf8Bytes(pk.toString("base64"));
       await aaa.seedPhraseGenerationProtocol(pid, pkBytes);
 
+      const nodePk = await generatePublicKey();
+      const nodePkBytes = ethers.toUtf8Bytes(nodePk.toString("base64"));
+
       const word = await getRandomWord()
         .then((w) => encryptWithKey(w, pk))
         .then(ethers.hexlify);
@@ -128,7 +142,9 @@ describe("AAAContract", function () {
       const nodeAddr = await nodes[0].getAddress();
       const nodeIndex = selected.findIndex((addr: string) => addr === nodeAddr);
 
-      await expect(aaa.connect(nodes[0]).submitEncryptedWord(pid, word))
+      await expect(
+        aaa.connect(nodes[0]).submitEncryptedWord(pid, word, nodePkBytes)
+      )
         .to.emit(aaa, "WordSubmitted")
         .withArgs(
           pid,
@@ -152,19 +168,25 @@ describe("AAAContract", function () {
         .then((w) => encryptWithKey(w, pk))
         .then(ethers.hexlify);
 
-      await aaa.connect(nodes[0]).submitEncryptedWord(pid, word);
+      const nodePk = await generatePublicKey();
+      const nodePkBytes = ethers.toUtf8Bytes(nodePk.toString("base64"));
+
+      await aaa.connect(nodes[0]).submitEncryptedWord(pid, word, nodePkBytes);
 
       await expect(
-        aaa.connect(nodes[0]).submitEncryptedWord(pid, word)
+        aaa.connect(nodes[0]).submitEncryptedWord(pid, word, nodePkBytes)
       ).to.be.revertedWith("already submitted");
     });
 
-    it("should emit PhraseComplete when all nodes have submitted", async function () {
+    it("should emit SIDEncryptionRequested when all nodes have submitted", async function () {
       const pid = ethers.keccak256(
         ethers.toUtf8Bytes(generateRandomBytes(32).toString("base64"))
       );
       const pk = await generatePublicKey();
       const pkBytes = ethers.toUtf8Bytes(pk.toString("base64"));
+
+      const nodePk = await generatePublicKey();
+      const nodePkBytes = ethers.toUtf8Bytes(nodePk.toString("base64"));
 
       await aaa.seedPhraseGenerationProtocol(pid, pkBytes);
 
@@ -172,13 +194,15 @@ describe("AAAContract", function () {
         const w = await getRandomWord()
           .then((w) => encryptWithKey(w, pk))
           .then(ethers.hexlify);
-        await aaa.connect(nodes[i]).submitEncryptedWord(pid, w);
+        await aaa.connect(nodes[i]).submitEncryptedWord(pid, w, nodePkBytes);
       }
 
       const last = await getRandomWord().then(ethers.toUtf8Bytes);
       await expect(
-        aaa.connect(nodes[WORDS_NEEDED - 1]).submitEncryptedWord(pid, last)
-      ).to.emit(aaa, "PhraseComplete");
+        aaa
+          .connect(nodes[WORDS_NEEDED - 1])
+          .submitEncryptedWord(pid, last, nodePkBytes)
+      ).to.emit(aaa, "SIDEncryptionRequested");
     });
 
     it("should revert submitting word after phrase finalized", async function () {
@@ -189,18 +213,21 @@ describe("AAAContract", function () {
       const pkBytes = ethers.toUtf8Bytes(pk.toString("base64"));
       await aaa.seedPhraseGenerationProtocol(pid, pkBytes);
 
+      const nodePk = await generatePublicKey();
+      const nodePkBytes = ethers.toUtf8Bytes(nodePk.toString("base64"));
+
       for (let i = 0; i < WORDS_NEEDED; i++) {
         const w = await getRandomWord()
           .then((w) => encryptWithKey(w, pk))
           .then(ethers.hexlify);
-        await aaa.connect(nodes[i]).submitEncryptedWord(pid, w);
+        await aaa.connect(nodes[i]).submitEncryptedWord(pid, w, nodePkBytes);
       }
 
       const extra = await getRandomWord()
         .then((w) => encryptWithKey(w, pk))
         .then(ethers.hexlify);
       await expect(
-        aaa.connect(nodes[0]).submitEncryptedWord(pid, extra)
+        aaa.connect(nodes[0]).submitEncryptedWord(pid, extra, nodePkBytes)
       ).to.be.revertedWith("done");
     });
   });
@@ -214,11 +241,14 @@ describe("AAAContract", function () {
       const pkBytes = ethers.toUtf8Bytes(pk.toString("base64"));
       await aaa.seedPhraseGenerationProtocol(pid, pkBytes);
 
+      const nodePk = await generatePublicKey();
+      const nodePkBytes = ethers.toUtf8Bytes(nodePk.toString("base64"));
+
       for (let i = 0; i < WORDS_NEEDED; i++) {
         const w = await getRandomWord()
           .then((w) => encryptWithKey(w, pk))
           .then(ethers.hexlify);
-        await aaa.connect(nodes[i]).submitEncryptedWord(pid, w);
+        await aaa.connect(nodes[i]).submitEncryptedWord(pid, w, nodePkBytes);
       }
 
       const redundancy = await getRandomWord()
@@ -235,31 +265,77 @@ describe("AAAContract", function () {
   });
 
   describe("Getters", function () {
-    it("should return stored words and keys correctly", async function () {
+    it("should return the public key associated with a PID", async function () {
       const pid = ethers.keccak256(
         ethers.toUtf8Bytes(generateRandomBytes(32).toString("base64"))
       );
       const pk = await generatePublicKey();
       const pkBytes = ethers.toUtf8Bytes(pk.toString("base64"));
+
+      expect(await aaa.seedPhraseGenerationProtocol(pid, pkBytes)).to.emit(
+        aaa,
+        "SeedPhraseProtocolInitiated"
+      );
+
+      const storedPK = await aaa.getUserPK(pid);
+
+      const { base64 } = recoverPublicKey(storedPK);
+      expect(base64).to.equal(pk.toString("base64"));
+    });
+
+    it("should return the encrypted SID after phrase completion", async function () {
+      const pid = ethers.keccak256(
+        ethers.toUtf8Bytes(generateRandomBytes(32).toString("base64"))
+      );
+
+      const keypair = await generateKeypair();
+      const publicKey = keypair.public_key;
+
+      const pkBytes = ethers.toUtf8Bytes(publicKey.toString("base64"));
       await aaa.seedPhraseGenerationProtocol(pid, pkBytes);
+
+      const nodePk = await generatePublicKey();
+      const nodePkBytes = ethers.toUtf8Bytes(nodePk.toString("base64"));
 
       for (let i = 0; i < WORDS_NEEDED; i++) {
         const w = await getRandomWord()
-          .then((w) => encryptWithKey(w, pk))
+          .then((w) => encryptWithKey(w, publicKey))
           .then(ethers.hexlify);
-        await aaa.connect(nodes[i]).submitEncryptedWord(pid, w);
+        await aaa.connect(nodes[i]).submitEncryptedWord(pid, w, nodePkBytes);
       }
 
-      const selected = await aaa.getSelectedNodes(pid);
-      expect(selected.length).to.equal(WORDS_NEEDED);
+      const filter = aaa.filters.SIDEncryptionRequested(pid);
+      const events = await aaa.queryFilter(filter);
+      const selectedNode = events[0].args?.node;
+      const sid = events[0].args?.sid;
+      const userPK = events[0].args?.userPK;
 
-      const originals = await aaa.getOriginalEncryptedWords(pid);
-      expect(originals.length).to.equal(WORDS_NEEDED);
+      const { buffer } = recoverPublicKey(userPK);
 
-      const sid = await aaa.getSID(pid);
-      const symK = await aaa.getSymK(pid);
-      expect(sid).to.not.equal(ethers.ZeroHash);
-      expect(symK).to.equal(sid);
+      const encSID = await encryptWithKey(sid, buffer);
+      const encSIDB64 = encSID.toString("base64");
+      const encSIDBytes = ethers.toUtf8Bytes(encSIDB64);
+
+      await expect(
+        aaa
+          .connect(await ethers.getSigner(selectedNode))
+          .storeEncryptedSID(pid, encSIDBytes, {
+            gasLimit: 5_000_000,
+          })
+      ).to.emit(aaa, "PhraseComplete");
+
+      const storedEncSIDHex = await aaa.getSID(pid);
+      const storedEncSIDBase64 = Buffer.from(
+        storedEncSIDHex.slice(2),
+        "hex"
+      ).toString("utf8");
+      const storedEncSIDBuffer = Buffer.from(storedEncSIDBase64, "base64");
+
+      expect(storedEncSIDHex).to.equal(ethers.hexlify(encSIDBytes));
+
+      const dec1 = await decryptWithKey(encSID, keypair);
+      const dec2 = await decryptWithKey(storedEncSIDBuffer, keypair);
+      expect(dec2).to.equal(dec1);
     });
   });
 });

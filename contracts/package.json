@@ -7,7 +7,7 @@
     "clean": "npx hardhat clean",
     "compile": "npx hardhat compile",
     "docs": "npx hardhat docgen",
-    "request-seed-phrase": "npx hardhat run scripts/seedPhrase.js",
+    "request-seed-phrase": "npx ts-node scripts/seedPhrase.ts",
     "uip-nodes": "npx ts-node scripts/uip.ts",
     "test": "npx hardhat test"
   },

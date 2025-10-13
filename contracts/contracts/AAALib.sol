@@ -33,6 +33,23 @@ library AAALib {
     }
 
     /**
+     * @dev Selects a single node from a pool based on a given pid.
+     *
+     * @param pid User's Public Identity Data.
+     * @param pool The array of available nodes to select from.
+     */
+    function selectNode(
+        bytes32 pid,
+        address[] memory pool
+    ) internal pure returns (address selected) {
+        require(pool.length > 0, "pool too small");
+
+        // TODO: this is deterministic and we don't like it much (check for VRF)
+        uint idx = uint(keccak256(abi.encodePacked(pid))) % pool.length;
+        selected = pool[idx];
+    }
+
+    /**
      * @dev Derives a symmetric key from the given words.
      *
      * @param words An array of encrypted words.

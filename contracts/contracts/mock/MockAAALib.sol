@@ -14,6 +14,13 @@ contract MockAAALib {
         return AAALib.selectNodes(pid, pool, wordsNeeded);
     }
 
+    function testSelectNode(
+        bytes32 pid,
+        address[] memory pool
+    ) external pure returns (address) {
+        return AAALib.selectNode(pid, pool);
+    }
+
     function testDeriveSymK(
         bytes[] memory words
     ) external pure returns (bytes32) {

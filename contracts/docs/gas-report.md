@@ -4,23 +4,24 @@
 |    **◯**   | Execution gas for this method does not include intrinsic gas overhead                    |
 |    **△**   | Cost was non-zero but below the precision setting for the currency display (see options) |
 
-|                                       |     Min |     Max |     Avg | Calls | eur avg |
-| :------------------------------------ | ------: | ------: | ------: | ----: | ------: |
-| **AAAContract**                       |         |         |         |       |         |
-|        *seedPhraseGenerationProtocol* | 614,528 | 614,540 | 614,538 |    11 |       - |
-|        *submitEncryptedWord*          | 233,683 | 421,558 | 307,801 |    21 |       - |
-|        *submitRedundantEncryptedWord* |       - |       - | 278,651 |     2 |       - |
-| **MockUIPRegistry**                   |         |         |         |       |         |
-|        *addNode*                      |       - |       - |  74,499 |     5 |       - |
-|        *onlyNodeFn*                   |       - |       - |  23,465 |     2 |       - |
-|        *onlyOwnerFn*                  |       - |       - |  23,393 |     2 |       - |
-|        *removeNode*                   |       - |       - |  37,324 |     2 |       - |
+|                                       |     Min |       Max |     Avg | Calls | eur avg |
+| :------------------------------------ | ------: | --------: | ------: | ----: | ------: |
+| **AAAContract**                       |         |           |         |       |         |
+|        *seedPhraseGenerationProtocol* | 614,598 |   614,610 | 614,609 |    13 |       - |
+|        *storeEncryptedSID*            |       - |         - | 310,907 |     2 |       - |
+|        *submitEncryptedWord*          | 769,780 | 1,130,262 | 964,996 |    21 |       - |
+|        *submitRedundantEncryptedWord* |       - |         - | 278,697 |     2 |       - |
+| **MockUIPRegistry**                   |         |           |         |       |         |
+|        *addNode*                      |       - |         - |  74,499 |     5 |       - |
+|        *onlyNodeFn*                   |       - |         - |  23,465 |     2 |       - |
+|        *onlyOwnerFn*                  |       - |         - |  23,393 |     2 |       - |
+|        *removeNode*                   |       - |         - |  37,324 |     2 |       - |
 
 ## Deployments
 |                     |     Min |    Max  |       Avg | Block % | eur avg |
 | :------------------ | ------: | ------: | --------: | ------: | ------: |
-| **AAAContract**     |       - |       - | 1,900,818 |   6.3 % |       - |
-| **MockAAALib**      |       - |       - |   408,762 |   1.4 % |       - |
+| **AAAContract**     |       - |       - | 2,237,499 |   7.5 % |       - |
+| **MockAAALib**      |       - |       - |   474,128 |   1.6 % |       - |
 | **MockUIPRegistry** | 489,686 | 536,172 |   495,749 |   1.7 % |       - |
 
 ## Solidity and Network Config
