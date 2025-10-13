@@ -20,6 +20,21 @@ _Selects a subset of nodes from a pool based on a given pid and the number of wo
 | pool | address[] | The array of available nodes to select from. |
 | wordsNeeded | uint256 | The number of nodes to select. |
 
+### selectNode
+
+```solidity
+function selectNode(bytes32 pid, address[] pool) internal pure returns (address selected)
+```
+
+_Selects a single node from a pool based on a given pid._
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| pid | bytes32 | User's Public Identity Data. |
+| pool | address[] | The array of available nodes to select from. |
+
 ### deriveSymK
 
 ```solidity

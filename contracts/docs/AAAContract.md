@@ -40,7 +40,11 @@ _Represents a seed phrase
 
 `hasSubmittedRedundant`: Tracks if a node has submitted a redundant word for a given index
 
-`sid`: Computed when the phrase is complete
+`encWordsByPID`: Mapping from PID to EncryptedWord struct
+
+`uipToEncryptSID`: Node selected to encrypt the SID
+
+`encSID`: encrypted with user’s public key
 
 `symK`: Computed when the phrase is complete
 
@@ -57,11 +61,25 @@ struct Phrase {
   mapping(uint256 => bytes[]) redundantEncryptedWords;
   mapping(address => bool) hasSubmittedOriginal;
   mapping(address => mapping(uint256 => bool)) hasSubmittedRedundant;
-  bytes32 sid;
+  mapping(bytes32 => struct AAAContract.EncryptedWord[]) encWordsByPID;
+  address uipToEncryptSID;
+  bytes encSID;
   bytes32 symK;
   bytes encPIDSymK;
   bool finalized;
   bytes pk;
+}
+```
+
+### EncryptedWord
+
+_Represents an encrypted word submitted by a node_
+
+```solidity
+struct EncryptedWord {
+  bytes word;
+  bytes nodePK;
+  uint256 index;
 }
 ```
 
@@ -97,10 +115,18 @@ event RedundantWordSubmitted(bytes32 pid, uint256 index, address node, bytes32 w
 
 _Redundant word submitted by a UIP node_
 
+### SIDEncryptionRequested
+
+```solidity
+event SIDEncryptionRequested(bytes32 pid, address node, bytes sid, bytes userPK)
+```
+
+_Emitted to request SID encryption from a UIP node_
+
 ### PhraseComplete
 
 ```solidity
-event PhraseComplete(bytes32 pid, bytes32 sid, bytes32 symK)
+event PhraseComplete(bytes32 pid, bytes encSID)
 ```
 
 _Phrase completed_
@@ -149,7 +175,7 @@ Requirements:
 ### submitEncryptedWord
 
 ```solidity
-function submitEncryptedWord(bytes32 pid, bytes encryptedWord) external
+function submitEncryptedWord(bytes32 pid, bytes encryptedWord, bytes nodePK) external
 ```
 
 _Submits an encrypted word for a given pid.
@@ -168,6 +194,7 @@ Requirements:
 | ---- | ---- | ----------- |
 | pid | bytes32 | User's PID. |
 | encryptedWord | bytes | The encrypted word submitted by the node. |
+| nodePK | bytes | The public key of the node submitting the word. |
 
 ### submitRedundantEncryptedWord
 
@@ -189,6 +216,28 @@ Requirements:
 | pid | bytes32 | User's PID. |
 | index | uint256 | Index of the word for which redundancy is being submitted. |
 | encryptedWordForTarget | bytes | The redundant encrypted word submitted by the node. |
+
+### storeEncryptedSID
+
+```solidity
+function storeEncryptedSID(bytes32 pid, bytes encSID) external
+```
+
+_Stores the encrypted SID for a given pid and marks the phrase as finalized.
+Emits {PhraseComplete} event.
+
+Requirements:
+- The phrase must be finalized.
+- The sender must be a UIP node.
+- The encrypted SID must not have been already stored.
+- The sender must be the node selected to encrypt the SID._
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| pid | bytes32 | User's PID. |
+| encSID | bytes | The encrypted SID to be stored. |
 
 ### getSelectedNodes
 
@@ -256,7 +305,7 @@ _Returns the redundant encrypted words for a given pid and index._
 ### getSID
 
 ```solidity
-function getSID(bytes32 pid) external view returns (bytes32)
+function getSID(bytes32 pid) external view returns (bytes)
 ```
 
 _Returns the SID for a given pid._
@@ -271,7 +320,7 @@ _Returns the SID for a given pid._
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| [0] | bytes32 | The SID associated with the pid. |
+| [0] | bytes | The SID associated with the pid. |
 
 ### getSymK
 
