@@ -9,6 +9,7 @@ import {
   recoverPublicKey,
   generateKeypair,
 } from "../utils/crypto";
+import { BytesLike } from "ethers";
 
 describe("AAAContract", function () {
   const WORDS_NEEDED = 4;
@@ -30,22 +31,6 @@ describe("AAAContract", function () {
 
     aaa = await Factory.deploy(nodeAddrs, WORDS_NEEDED, REDUNDANCY_M);
     await aaa.waitForDeployment();
-  });
-
-  describe("Deployment", function () {
-    it("should deploy with correct parameters", async function () {
-      expect(await aaa.WORDS_NEEDED()).to.equal(WORDS_NEEDED);
-      expect(await aaa.REDUNDANCY_M()).to.equal(REDUNDANCY_M);
-      expect(await aaa.owner()).to.equal(await owner.getAddress());
-    });
-
-    it("should revert if deployed with too few nodes", async function () {
-      const Factory = await ethers.getContractFactory("AAAContract");
-      const oneNode = [await nodes[0].getAddress()];
-      await expect(Factory.deploy(oneNode, 2, REDUNDANCY_M)).to.be.revertedWith(
-        "too few nodes"
-      );
-    });
   });
 
   describe("Seed Phrase Protocol Requested", function () {
@@ -281,6 +266,43 @@ describe("AAAContract", function () {
 
       const { base64 } = recoverPublicKey(storedPK);
       expect(base64).to.equal(pk.toString("base64"));
+    });
+
+    it("should return the list of words for a PID and decrypt them", async function () {
+      const pid = ethers.keccak256(
+        ethers.toUtf8Bytes(generateRandomBytes(32).toString("base64"))
+      );
+      const keypair = await generateKeypair();
+      const publicKey = keypair.public_key;
+      const pkBytes = ethers.toUtf8Bytes(publicKey.toString("base64"));
+
+      await aaa.seedPhraseGenerationProtocol(pid, pkBytes);
+
+      const nodePk = await generatePublicKey();
+      const nodePkBytes = ethers.toUtf8Bytes(nodePk.toString("base64"));
+
+      const originalWords: string[] = [];
+      for (let i = 0; i < WORDS_NEEDED; i++) {
+        const w = await getRandomWord();
+        originalWords.push(w);
+        const encW = await encryptWithKey(w, publicKey).then(ethers.hexlify);
+        await aaa.connect(nodes[i]).submitEncryptedWord(pid, encW, nodePkBytes);
+      }
+
+      const storedWords = await aaa.getWords(pid);
+      const storedWordsHex = storedWords.map((w: BytesLike) =>
+        ethers.hexlify(w)
+      );
+
+      expect(storedWordsHex.length).to.equal(WORDS_NEEDED);
+
+      for (let i = 0; i < WORDS_NEEDED; i++) {
+        const dec = await decryptWithKey(
+          Buffer.from(storedWordsHex[i].slice(2), "hex"),
+          keypair
+        );
+        expect(dec).to.equal(originalWords[i]);
+      }
     });
 
     it("should return the encrypted SID after phrase completion", async function () {

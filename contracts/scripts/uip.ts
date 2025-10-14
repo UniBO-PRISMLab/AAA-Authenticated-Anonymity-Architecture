@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { encryptWithKey } from "../utils/crypto";
+import { encryptWithKey, generatePublicKey } from "../utils/crypto";
 
 const provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
 const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
@@ -39,10 +39,18 @@ function startWorker(
         ethers.toUtf8Bytes("enc_" + randomWord)
       );
 
+      const nodePk = await generatePublicKey();
+      const nodePkBytes = ethers.toUtf8Bytes(nodePk.toString("base64"));
+
       try {
-        const tx = await contract.submitEncryptedWord(pid, encryptedWord, {
-          gasLimit: 5_000_000,
-        });
+        const tx = await contract.submitEncryptedWord(
+          pid,
+          encryptedWord,
+          nodePkBytes,
+          {
+            gasLimit: 5_000_000,
+          }
+        );
         await tx.wait();
         console.log(
           `\nNode ${wallet.address} submitted word for PID ${pid}. Tx hash:`,

@@ -7,11 +7,11 @@ contract MockAAALib {
     using AAALib for *;
 
     function testSelectNodes(
-        bytes32 pid,
+        uint256 randomSeed,
         address[] memory pool,
         uint wordsNeeded
     ) external pure returns (address[] memory) {
-        return AAALib.selectNodes(pid, pool, wordsNeeded);
+        return AAALib.selectNodes(randomSeed, pool, wordsNeeded);
     }
 
     function testSelectNode(

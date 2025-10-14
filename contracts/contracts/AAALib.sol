@@ -6,26 +6,29 @@ pragma solidity ^0.8.0;
  */
 library AAALib {
     /**
-     * @dev Selects a subset of nodes from a pool based on a given pid and the number of words needed.
+     * @dev Selects a subset of nodes from a pool based on a given random seed and the number of words needed.
      *
-     * @param pid User's Public Identity Data.
+     * @param randomSeed A random seed for selection.
      * @param pool The array of available nodes to select from.
      * @param wordsNeeded The number of nodes to select.
      */
     function selectNodes(
-        bytes32 pid,
+        uint256 randomSeed,
         address[] memory pool,
         uint wordsNeeded
     ) internal pure returns (address[] memory selected) {
         require(pool.length >= wordsNeeded, "pool too small");
+
         selected = new address[](wordsNeeded);
         address[] memory temp = new address[](pool.length);
-        for (uint i = 0; i < pool.length; i++) temp[i] = pool[i];
-        uint remaining = pool.length;
+        for (uint256 i = 0; i < pool.length; i++) temp[i] = pool[i];
+        uint256 remaining = pool.length;
 
-        // TODO: this is deterministic and we don't like it much (check for VRF)
-        for (uint i = 0; i < wordsNeeded; i++) {
-            uint idx = uint(keccak256(abi.encodePacked(pid, i))) % remaining;
+        // Fisher–Yates shuffle using randomness derived from randomSeed
+        for (uint256 i = 0; i < wordsNeeded; i++) {
+            // mix in loop index to get fresh randomness per step
+            randomSeed = uint256(keccak256(abi.encode(randomSeed, i)));
+            uint256 idx = randomSeed % remaining;
             selected[i] = temp[idx];
             temp[idx] = temp[remaining - 1];
             remaining--;

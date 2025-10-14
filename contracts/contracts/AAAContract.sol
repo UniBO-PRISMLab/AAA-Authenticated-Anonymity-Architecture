@@ -32,8 +32,6 @@ contract AAAContract is UIPRegistry {
      *
      * `selectedNodes`: List of selected nodes for the phrase of size equals to WORDS_NEEDED
      *
-     * `originalEncryptedWords`: Encrypted words submitted by selected nodes in their order
-     *
      * `redundantEncryptedWords`: Redundant encrypted words keyed by index: mapping(index => address[] submissions)
      *
      * `hasSubmittedOriginal`: Tracks if a node has submitted its original word
@@ -42,7 +40,7 @@ contract AAAContract is UIPRegistry {
      *
      * `encWordsByPID`: Mapping from PID to EncryptedWord struct
      *
-     * `uipToEncryptSID`: Node selected to encrypt the SID
+     * `uipToEncryptSID`: address of the node selected to encrypt the SID with the user's public key
      *
      * `encSID`: encrypted with user’s public key
      *
@@ -56,7 +54,6 @@ contract AAAContract is UIPRegistry {
      */
     struct Phrase {
         address[] selectedNodes;
-        bytes[] originalEncryptedWords;
         mapping(uint => bytes[]) redundantEncryptedWords;
         mapping(address => bool) hasSubmittedOriginal;
         mapping(address => mapping(uint => bool)) hasSubmittedRedundant;
@@ -156,7 +153,7 @@ contract AAAContract is UIPRegistry {
         require(p.selectedNodes.length == 0, "already started");
 
         address[] memory selected = AAALib.selectNodes(
-            pid,
+            132456,
             nodeList,
             WORDS_NEEDED
         );
@@ -206,7 +203,6 @@ contract AAAContract is UIPRegistry {
         }
         require(isSelected, "not selected");
 
-        p.originalEncryptedWords.push(encryptedWord);
         p.encWordsByPID[pid].push(
             EncryptedWord({word: encryptedWord, nodePK: nodePK, index: index})
         );
@@ -236,10 +232,10 @@ contract AAAContract is UIPRegistry {
             }
         }
 
-        if (p.originalEncryptedWords.length == WORDS_NEEDED) {
+        if (p.encWordsByPID[pid].length == WORDS_NEEDED) {
             bytes32 acc;
-            for (uint k = 0; k < p.originalEncryptedWords.length; k++) {
-                bytes32 h = keccak256(p.originalEncryptedWords[k]);
+            for (uint k = 0; k < p.encWordsByPID[pid].length; k++) {
+                bytes32 h = keccak256(p.encWordsByPID[pid][k].word);
                 acc = keccak256(abi.encodePacked(acc, h));
             }
 
@@ -331,18 +327,6 @@ contract AAAContract is UIPRegistry {
     }
 
     /**
-     * @dev Returns the original encrypted words for a given pid.
-     *
-     * @param pid User's PID.
-     * @return Array of original encrypted words.
-     */
-    function getOriginalEncryptedWords(
-        bytes32 pid
-    ) external view returns (bytes[] memory) {
-        return phrases[pid].originalEncryptedWords;
-    }
-
-    /**
      * @dev Returns the redundant encrypted words for a given pid and index.
      *
      * @param pid User's PID.
@@ -396,5 +380,14 @@ contract AAAContract is UIPRegistry {
      */
     function getUserPK(bytes32 pid) external view returns (bytes memory) {
         return phrases[pid].pk;
+    }
+
+    function getWords(bytes32 pid) external view returns (bytes[] memory) {
+        EncryptedWord[] storage encWords = phrases[pid].encWordsByPID[pid];
+        bytes[] memory words = new bytes[](encWords.length);
+        for (uint i = 0; i < encWords.length; i++) {
+            words[i] = encWords[i].word;
+        }
+        return words;
     }
 }
