@@ -76,7 +76,7 @@ const docTemplate = `{
         },
         "/v1/auth/sac": {
             "post": {
-                "description": "The SAC (Secret Authentication Code) is a one-time code used to authenticate the user as an anonymous user, at the same time guaranteeing that a real user—one that has been registered within the system—exists behind the anonymous identity. To obtain the SAC, the user queries the NIP by sending a message containing ` + "`" + `ENC(SID, SK)` + "`" + `, i.e., her SID signed with the private key associated with the public key saved on the blockchain at the moment of seed phrase creation and used in the record where the SID was stored. The NIP retrieves the SID record from the blockchain and checks that it was actually signed by that user via the PK saved in the record. This certifies that the user is the true owner of that SID.",
+                "description": "The SAC (Secret Authentication Code) is a one-time code used to authenticate the user as an anonymous user, at the same time guaranteeing that a real user exists behind the anonymous identity. To obtain the SAC, the user queries the NIP by sending a message containing ` + "`" + `ENC(SID, SK)` + "`" + `, i.e., her SID signed with the private key associated with the public key saved on the blockchain at the moment of seed phrase creation and used in the record where the SID was stored. The NIP retrieves the SID record from the blockchain and checks that it was actually signed by that user via the PK saved in the record. This certifies that the user is the true owner of that SID.",
                 "consumes": [
                     "application/json"
                 ],
@@ -244,7 +244,7 @@ const docTemplate = `{
                 },
                 "signed_pid": {
                     "type": "string",
-                    "example": "fzLD1/PAJoq7EtWqIXLOYMhxNJCK9L4w4yniXZSxu0r3+oZ84jreOAhAIlrodSdg0/4EaKYWLmyf0D0uD0eozzwhvVYPDZIrLSxllH+HeEWWuOm1hnPVOOUwo7G4ROemojqwNQ6uvSB+AxoAPiSfm01Rgi0BPoaH9X8H6r94O9Hm3ZrgA9zoxQhMTx/eDpsW2yNbfPFXd18IAuHqLJSCBOSl3U4PfHEad3xFw6H04s2hr3Rqlsb2WsJmS6rf0mPEPAKjq1fSvBIcxg6PCJdfw/GhZEByrP0qc5DllkYSYZaddM/pAh+8LA16YmN1eO9VthsQxGt/WHma/5xsChOaCMd+fgk+Yjio56LoHrC86SqKsS4gkfa2jZoyagwNCah/nKAQkeVzQjk5+WLdCfMh71v82lw9L3rwlng2KhLC4z19k7wheoKQipJaxFR72T7PDftt1TvttK5q6F8x+sV6cTC6roRkgZG03X4tgLJrkBLjF9w3KbcKhPzLyu9ehYtTqFe9hBuR11UXirTi96bvmT9wWDVoTxv+ZGvn59e0VLBcQp67W2m3CZgmIs5eksQPhsFufRwYq49kXxFqnX5OZdqmVVhbQM8X9b8dTpgxd+tIuPzrYcG3ts5ApPCdXMoM/s1Tp6x+QQtq6uOD44V5v5E9tHd9GAH5cYKDfPvdA/w="
+                    "example": "signed_pid_payload_base64"
                 }
             }
         },
@@ -299,7 +299,7 @@ const docTemplate = `{
             "properties": {
                 "public_key": {
                     "type": "string",
-                    "example": "abc123def456ghci78"
+                    "example": "-----BEGIN RSA PUBLIC KEY-----MIIBCgKCAQEA2aOVUGMBXS07BIKnFq0w/enJLXtQ1K/Yq0ep+ov68R+TPO7EafnZ/fzZSFygAVjYTkgHWr6fXwp4xtPdUUVYMYJLQG5gqK6oOlONZO1NKwjb24Ww6ViRnxYUJOld/6AlZ6kKHDneVI1aINkjJqx6YMK82u5m/7G1/xeHQ9geeQL/CKCAIf+rKGTHYVYQRPIvKhoEMWmYlrAsHpzW462UZDu/zRMqoQXn+KvXI/WrIvisOwXZLoBve8gA6aLbtxOCCmZ/ARK/SeEJrp1mcnRdHVkUHvveQARkoT3dLEeRmLQf9N1HYcLC8GwcWaY0v7cCv4nCVgvJaJfQzA8SngSQqQIDAQAB-----END RSA PUBLIC KEY-----"
                 }
             }
         },
@@ -312,7 +312,7 @@ const docTemplate = `{
                 },
                 "pid": {
                     "type": "string",
-                    "example": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+                    "example": "Nifl3y+2jmuAxF26jqpjogu0ZYnA6IxSikjmTnnjm7k="
                 }
             }
         },
@@ -328,9 +328,13 @@ const docTemplate = `{
         "models.SACResponseModel": {
             "type": "object",
             "properties": {
-                "sac": {
+                "expiration": {
                     "type": "string",
-                    "example": "abc123def456ghci78"
+                    "example": "2024-12-31T23:59:59Z"
+                },
+                "sac": {
+                    "type": "integer",
+                    "example": 874532
                 }
             }
         }
