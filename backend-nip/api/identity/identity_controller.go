@@ -65,7 +65,7 @@ func (c *IdentityController) injectUnAuthenticatedRoutes() {
 //	@Schemes		http
 //	@Router			/v1/identity/pid [post]
 //	@Summary		PID issuance request
-//	@Description	The NIP issues a Public Identity Data (PID), i.e., an anonymous token that identifies the user without explicitly sharing information, saves it on its local database, and shares it with the user. The real identity of the user is carried by the PID alone, since it has been officially issued by an NIP that verified the identity of the user. Additionally, the NIP will be the only one able to connect a PID to the real information of the respective user.
+//	@Description	The NIP issues a Public Identity Data (PID), i.e., an anonymous token that identifies the user without sharing information. The real identity of the user is carried by the PID alone. The NIP will be the only one able to connect a PID to the real information of the respective user. It accepts a 2048 bit RSA PKCS#8 key encoded in base64.
 //	@Accept			json
 //	@Produce		json
 //	@Param			models.PIDRequestModel	body		models.PIDRequestModel		true	"PID Request Model"

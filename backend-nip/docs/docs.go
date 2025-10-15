@@ -174,7 +174,7 @@ const docTemplate = `{
         },
         "/v1/identity/pid": {
             "post": {
-                "description": "The NIP issues a Public Identity Data (PID), i.e., an anonymous token that identifies the user without explicitly sharing information, saves it on its local database, and shares it with the user. The real identity of the user is carried by the PID alone, since it has been officially issued by an NIP that verified the identity of the user. Additionally, the NIP will be the only one able to connect a PID to the real information of the respective user.",
+                "description": "The NIP issues a Public Identity Data (PID), i.e., an anonymous token that identifies the user without sharing information. The real identity of the user is carried by the PID alone. The NIP will be the only one able to connect a PID to the real information of the respective user. It accepts a 2048 bit RSA PKCS#8 key encoded in base64.",
                 "consumes": [
                     "application/json"
                 ],
@@ -299,7 +299,7 @@ const docTemplate = `{
             "properties": {
                 "public_key": {
                     "type": "string",
-                    "example": "-----BEGIN RSA PUBLIC KEY-----MIIBCgKCAQEA2aOVUGMBXS07BIKnFq0w/enJLXtQ1K/Yq0ep+ov68R+TPO7EafnZ/fzZSFygAVjYTkgHWr6fXwp4xtPdUUVYMYJLQG5gqK6oOlONZO1NKwjb24Ww6ViRnxYUJOld/6AlZ6kKHDneVI1aINkjJqx6YMK82u5m/7G1/xeHQ9geeQL/CKCAIf+rKGTHYVYQRPIvKhoEMWmYlrAsHpzW462UZDu/zRMqoQXn+KvXI/WrIvisOwXZLoBve8gA6aLbtxOCCmZ/ARK/SeEJrp1mcnRdHVkUHvveQARkoT3dLEeRmLQf9N1HYcLC8GwcWaY0v7cCv4nCVgvJaJfQzA8SngSQqQIDAQAB-----END RSA PUBLIC KEY-----"
+                    "example": "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUF1aVRTYzZMY3NmaFRZbEY0WDk2OApEcStXVzNrRmx3U21UR2NJQXJ5eFZ2OVhBQ2VFSXJuL0JYZE9McTFNSU52enc5WTZvNmhTd3hqUkp2SzlvdFpMCnlXYzFvc2RUNGdlTDJaT2xEMHUwakFvbEpqVU9hVWVyMmJKQTUzQzhXMjd1MHJyQzVvc3Z3THRNVWYxWnpTR0MKL2hrY0VOcjNjRGl6YWJibkw2dzVFUEdCVjlNU2RnaUdlelJXaXVEeGIzcldEOFNwSlpNa2c5b3ZSK3dOMlI2YwpOK2RwTkNjdDdWYjQxaWhXU0VXT1o2djhFdTREV3FjVW0vQzBpLzZ3eVJkWU93Y0E3NktkMmkxcnNZdHFlQS84CnZuMklTTEp2eGdkM3ZCdXY1ZnFkS0kzRm0rd3NIVDhHdHlkQUw5VjF4V3g4bnFlcFlwMlIvaXJMNHFUeGFnVzkKMXdJREFRQUIKLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg=="
                 }
             }
         },
