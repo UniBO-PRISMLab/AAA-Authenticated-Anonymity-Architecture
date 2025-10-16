@@ -10,6 +10,7 @@ import (
 	"github.com/UniBO-PRISMLab/nip/db"
 	_ "github.com/UniBO-PRISMLab/nip/docs"
 	"github.com/UniBO-PRISMLab/nip/models"
+	eth "github.com/ethereum/go-ethereum/ethclient"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rs/zerolog/log"
 )
@@ -52,6 +53,20 @@ func main() {
 
 	identityService := identity.NewService(configuration, repos.Identity)
 	authService := auth.NewService(configuration, repos.Auth, identityService)
+
+	ethClient, err := eth.DialContext(ctx, configuration.Blockchain.EthNodeURL)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Unable to connect to Ethereum client")
+		os.Exit(1)
+	}
+	if _, err := ethClient.NetworkID(ctx); err != nil {
+		log.Fatal().Err(err).Msg("Unable to connect to Ethereum client")
+		os.Exit(1)
+	}
+
+	defer ethClient.Close()
+
+	log.Info().Msgf("Connected to Ethereum node at %s", configuration.Blockchain.EthNodeURL)
 
 	if err = api.NewServer(
 		configuration,

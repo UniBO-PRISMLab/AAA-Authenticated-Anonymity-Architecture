@@ -20,6 +20,10 @@ type DBConfiguration struct {
 	DatabaseURL string
 }
 
+type BlockchainConfiguration struct {
+	EthNodeURL string
+}
+
 type Configuration struct {
 	Environment EnvironmentType
 	HTTPHost    string
@@ -27,6 +31,7 @@ type Configuration struct {
 	CORS        CORSConfiguration
 	DB          DBConfiguration
 	SK          []byte
+	Blockchain  BlockchainConfiguration
 }
 
 type CORSConfiguration struct {
@@ -51,6 +56,8 @@ func NewConfiguration() Configuration {
 
 	databaseURL := stringOrPanic("DATABASE_URL")
 
+	ethNodeUrl := stringOrPanic("ETH_NODE_URL")
+
 	secretKey := [32]byte{}
 	copy(secretKey[:], stringOrPanic("SK"))
 
@@ -70,6 +77,10 @@ func NewConfiguration() Configuration {
 		},
 		DB: DBConfiguration{
 			DatabaseURL: databaseURL,
+		},
+		SK: secretKey[:],
+		Blockchain: BlockchainConfiguration{
+			EthNodeURL: ethNodeUrl,
 		},
 	}
 }
