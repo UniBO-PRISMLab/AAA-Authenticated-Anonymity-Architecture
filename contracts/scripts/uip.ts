@@ -17,7 +17,7 @@ const wordList = ["apple", "banana", "cherry", "dragon", "eagle"];
 
 const abi = [
   "event WordRequestedToUIPNode(bytes32 indexed pid, address indexed node, bytes publicKey)",
-  "function submitEncryptedWord(bytes32 pid, bytes encryptedWord) external",
+  "function submitEncryptedWord(bytes32 pid, bytes encryptedWord, bytes nodePK) external",
   "event PhraseComplete(bytes32 indexed pid)",
   "event SIDEncryptionRequested(bytes32 indexed pid, address indexed node, bytes sid, bytes userPK)",
   "function storeEncryptedSID(bytes32 pid, bytes encryptedSID) external",
@@ -66,12 +66,10 @@ function startWorker(
     "SIDEncryptionRequested",
     async (pid: string, nodes: string, sid: string, userPK: string) => {
       const { buffer, pem } = recoverPublicKey(userPK);
-      console.log("SID:" + sid);
 
       if (nodes.toLowerCase() !== wallet.address.toLowerCase()) return;
 
       const encSID = await encryptWithKey(sid, buffer);
-      console.log("Encrypted SID:", encSID);
       contract.storeEncryptedSID(
         pid,
         ethers.toUtf8Bytes(encSID.toString("base64")),
