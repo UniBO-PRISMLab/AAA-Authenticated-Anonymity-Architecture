@@ -329,7 +329,7 @@ contract AAAContract is UIPRegistry {
 
         bytes32 symK = AAALib.deriveSymK(wordBytes);
 
-        emit PIDEncryptionRequested(pid, msg.sender, symK);
+        emit PIDEncryptionRequested(pid, p.uipToEncryptSID, symK);
     }
 
     /**

@@ -1,5 +1,9 @@
 import { ethers } from "ethers";
-import { encryptWithKey, generatePublicKey } from "../utils/crypto";
+import {
+  encryptWithKey,
+  generatePublicKey,
+  encryptWithSymK,
+} from "../utils/crypto";
 
 const provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
 const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
@@ -21,6 +25,8 @@ const abi = [
   "event PhraseComplete(bytes32 indexed pid)",
   "event SIDEncryptionRequested(bytes32 indexed pid, address indexed node, bytes sid, bytes userPK)",
   "function storeEncryptedSID(bytes32 pid, bytes encryptedSID) external",
+  "event PIDEncryptionRequested(bytes32 indexed pid, address indexed node,bytes32 symK)",
+  "function storeEncryptedPID(bytes32 pid, bytes encryptedPID) external",
 ];
 
 function startWorker(
@@ -70,12 +76,38 @@ function startWorker(
       if (nodes.toLowerCase() !== wallet.address.toLowerCase()) return;
 
       const encSID = await encryptWithKey(sid, buffer);
-      contract.storeEncryptedSID(
+      const tx = await contract.storeEncryptedSID(
         pid,
         ethers.toUtf8Bytes(encSID.toString("base64")),
         {
           gasLimit: 5_000_000,
         }
+      );
+      await tx.wait();
+      console.log(
+        `\nNode ${wallet.address} submitted encrypted SID for PID ${pid}. Tx hash:`,
+        tx.hash
+      );
+    }
+  );
+
+  contract.on(
+    "PIDEncryptionRequested",
+    async (pid: string, nodes: string, symK: string) => {
+      if (nodes.toLowerCase() !== wallet.address.toLowerCase()) return;
+
+      const encPID = await encryptWithSymK(pid);
+      const tx = await contract.storeEncryptedPID(
+        pid,
+        ethers.toUtf8Bytes(encPID.toString("base64")),
+        {
+          gasLimit: 5_000_000,
+        }
+      );
+      await tx.wait();
+      console.log(
+        `\nNode ${wallet.address} submitted encrypted PID for PID ${pid}. Tx hash:`,
+        tx.hash
       );
     }
   );
