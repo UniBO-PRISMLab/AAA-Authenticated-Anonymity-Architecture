@@ -28,44 +28,33 @@ modifier nonReentrant()
 
 ### Phrase
 
-_Represents a seed phrase
+_Represents a seed phrase.
 
-`selectedNodes`: List of selected nodes for the phrase of size equals to WORDS_NEEDED
+`selectedNodes`: List of selected nodes for the phrase.
 
-`originalEncryptedWords`: Encrypted words submitted by selected nodes in their order
+`redundantEncryptedWords`: Redundant encrypted words keyed by index: mapping(index => address[] submissions).
 
-`redundantEncryptedWords`: Redundant encrypted words keyed by index: mapping(index => address[] submissions)
+`hasSubmitted`: Tracks if a node has submitted its original word.
 
-`hasSubmittedOriginal`: Tracks if a node has submitted its original word
+`hasSubmittedRedundant`: Tracks if a node has submitted a redundant word for a given index.
+`
+`encWordsByPID`: Mapping from PID to EncryptedWord struct.
 
-`hasSubmittedRedundant`: Tracks if a node has submitted a redundant word for a given index
+`uipToEncryptSID`: address of the node selected to encrypt the SID with the user's public key.
 
-`encWordsByPID`: Mapping from PID to EncryptedWord struct
+`encSID`: SID encrypted with user’s public key.
 
-`uipToEncryptSID`: Node selected to encrypt the SID
-
-`encSID`: encrypted with user’s public key
-
-`symK`: Computed when the phrase is complete
-
-`encPIDSymK`: Opaque encrypted payload: ENC(PID, symK) encrypted with user's PK
-
-`finalized`: Indicates if the phrase has been finalized
-
-`pk`: Public Key of the user_
+`finalized`: Indicates if the phrase has been finalized._
 
 ```solidity
 struct Phrase {
   address[] selectedNodes;
-  bytes[] originalEncryptedWords;
   mapping(uint256 => bytes[]) redundantEncryptedWords;
-  mapping(address => bool) hasSubmittedOriginal;
+  mapping(address => bool) hasSubmitted;
   mapping(address => mapping(uint256 => bool)) hasSubmittedRedundant;
   mapping(bytes32 => struct AAAContract.EncryptedWord[]) encWordsByPID;
   address uipToEncryptSID;
   bytes encSID;
-  bytes32 symK;
-  bytes encPIDSymK;
   bool finalized;
   bytes pk;
 }
@@ -83,10 +72,22 @@ struct EncryptedWord {
 }
 ```
 
-### WordRequestedToUIPNode
+### SIDRecord
+
+_Represents a SID record_
 
 ```solidity
-event WordRequestedToUIPNode(bytes32 pid, address node, bytes userPK)
+struct SIDRecord {
+  bytes encPID;
+  bytes pk;
+  bool exists;
+}
+```
+
+### WordRequested
+
+```solidity
+event WordRequested(bytes32 pid, address node, bytes userPK)
 ```
 
 _Word requested to a UIP node_
@@ -123,21 +124,13 @@ event SIDEncryptionRequested(bytes32 pid, address node, bytes sid, bytes userPK)
 
 _Emitted to request SID encryption from a UIP node_
 
-### PhraseComplete
+### PIDEncryptionRequested
 
 ```solidity
-event PhraseComplete(bytes32 pid, bytes encSID)
+event PIDEncryptionRequested(bytes32 pid, address node, bytes32 symK)
 ```
 
-_Phrase completed_
-
-### SymKEncryptedStored
-
-```solidity
-event SymKEncryptedStored(bytes32 pid, bytes encPIDSymK)
-```
-
-_SymK encrypted with user's public key and stored on-chain_
+_Emitted to request PID encryption from a UIP node_
 
 ### SeedPhraseProtocolInitiated
 
@@ -146,6 +139,14 @@ event SeedPhraseProtocolInitiated(bytes32 pid)
 ```
 
 _Seed phrase generation protocol initiated_
+
+### PhraseComplete
+
+```solidity
+event PhraseComplete(bytes32 pid, bytes encSID)
+```
+
+_Phrase completed_
 
 ### constructor
 
@@ -239,47 +240,24 @@ Requirements:
 | pid | bytes32 | User's PID. |
 | encSID | bytes | The encrypted SID to be stored. |
 
-### getSelectedNodes
+### storeEncryptedPID
 
 ```solidity
-function getSelectedNodes(bytes32 pid) external view returns (address[])
+function storeEncryptedPID(bytes32 pid, bytes encPID) external
 ```
 
-_Returns the selected nodes for a given pid.
-This will be probably removed since the determinism of node selection
-is not something that we want._
+_Stores the encrypted PID and symmetric key for a given pid.
+
+Requirements:
+- The sender must be a UIP node.
+- The encrypted PID and symmetric key must not have been already stored._
 
 #### Parameters
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | pid | bytes32 | User's PID. |
-
-#### Return Values
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| [0] | address[] | Array of selected node addresses. |
-
-### getOriginalEncryptedWords
-
-```solidity
-function getOriginalEncryptedWords(bytes32 pid) external view returns (bytes[])
-```
-
-_Returns the original encrypted words for a given pid._
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| pid | bytes32 | User's PID. |
-
-#### Return Values
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| [0] | bytes[] | Array of original encrypted words. |
+| encPID | bytes | The encrypted PID and symmetric key to be stored. |
 
 ### getRedundantEncryptedWords
 
@@ -308,7 +286,7 @@ _Returns the redundant encrypted words for a given pid and index._
 function getSID(bytes32 pid) external view returns (bytes)
 ```
 
-_Returns the SID for a given pid._
+_Returns the encrypted SID for a given pid._
 
 #### Parameters
 
@@ -320,15 +298,15 @@ _Returns the SID for a given pid._
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| [0] | bytes | The SID associated with the pid. |
+| [0] | bytes | The encrypted SID associated with the pid. |
 
-### getSymK
+### getSelectedNodes
 
 ```solidity
-function getSymK(bytes32 pid) external view returns (bytes32)
+function getSelectedNodes(bytes32 pid) external view returns (address[])
 ```
 
-_Returns the symmetric key (symK) for a given pid._
+_Returns the selected nodes for a given pid._
 
 #### Parameters
 
@@ -340,27 +318,7 @@ _Returns the symmetric key (symK) for a given pid._
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| [0] | bytes32 | The symmetric key associated with the pid. |
-
-### getEncryptedPIDSymK
-
-```solidity
-function getEncryptedPIDSymK(bytes32 pid) external view returns (bytes)
-```
-
-_Returns the encrypted PID and symmetric key (encPIDSymK) for a given pid._
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| pid | bytes32 | User's PID. |
-
-#### Return Values
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| [0] | bytes | The encrypted PID and symmetric key associated with the pid. |
+| [0] | address[] | Array of selected node addresses for the specified pid. |
 
 ### getUserPK
 
@@ -381,4 +339,24 @@ _Returns the public key (pk) for a given pid._
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | [0] | bytes | The public key associated with the pid. |
+
+### getWords
+
+```solidity
+function getWords(bytes32 pid) external view returns (bytes[])
+```
+
+_Returns the encrypted words for a given pid._
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| pid | bytes32 | User's PID. |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bytes[] | Array of encrypted words associated with the pid. |
 

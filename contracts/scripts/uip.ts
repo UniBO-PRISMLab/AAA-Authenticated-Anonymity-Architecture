@@ -16,7 +16,7 @@ const privateKeys = [
 const wordList = ["apple", "banana", "cherry", "dragon", "eagle"];
 
 const abi = [
-  "event WordRequestedToUIPNode(bytes32 indexed pid, address indexed node, bytes publicKey)",
+  "event WordRequested(bytes32 indexed pid, address indexed node, bytes publicKey)",
   "function submitEncryptedWord(bytes32 pid, bytes encryptedWord, bytes nodePK) external",
   "event PhraseComplete(bytes32 indexed pid)",
   "event SIDEncryptionRequested(bytes32 indexed pid, address indexed node, bytes sid, bytes userPK)",
@@ -30,7 +30,7 @@ function startWorker(
 ) {
   console.log("UIP Node started at address:", wallet.address);
   contract.on(
-    "WordRequestedToUIPNode",
+    "WordRequested",
     async (pid: string, node: string, publicKey: string) => {
       if (node.toLowerCase() !== wallet.address.toLowerCase()) return;
 

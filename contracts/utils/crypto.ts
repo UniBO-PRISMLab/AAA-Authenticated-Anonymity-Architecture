@@ -27,6 +27,18 @@ export async function encryptWithKey(
 }
 
 /**
+ * Encrypts a message using a symmetric key.
+ *
+ * @param msg The message to encrypt
+ * @returns a Promise that resolves to the encrypted message
+ */
+export async function encryptWithSymK(msg: string): Promise<Buffer> {
+  return new Enigma.AES().init().then(async (aes: Enigma.AES) => {
+    return (await aes.encrypt(msg)).content;
+  });
+}
+
+/**
  * Encrypts a message using the loaded RSA public key.
  *
  * @param msg The encrypted message to decrypt

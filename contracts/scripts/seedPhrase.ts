@@ -4,7 +4,7 @@ import { generatePublicKey } from "../utils/crypto";
 
 const abi: string[] = [
   "function seedPhraseGenerationProtocol(bytes32 pid, bytes publicKey)",
-  "event WordRequestedToUIPNode(bytes32 indexed pid, address indexed node, bytes publicKey)",
+  "event WordRequested(bytes32 indexed pid, address indexed node, bytes publicKey)",
   "event SeedPhraseProtocoloInitiated(bytes32 indexed pid)",
 ];
 

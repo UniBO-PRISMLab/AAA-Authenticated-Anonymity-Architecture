@@ -5,7 +5,7 @@
 ### testSelectNodes
 
 ```solidity
-function testSelectNodes(bytes32 pid, address[] pool, uint256 wordsNeeded) external pure returns (address[])
+function testSelectNodes(uint256 randomSeed, address[] pool, uint256 wordsNeeded) external pure returns (address[])
 ```
 
 ### testSelectNode

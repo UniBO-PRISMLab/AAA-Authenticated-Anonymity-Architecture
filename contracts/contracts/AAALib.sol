@@ -58,11 +58,13 @@ library AAALib {
      * @param words An array of encrypted words.
      */
     function deriveSymK(
-        bytes[] storage words
-    ) internal view returns (bytes32 acc) {
+        bytes[] memory words
+    ) internal pure returns (bytes32 acc) {
+        // TODO: deterministic key derivation is not ideal (check for KDF)
         for (uint i = 0; i < words.length; i++) {
             bytes32 h = keccak256(words[i]);
             acc = keccak256(abi.encodePacked(acc, h));
         }
+        return acc;
     }
 }
