@@ -318,10 +318,18 @@ const docTemplate = `{
         },
         "models.SACRequestModel": {
             "type": "object",
+            "required": [
+                "sid",
+                "signed_sid"
+            ],
             "properties": {
+                "sid": {
+                    "type": "string",
+                    "example": "MHhhOTcwZWRkMTEyNTRjNTQ3OTIyMWVjOTFjZGU0YjNiMGI2MjQ1NzI3NmVmMzA0MmMzN2M2MDJkMWRlMTg4Njc5"
+                },
                 "signed_sid": {
                     "type": "string",
-                    "example": "signed_sid_payload_base64"
+                    "example": "QEZZSiBAF1TPbSgHAlcwlrG4unRGZBGYOf8yjiSfP8wUcnkvdm+yQTOzGpqWG/m4/qCG7stlDYqZrQIyRWC7mb0sbTe2MhMYrZOzyz6uH8hCxIJh5JQ6ivsntufaeg9HOoZ9M6wdhp1/BsbwuGG27CQ7BcuuKZu2Mi1cNu32dnTGxv4PORoCy1JqgV519JsuwL3aekdZ2jVrYaepTTDT1vJR4vhLZ76gV1ywUAIEMm8q+R12ydntAroOd8EaiCXx0pyM3zVAE1G0Qv1g0qRGrnogmMhCIpljJ79KEFtOQDHLd0RnbPuoh99eszx99qc911VXTjiHMNdIxhanp31odA=="
                 }
             }
         },
