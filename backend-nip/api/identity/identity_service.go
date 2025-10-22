@@ -45,26 +45,21 @@ func (s *Service) IssuePID(ctx context.Context, req *models.PIDRequestModel) (*m
 		return nil, models.ErrorInvalidPublicKeyHeader
 	}
 
+	// compute PK digest (32 bytes)
 	h := sha256.New()
 	h.Write(pkBytes)
 	pkSum := h.Sum(nil)
 
+	// generate nonce (32 bytes)
 	nonce := make([]byte, 32)
 	rand.Read(nonce)
 
+	// derive pid = HMAC(SK, pkSum || nonce)
 	key := s.configuration.SK
-
-	// Compute f_k(r)
 	mac := hmac.New(sha256.New, key)
+	mac.Write(pkSum[:])
 	mac.Write(nonce)
-	macKR := mac.Sum(nil)
-
-	// Compute pid as
-	// pid = f_k(r) ^ pk
-	pid := make([]byte, 32)
-	for i := range macKR {
-		pid[i] = macKR[i] ^ pkSum[i]
-	}
+	pid := mac.Sum(nil)
 
 	return s.identityRepo.IssuePID(
 		ctx,
