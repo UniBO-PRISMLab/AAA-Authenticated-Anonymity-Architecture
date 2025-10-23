@@ -7,95 +7,42 @@ import "./UIPRegistry.sol";
 /**
  * @dev AAAContract is a smart contract that manages the blockchain interactions for the AAA protocol.
  */
-
 contract AAAContract is UIPRegistry {
     using AAALib for *;
 
     /// @dev Number of words needed to complete the seed phrase.
-    uint public immutable WORDS_NEEDED;
+    uint public immutable WORDS;
 
     /// @dev Redundancy factor.
-    uint public immutable REDUNDANCY_M;
+    uint public immutable REDUNDANCY_FACTOR;
 
-    /// @dev If the contract is locked or not.
+    /// @dev Tells if the contract is locked or not to avoid reentrancy.
     bool private _isLocked;
 
-    modifier nonReentrant() {
-        require(!_isLocked, "Reentrancy");
-        _isLocked = true;
-        _;
-        _isLocked = false;
-    }
-
-    /**
-     * @dev Represents a seed phrase.
-     *
-     * `selectedNodes`: List of selected nodes for the phrase.
-     *
-     * `redundantEncryptedWords`: Redundant encrypted words keyed by index: mapping(index => address[] submissions).
-     *
-     * `hasSubmitted`: Tracks if a node has submitted its original word.
-     *
-     * `hasSubmittedRedundant`: Tracks if a node has submitted a redundant word for a given index.
-     *`
-     * `encWordsByPID`: Mapping from PID to EncryptedWord struct.
-     *
-     * `uipToEncryptSID`: address of the node selected to encrypt the SID with the user's public key.
-     *
-     * `encSID`: SID encrypted with user’s public key.
-     *
-     * `finalized`: Indicates if the phrase has been finalized.
-     */
-    struct Phrase {
-        address[] selectedNodes;
-        mapping(uint => bytes[]) redundantEncryptedWords;
-        mapping(address => bool) hasSubmitted;
-        mapping(address => mapping(uint => bool)) hasSubmittedRedundant;
-        mapping(bytes32 => EncryptedWord[]) encWordsByPID;
-        address uipToEncryptSID;
-        bytes encSID;
-        bool finalized;
-        bytes pk;
-    }
-
-    /// @dev Represents an encrypted word submitted by a node
-    struct EncryptedWord {
-        bytes word;
-        bytes nodePK;
-        uint index;
-    }
-
-    /// @dev Represents a SID record
-    struct SIDRecord {
-        bytes encPID;
-        bytes pk;
-        bool exists;
-    }
-
-    /// @dev Mapping from PID to Phrase
+    /// @dev Mapping from PID to {Phrase} struct.
     mapping(bytes32 => Phrase) private phrases;
 
-    /// @dev Mapping from SID to PID encrypted with symK and PK
+    /// @dev Mapping from SID to {SIDRecord} struct.
     mapping(bytes32 => SIDRecord) private sidRecords;
 
-    /// @dev Represents a SID record
+    /// @dev Mapping from PID to SID encrypted with user's public key.
+    mapping(bytes32 => bytes) private pidToEncSid;
 
-    /// @dev Word requested to a UIP node
+    /// @dev Emitted to request word generation requested to a UIP node.
     event WordRequested(
         bytes32 indexed pid,
         address indexed node,
         bytes userPK
     );
 
-    /// @dev Word submitted by a UIP node
+    /// @dev Emitted when a word is submitted by a UIP node.
     event WordSubmitted(
         bytes32 indexed pid,
         address indexed node,
-        uint indexed index,
         bytes32 wordHash
     );
 
-    /// @dev Redundancy requested from a UIP node
+    /// @dev Redundancy requested from a UIP node.
     event RedundancyRequested(
         bytes32 indexed pid,
         uint indexed index,
@@ -111,7 +58,7 @@ contract AAAContract is UIPRegistry {
         bytes32 wordHash
     );
 
-    /// @dev Emitted to request SID encryption from a UIP node
+    /// @dev Emitted to request SID encryption from a UIP node.
     event SIDEncryptionRequested(
         bytes32 indexed pid,
         address indexed node,
@@ -119,35 +66,67 @@ contract AAAContract is UIPRegistry {
         bytes userPK
     );
 
-    /// @dev Emitted to request PID encryption from a UIP node
+    /// @dev Emitted to request PID encryption from a UIP node.
     event PIDEncryptionRequested(
         bytes32 indexed pid,
         address indexed node,
-        bytes32 symK
+        bytes32 symK,
+        bytes32 sid
     );
 
-    /// @dev Seed phrase generation protocol initiated
+    /// @dev Seed phrase generation protocol initiated.
     event SeedPhraseProtocolInitiated(bytes32 indexed pid);
 
-    /// @dev Phrase completed
+    /// @dev Seed phrase protocol is completed.
     event PhraseComplete(bytes32 indexed pid, bytes encSID);
+
+    /// @dev Represents a seed phrase.
+    struct Phrase {
+        bool started;
+        bytes pk;
+        address encryptionResp;
+        mapping(address => bool) hasSubmitted;
+        mapping(uint => bytes[]) redundantEncryptedWords;
+        mapping(address => mapping(uint => bool)) hasSubmittedRedundant;
+        mapping(bytes32 => EncryptedWord[]) encWordsByPID;
+    }
+
+    /// @dev Represents an encrypted word submitted by a node.
+    struct EncryptedWord {
+        bytes word;
+        bytes nodePK;
+        uint index;
+    }
+
+    /// @dev Represents a SID record.
+    struct SIDRecord {
+        bytes encPID;
+        bytes pk;
+        bool exists;
+    }
+
+    modifier nonReentrant() {
+        require(!_isLocked, "Reentrancy");
+        _isLocked = true;
+        _;
+        _isLocked = false;
+    }
 
     constructor(
         address[] memory nodes,
-        uint wordsNeeded,
-        uint redundancyM
+        uint words,
+        uint redundancyFactor
     ) UIPRegistry(nodes) {
-        require(nodes.length >= wordsNeeded, "too few nodes");
-        WORDS_NEEDED = wordsNeeded;
-        REDUNDANCY_M = redundancyM;
+        require(nodes.length >= words, "too few nodes");
+        WORDS = words;
+        REDUNDANCY_FACTOR = redundancyFactor;
     }
 
     /**
      * @dev Initiates the seed phrase generation protocol.
      *
      * Requirements:
-     * - The phrase must not be finalized.
-     * - The phrase must not have been started.
+     * - The phrase must not be started.
      *
      * @param pid User's PID.
      * @param pk User's Public Key.
@@ -157,32 +136,35 @@ contract AAAContract is UIPRegistry {
         bytes calldata pk
     ) external nonReentrant {
         Phrase storage p = phrases[pid];
-        require(!p.finalized, "finalized");
-        require(p.selectedNodes.length == 0, "already started");
+        require(!p.started, "already started");
 
+        p.started = true;
+        p.pk = pk;
+
+        // TODO: produce a random seed (check VRF)
         address[] memory selected = AAALib.selectNodes(
-            132456,
+            uint256(pid),
             nodeList,
-            WORDS_NEEDED
+            WORDS
         );
+
         for (uint i = 0; i < selected.length; i++) {
-            p.selectedNodes.push(selected[i]);
+            selectedNodesByPID[pid].push(selected[i]);
             emit WordRequested(pid, selected[i], pk);
         }
-        p.pk = pk;
+
         emit SeedPhraseProtocolInitiated(pid);
     }
 
     /**
      * @dev Submits an encrypted word for a given pid.
-     * When the required number of words is reached, emits {PhraseComplete} event.
+     * When the required number of words is reached, emits {SIDEncryptionRequested} event.
      *
      * Requirements:
      * - The encrypted word must not be empty.
      * - The phrase must have been initiated.
-     * - The phrase must not be finalized.
      * - The sender must be one of the selected nodes.
-     * - The sender must not have already submitted their original word.
+     * - The sender must not have already submitted their word.
      *
      * @param pid User's PID.
      * @param encryptedWord The encrypted word submitted by the node.
@@ -194,16 +176,15 @@ contract AAAContract is UIPRegistry {
         bytes calldata nodePK
     ) external nonReentrant onlyUIPNode {
         require(encryptedWord.length > 0, "empty");
-
         Phrase storage p = phrases[pid];
-        require(p.selectedNodes.length == WORDS_NEEDED, "not initiated");
-        require(!p.finalized, "done");
+        require(p.started, "not started");
         require(!p.hasSubmitted[msg.sender], "already submitted");
 
         bool isSelected;
         uint index;
-        for (uint i = 0; i < p.selectedNodes.length; i++) {
-            if (p.selectedNodes[i] == msg.sender) {
+        address[] memory selectedNodes = selectedNodesByPID[pid];
+        for (uint i = 0; i < selectedNodes.length; i++) {
+            if (selectedNodes[i] == msg.sender) {
                 isSelected = true;
                 index = i;
                 break;
@@ -216,155 +197,94 @@ contract AAAContract is UIPRegistry {
         );
         p.hasSubmitted[msg.sender] = true;
 
-        emit WordSubmitted(pid, msg.sender, index, keccak256(encryptedWord));
+        emit WordSubmitted(pid, msg.sender, keccak256(encryptedWord));
 
-        if (REDUNDANCY_M > 1) {
-            address[] memory pool = nodeList;
-            uint remaining = pool.length;
-            address[] memory temp = new address[](pool.length);
-            for (uint i = 0; i < pool.length; i++) temp[i] = pool[i];
-            for (uint i = 0; i < remaining; i++) {
-                if (temp[i] == msg.sender) {
-                    temp[i] = temp[remaining - 1];
-                    remaining--;
-                    break;
-                }
-            }
-            for (uint j = 0; j < REDUNDANCY_M - 1 && remaining > 0; j++) {
-                uint targetIdx = uint(
-                    keccak256(abi.encodePacked(pid, index, j))
-                ) % remaining;
-                address target = temp[targetIdx];
-                emit RedundancyRequested(pid, index, msg.sender, target);
-                temp[targetIdx] = temp[remaining - 1];
-                remaining--;
-            }
-        }
-
-        if (p.encWordsByPID[pid].length == WORDS_NEEDED) {
-            bytes32 acc;
-            for (uint k = 0; k < p.encWordsByPID[pid].length; k++) {
-                bytes32 h = keccak256(p.encWordsByPID[pid][k].word);
-                acc = keccak256(abi.encodePacked(acc, h));
-            }
-
-            bytes[] memory wordBytes = new bytes[](WORDS_NEEDED);
-            for (uint i = 0; i < WORDS_NEEDED; i++) {
+        if (p.encWordsByPID[pid].length == WORDS) {
+            bytes memory acc;
+            bytes[] memory wordBytes = new bytes[](WORDS);
+            for (uint i = 0; i < p.encWordsByPID[pid].length; i++) {
+                bytes32 h = keccak256(p.encWordsByPID[pid][i].word);
                 wordBytes[i] = p.encWordsByPID[pid][i].word;
+                acc = abi.encodePacked(acc, h);
             }
-
-            p.finalized = true;
 
             address nodeAddress = AAALib.selectNode(pid, nodeList);
-            p.uipToEncryptSID = nodeAddress;
+            p.encryptionResp = nodeAddress;
 
             emit SIDEncryptionRequested(
                 pid,
                 nodeAddress,
-                abi.encodePacked(acc),
+                abi.encodePacked(keccak256(acc)),
                 p.pk
             );
         }
     }
 
     /**
-     * @dev Submits a redundant encrypted word for a given pid and index.
-     *
-     * Requirements:
-     * - The phrase must be finalized.
-     * - The sender must be a UIP node.
-     * - The sender must not have already submitted a redundant word for the given index.
-     *
-     * @param pid User's PID.
-     * @param index Index of the word for which redundancy is being submitted.
-     * @param encryptedWordForTarget The redundant encrypted word submitted by the node.
-     */
-    function submitRedundantEncryptedWord(
-        bytes32 pid,
-        uint index,
-        bytes calldata encryptedWordForTarget
-    ) external nonReentrant onlyUIPNode {
-        Phrase storage p = phrases[pid];
-        require(
-            !p.hasSubmittedRedundant[msg.sender][index],
-            "already submitted"
-        );
-        p.redundantEncryptedWords[index].push(encryptedWordForTarget);
-        p.hasSubmittedRedundant[msg.sender][index] = true;
-        emit RedundantWordSubmitted(
-            pid,
-            index,
-            msg.sender,
-            keccak256(encryptedWordForTarget)
-        );
-    }
-
-    /**
      * @dev Stores the encrypted SID for a given pid and marks the phrase as finalized.
-     * Emits {PhraseComplete} event.
+     * Emits {PIDEncryptionRequested} event.
      *
      * Requirements:
-     * - The phrase must be finalized.
      * - The sender must be a UIP node.
+     * - The protocol must have been started for the given pid.
      * - The encrypted SID must not have been already stored.
      * - The sender must be the node selected to encrypt the SID.
      *
      * @param pid User's PID.
      * @param encSID The encrypted SID to be stored.
      */
-    function storeEncryptedSID(
+    function submitEncryptedSID(
         bytes32 pid,
         bytes calldata encSID
     ) external nonReentrant onlyUIPNode {
         Phrase storage p = phrases[pid];
-        require(p.encSID.length == 0, "already stored");
-        require(p.finalized, "not finalized");
-        require(p.uipToEncryptSID == msg.sender, "not selected");
-        p.encSID = encSID;
+        require(p.started, "not started");
+        require(pidToEncSid[pid].length == 0, "already stored");
+        require(p.encryptionResp == msg.sender, "not selected");
+        require(encSID.length > 0, "empty");
+        pidToEncSid[pid] = encSID;
 
-        bytes[] memory wordBytes = new bytes[](WORDS_NEEDED);
-        for (uint i = 0; i < WORDS_NEEDED; i++) {
+        bytes[] memory wordBytes = new bytes[](WORDS);
+        bytes memory acc;
+        for (uint i = 0; i < WORDS; i++) {
             wordBytes[i] = p.encWordsByPID[pid][i].word;
+            bytes32 h = keccak256(p.encWordsByPID[pid][i].word);
+            acc = abi.encodePacked(acc, h);
         }
 
         bytes32 symK = AAALib.deriveSymK(wordBytes);
 
-        emit PIDEncryptionRequested(pid, p.uipToEncryptSID, symK);
+        emit PIDEncryptionRequested(
+            pid,
+            p.encryptionResp,
+            symK,
+            keccak256(acc)
+        );
     }
 
     /**
      * @dev Stores the encrypted PID and symmetric key for a given pid.
+     * Emits {PhraseComplete} event.
      *
      * Requirements:
      * - The sender must be a UIP node.
-     * - The encrypted PID and symmetric key must not have been already stored.
+     * - The {SIDRecord} must not have been already stored.
      *
      * @param pid User's PID.
+     * @param sid User's SID.
      * @param encPID The encrypted PID and symmetric key to be stored.
      */
-    function storeEncryptedPID(
+    function submitEncryptedPID(
         bytes32 pid,
+        bytes32 sid,
         bytes calldata encPID
     ) external nonReentrant onlyUIPNode {
-        SIDRecord storage record = sidRecords[pid];
+        SIDRecord storage record = sidRecords[sid];
         require(!record.exists, "already stored");
         record.encPID = encPID;
         record.pk = phrases[pid].pk;
-        emit PhraseComplete(pid, phrases[pid].encSID);
-    }
-
-    /**
-     * @dev Returns the redundant encrypted words for a given pid and index.
-     *
-     * @param pid User's PID.
-     * @param index Index of the word.
-     * @return Array of redundant encrypted words for the specified index.
-     */
-    function getRedundantEncryptedWords(
-        bytes32 pid,
-        uint index
-    ) external view returns (bytes[] memory) {
-        return phrases[pid].redundantEncryptedWords[index];
+        record.exists = true;
+        emit PhraseComplete(pid, pidToEncSid[pid]);
     }
 
     /**
@@ -374,29 +294,22 @@ contract AAAContract is UIPRegistry {
      * @return The encrypted SID associated with the pid.
      */
     function getSID(bytes32 pid) external view returns (bytes memory) {
-        return phrases[pid].encSID;
+        return pidToEncSid[pid];
     }
 
     /**
-     * @dev Returns the selected nodes for a given pid.
+     * @dev Returns the SID record for a given sid.
      *
-     * @param pid User's PID.
-     * @return Array of selected node addresses for the specified pid.
+     * @param sid User's SID.
+     * @return The encrypted PID.
+     * @return The user's public key.
      */
-    function getSelectedNodes(
-        bytes32 pid
-    ) external view returns (address[] memory) {
-        return phrases[pid].selectedNodes;
-    }
-
-    /**
-     * @dev Returns the public key (pk) for a given pid.
-     *
-     * @param pid User's PID.
-     * @return The public key associated with the pid.
-     */
-    function getUserPK(bytes32 pid) external view returns (bytes memory) {
-        return phrases[pid].pk;
+    function getSIDRecord(
+        bytes32 sid
+    ) external view returns (bytes memory, bytes memory) {
+        SIDRecord storage record = sidRecords[sid];
+        require(record.exists, "not found");
+        return (record.encPID, record.pk);
     }
 
     /**

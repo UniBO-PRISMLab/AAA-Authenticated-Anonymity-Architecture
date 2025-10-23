@@ -119,4 +119,20 @@ describe("UIPRegistry", function () {
       );
     });
   });
+
+  describe("selectedNodesByPID mapping", function () {
+    it("should allow owner to get selected nodes by PID", async function () {
+      const pid = ethers.keccak256(ethers.toUtf8Bytes("test-pid"));
+
+      await expect(await registry.connect(owner).getSelectedNodes(pid)).to.not
+        .be.reverted;
+    });
+
+    it("should revert when non-owner tries to get selected nodes", async function () {
+      const pid = ethers.keccak256(ethers.toUtf8Bytes("test-pid"));
+      await expect(
+        registry.connect(other).getSelectedNodes(pid)
+      ).to.be.revertedWith("Only owner");
+    });
+  });
 });

@@ -32,8 +32,23 @@ export async function encryptWithKey(
  * @param msg The message to encrypt
  * @returns a Promise that resolves to the encrypted message
  */
-export async function encryptWithSymK(msg: string): Promise<Buffer> {
+export async function encryptSym(msg: string): Promise<Buffer> {
   return new Enigma.AES().init().then(async (aes: Enigma.AES) => {
+    return (await aes.encrypt(msg)).content;
+  });
+}
+
+/**
+ * Encrypts a message using a symmetric key.
+ *
+ * @param msg The message to encrypt
+ * @returns a Promise that resolves to the encrypted message
+ */
+export async function encryptWithSymK(
+  key: Buffer,
+  msg: string
+): Promise<Buffer> {
+  return new Enigma.AES().init({ key: key }).then(async (aes: Enigma.AES) => {
     return (await aes.encrypt(msg)).content;
   });
 }

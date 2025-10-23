@@ -14,6 +14,9 @@ abstract contract UIPRegistry {
     /// @dev List of authorized UIP nodes.
     address[] public nodeList;
 
+    /// @dev Mapping from PID to selected UIP nodes.
+    mapping(bytes32 => address[]) public selectedNodesByPID;
+
     /// @dev Events for node addition and removal.
     event NodeAdded(address node);
 
@@ -78,5 +81,20 @@ abstract contract UIPRegistry {
             }
         }
         emit NodeRemoved(node);
+    }
+
+    /**
+     * @dev Retrieves the list of selected UIP nodes for a given PID.
+     *
+     * Requirements:
+     * - Only the contract owner can retrieve the selected nodes.
+     *
+     * @param pid The PID for which to retrieve the selected UIP nodes.
+     * @return An array of addresses representing the selected UIP nodes.
+     */
+    function getSelectedNodes(
+        bytes32 pid
+    ) external view onlyOwner returns (address[] memory) {
+        return selectedNodesByPID[pid];
     }
 }

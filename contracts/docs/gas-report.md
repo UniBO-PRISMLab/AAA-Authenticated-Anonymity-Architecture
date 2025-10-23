@@ -7,23 +7,22 @@
 |                                       |     Min |     Max |     Avg | Calls | eur avg |
 | :------------------------------------ | ------: | ------: | ------: | ----: | ------: |
 | **AAAContract**                       |         |         |         |       |         |
-|        *seedPhraseGenerationProtocol* | 614,568 | 614,580 | 614,579 |    14 |       - |
-|        *storeEncryptedPID*            |       - |       - | 612,953 |     2 |       - |
-|        *storeEncryptedSID*            |       - |       - | 390,654 |     6 |       - |
-|        *submitEncryptedWord*          | 718,436 | 910,717 | 772,840 |    33 |       - |
-|        *submitRedundantEncryptedWord* |       - |       - | 278,734 |     2 |       - |
+|        *seedPhraseGenerationProtocol* | 637,105 | 637,117 | 637,116 |    16 |       - |
+|        *submitEncryptedPID*           |       - |       - | 126,718 |     4 |       - |
+|        *submitEncryptedSID*           | 361,484 | 429,475 | 384,152 |     6 |       - |
+|        *submitEncryptedWord*          | 725,901 | 979,071 | 825,346 |    50 |       - |
 | **MockUIPRegistry**                   |         |         |         |       |         |
-|        *addNode*                      |       - |       - |  74,499 |     5 |       - |
+|        *addNode*                      |       - |       - |  74,522 |     5 |       - |
 |        *onlyNodeFn*                   |       - |       - |  23,465 |     2 |       - |
-|        *onlyOwnerFn*                  |       - |       - |  23,393 |     2 |       - |
-|        *removeNode*                   |       - |       - |  37,324 |     2 |       - |
+|        *onlyOwnerFn*                  |       - |       - |  23,415 |     2 |       - |
+|        *removeNode*                   |       - |       - |  37,307 |     2 |       - |
 
 ## Deployments
-|                     |     Min |    Max  |       Avg | Block % | eur avg |
-| :------------------ | ------: | ------: | --------: | ------: | ------: |
-| **AAAContract**     |       - |       - | 2,557,644 |   8.5 % |       - |
-| **MockAAALib**      |       - |       - |   472,628 |   1.6 % |       - |
-| **MockUIPRegistry** | 489,686 | 536,172 |   495,749 |   1.7 % |       - |
+|                     |       Min |      Max  |       Avg | Block % | eur avg |
+| :------------------ | --------: | --------: | --------: | ------: | ------: |
+| **AAAContract**     | 2,356,394 | 2,402,892 | 2,397,726 |     8 % |       - |
+| **MockAAALib**      |         - |         - |   472,628 |   1.6 % |       - |
+| **MockUIPRegistry** |   583,653 |   630,139 |   588,818 |     2 % |       - |
 
 ## Solidity and Network Config
 | **Settings**        | **Value**  |

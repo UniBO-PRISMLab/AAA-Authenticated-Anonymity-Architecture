@@ -28,6 +28,14 @@ address[] nodeList
 
 _List of authorized UIP nodes._
 
+### selectedNodesByPID
+
+```solidity
+mapping(bytes32 => address[]) selectedNodesByPID
+```
+
+_Mapping from PID to selected UIP nodes._
+
 ### NodeAdded
 
 ```solidity
@@ -99,4 +107,27 @@ Requirements:
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | node | address | The address of the UIP node to be removed. |
+
+### getSelectedNodes
+
+```solidity
+function getSelectedNodes(bytes32 pid) external view returns (address[])
+```
+
+_Retrieves the list of selected UIP nodes for a given PID.
+
+Requirements:
+- Only the contract owner can retrieve the selected nodes._
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| pid | bytes32 | The PID for which to retrieve the selected UIP nodes. |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | address[] | An array of addresses representing the selected UIP nodes. |
 

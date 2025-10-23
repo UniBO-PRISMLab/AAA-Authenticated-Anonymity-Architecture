@@ -1,9 +1,6 @@
 import { ethers } from "ethers";
-import {
-  encryptWithKey,
-  generatePublicKey,
-  encryptWithSymK,
-} from "../utils/crypto";
+import { encryptWithKey, generatePublicKey, encryptSym } from "../utils/crypto";
+import { getRandomWord } from "../utils/dictionary";
 
 const provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
 const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
@@ -21,12 +18,12 @@ const wordList = ["apple", "banana", "cherry", "dragon", "eagle"];
 
 const abi = [
   "event WordRequested(bytes32 indexed pid, address indexed node, bytes publicKey)",
-  "function submitEncryptedWord(bytes32 pid, bytes encryptedWord, bytes nodePK) external",
-  "event PhraseComplete(bytes32 indexed pid)",
+  "function submitEncryptedWord(bytes32 pid, bytes calldata encryptedWord, bytes calldata nodePK) external",
+  "event PhraseComplete(bytes32 indexed pid, bytes encSID)",
   "event SIDEncryptionRequested(bytes32 indexed pid, address indexed node, bytes sid, bytes userPK)",
-  "function storeEncryptedSID(bytes32 pid, bytes encryptedSID) external",
-  "event PIDEncryptionRequested(bytes32 indexed pid, address indexed node,bytes32 symK)",
-  "function storeEncryptedPID(bytes32 pid, bytes encryptedPID) external",
+  "function submitEncryptedSID(bytes32 pid, bytes calldata encSID) external",
+  "event PIDEncryptionRequested(bytes32 indexed pid, address indexed node, bytes32 symK, bytes32 sid)",
+  "function submitEncryptedPID(bytes32 pid, bytes32 sid, bytes calldata encPID) external",
 ];
 
 function startWorker(
@@ -40,23 +37,18 @@ function startWorker(
     async (pid: string, node: string, publicKey: string) => {
       if (node.toLowerCase() !== wallet.address.toLowerCase()) return;
 
-      const randomWord = wordList[Math.floor(Math.random() * wordList.length)];
-      const encryptedWord = ethers.hexlify(
-        ethers.toUtf8Bytes("enc_" + randomWord)
-      );
+      const pk = recoverPublicKey(publicKey);
+      const pkBytes = pk.buffer;
 
-      const nodePk = await generatePublicKey();
-      const nodePkBytes = ethers.toUtf8Bytes(nodePk.toString("base64"));
+      const randomWord = await getRandomWord();
+      const wordEnc = await encryptWithKey(randomWord, pkBytes);
+
+      const nodePK = await generatePublicKey();
 
       try {
-        const tx = await contract.submitEncryptedWord(
-          pid,
-          encryptedWord,
-          nodePkBytes,
-          {
-            gasLimit: 5_000_000,
-          }
-        );
+        const tx = await contract.submitEncryptedWord(pid, wordEnc, nodePK, {
+          gasLimit: 5_000_000,
+        });
         await tx.wait();
         console.log(
           `\nNode ${wallet.address} submitted word for PID ${pid}. Tx hash:`,
@@ -76,16 +68,12 @@ function startWorker(
       if (nodes.toLowerCase() !== wallet.address.toLowerCase()) return;
 
       const encSID = await encryptWithKey(sid, buffer);
-      const tx = await contract.storeEncryptedSID(
-        pid,
-        ethers.toUtf8Bytes(encSID.toString("base64")),
-        {
-          gasLimit: 5_000_000,
-        }
-      );
+      const tx = await contract.submitEncryptedSID(pid, encSID, {
+        gasLimit: 500000,
+      });
       await tx.wait();
       console.log(
-        `\nNode ${wallet.address} submitted encrypted SID for PID ${pid}. Tx hash:`,
+        `\nNode ${wallet.address} submitted encrypted SID: ${sid} for PID ${pid}. Tx hash:`,
         tx.hash
       );
     }
@@ -93,17 +81,12 @@ function startWorker(
 
   contract.on(
     "PIDEncryptionRequested",
-    async (pid: string, nodes: string, symK: string) => {
+    async (pid: string, nodes: string, symK: string, sid: string) => {
       if (nodes.toLowerCase() !== wallet.address.toLowerCase()) return;
 
-      const encPID = await encryptWithSymK(pid);
-      const tx = await contract.storeEncryptedPID(
-        pid,
-        ethers.toUtf8Bytes(encPID.toString("base64")),
-        {
-          gasLimit: 5_000_000,
-        }
-      );
+      const encPID = await encryptSym(pid);
+      const tx = await contract.submitEncryptedPID(pid, sid, encPID);
+
       await tx.wait();
       console.log(
         `\nNode ${wallet.address} submitted encrypted PID for PID ${pid}. Tx hash:`,
@@ -112,8 +95,9 @@ function startWorker(
     }
   );
 
-  contract.on("PhraseComplete", (pid: string) => {
+  contract.on("PhraseComplete", (pid: string, encSID: string) => {
     console.log("\nPhrase completed for PID:", pid);
+    console.log("Encrypted SID:", encSID);
   });
 }
 

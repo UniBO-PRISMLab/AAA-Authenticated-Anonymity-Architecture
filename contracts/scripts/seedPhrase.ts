@@ -20,7 +20,7 @@ const contractAddress: string = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 const contract: Contract = new ethers.Contract(contractAddress, abi, wallet);
 
 async function main(): Promise<void> {
-  const pidBase64: string = "Nifl3y+2jnuBxF26jqpjogu0ZYnA6IxZikjmVnnzm1k=";
+  const pidBase64: string = "6N2DIqooOHIPCth6+vVLYm1dcsZRJnOYG+ZnUCGYUZw=";
   const pidBytes: Buffer = Buffer.from(pidBase64, "base64");
   const pidHex: string = "0x" + pidBytes.toString("hex");
 

@@ -23,8 +23,8 @@ describe("AAAContract", function () {
 
   describe("Deployment", function () {
     it("should deploy with correct parameters", async function () {
-      expect(await aaa.WORDS_NEEDED()).to.equal(WORDS_NEEDED);
-      expect(await aaa.REDUNDANCY_M()).to.equal(REDUNDANCY_M);
+      expect(await aaa.WORDS()).to.equal(WORDS_NEEDED);
+      expect(await aaa.REDUNDANCY_FACTOR()).to.equal(REDUNDANCY_M);
       expect(await aaa.owner()).to.equal(await owner.getAddress());
     });
 
