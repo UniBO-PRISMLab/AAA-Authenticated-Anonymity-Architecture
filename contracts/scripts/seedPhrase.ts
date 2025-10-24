@@ -1,6 +1,7 @@
 import { ethers, Contract, Wallet } from "ethers";
 import { Buffer } from "buffer";
-import { generatePublicKey } from "../utils/crypto";
+import { generatePublicKey, generateRandomBytes } from "../utils/crypto";
+import { createPublicKey, generateKeyPairSync } from "crypto";
 
 const abi: string[] = [
   "function seedPhraseGenerationProtocol(bytes32 pid, bytes publicKey)",
@@ -20,17 +21,17 @@ const contractAddress: string = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 const contract: Contract = new ethers.Contract(contractAddress, abi, wallet);
 
 async function main(): Promise<void> {
-  const pidBase64: string = "6N2DIqooOHIPCth6+vVLYm1dcsZRJnOYG+ZnUCGYUZw=";
-  const pidBytes: Buffer = Buffer.from(pidBase64, "base64");
-  const pidHex: string = "0x" + pidBytes.toString("hex");
-
-  const pubKey: Buffer = await generatePublicKey();
-
-  console.log("\nSubmitting PID...");
-  const pkBytes = ethers.toUtf8Bytes(pubKey.toString("base64"));
+  const pid: Buffer = generateRandomBytes(32);
+  const { publicKey, privateKey } = generateKeyPairSync("rsa", {
+    modulusLength: 2048,
+    publicKeyEncoding: { type: "spki", format: "pem" },
+    privateKeyEncoding: { type: "pkcs8", format: "pem" },
+  });
+  console.log("Submitting PID (b64): ", pid.toString("base64"));
+  console.log("Submitting PK: ", publicKey);
 
   const tx: ethers.TransactionResponse =
-    await contract.seedPhraseGenerationProtocol(pidHex, pkBytes);
+    await contract.seedPhraseGenerationProtocol(pid, Buffer.from(publicKey));
   console.log("Tx hash:", tx.hash);
 }
 

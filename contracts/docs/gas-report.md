@@ -7,10 +7,10 @@
 |                                       |     Min |     Max |     Avg | Calls | eur avg |
 | :------------------------------------ | ------: | ------: | ------: | ----: | ------: |
 | **AAAContract**                       |         |         |         |       |         |
-|        *seedPhraseGenerationProtocol* | 637,105 | 637,117 | 637,116 |    16 |       - |
-|        *submitEncryptedPID*           |       - |       - | 126,718 |     4 |       - |
-|        *submitEncryptedSID*           | 361,484 | 429,475 | 384,152 |     6 |       - |
-|        *submitEncryptedWord*          | 725,901 | 979,071 | 825,346 |    50 |       - |
+|        *seedPhraseGenerationProtocol* | 541,980 | 542,004 | 542,003 |    16 |       - |
+|        *submitEncryptedPID*           |       - |       - | 149,295 |     4 |       - |
+|        *submitEncryptedSID*           | 333,400 | 333,448 | 333,432 |     6 |       - |
+|        *submitEncryptedWord*          | 634,920 | 788,301 | 673,194 |    50 |       - |
 | **MockUIPRegistry**                   |         |         |         |       |         |
 |        *addNode*                      |       - |       - |  74,522 |     5 |       - |
 |        *onlyNodeFn*                   |       - |       - |  23,465 |     2 |       - |
