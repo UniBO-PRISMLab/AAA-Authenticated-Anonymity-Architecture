@@ -48,7 +48,7 @@ func (u *UIP) ListenWordRequested(ctx context.Context) error {
 			}
 
 			word := strings.ToLower(u.babbler.Babble())
-			encryptedWord, err := EncryptWord(word, event.UserPK[:])
+			encryptedWord, err := PublicEncrypt([]byte(word), event.UserPK[:])
 			if err != nil {
 				return models.ErrorWordEncryption
 			}
@@ -57,13 +57,13 @@ func (u *UIP) ListenWordRequested(ctx context.Context) error {
 				transactOpts,
 				event.Pid,
 				encryptedWord,
-				[]byte(u.configuration.PublicKey),
+				[]byte(u.configuration.KeyPair.PublicKey),
 			)
 			if err != nil {
 				return models.ErrorWordSubmission
 			}
 
-			u.logger.Debug().Msgf("Submitted encrypted word: %s", tx.Hash().Hex())
+			u.logger.Debug().Msgf("Submitted encrypted word. Tx: %s", tx.Hash().Hex())
 
 		case <-ctx.Done():
 			u.logger.Debug().Msg("context cancelled, stopping listener")

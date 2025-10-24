@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/UniBO-PRISMLab/nip-backend/models"
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -24,10 +25,10 @@ func (u *UIP) ListenPIDEncryption(ctx context.Context) error {
 	}
 	defer sub.Unsubscribe()
 
-	// transactOpts, err := u.loadTransactor(ctx)
-	// if err != nil {
-	// 	return fmt.Errorf("failed to load transactor: %w", err)
-	// }
+	transactOpts, err := u.loadTransactor(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to load transactor: %w", err)
+	}
 
 	for {
 		select {
@@ -36,11 +37,32 @@ func (u *UIP) ListenPIDEncryption(ctx context.Context) error {
 			return err
 
 		case vLog := <-logs:
-			_, err := u.contract.ParsePIDEncryptionRequested(vLog)
+			event, err := u.contract.ParsePIDEncryptionRequested(vLog)
 			if err != nil {
 				u.logger.Error().Err(err).Msg("failed to parse PIDEncryptionRequested event")
 				continue
 			}
+
+			if u.nodeAddress.Hex() != event.Node.Hex() {
+				continue
+			}
+
+			encryptedPID, err := SymEncrypt(event.Pid[:], event.SymK[:])
+			if err != nil {
+				return models.ErrorWordEncryption
+			}
+
+			tx, err := u.contract.SubmitEncryptedPID(
+				transactOpts,
+				event.Pid,
+				event.Sid,
+				encryptedPID,
+			)
+			if err != nil {
+				return models.ErrorWordSubmission
+			}
+
+			u.logger.Debug().Msgf("Submitted encrypted pid. Tx: %s", tx.Hash().Hex())
 
 		case <-ctx.Done():
 			u.logger.Info().Msg("context cancelled, stopping listener")

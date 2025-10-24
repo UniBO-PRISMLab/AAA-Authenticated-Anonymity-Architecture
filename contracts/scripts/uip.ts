@@ -1,6 +1,7 @@
 import { ethers } from "ethers";
 import { encryptWithKey, generatePublicKey, encryptSym } from "../utils/crypto";
 import { getRandomWord } from "../utils/dictionary";
+import { publicEncrypt } from "crypto";
 
 const provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
 const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
@@ -8,9 +9,9 @@ const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 const privateKeys = [
   "0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97",
   "0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6",
-  "0xf214f2b2cd398c806f84e317254e0f0b801d0643303237d97a22a48e01628897",
+  // "0xf214f2b2cd398c806f84e317254e0f0b801d0643303237d97a22a48e01628897",
   "0x701b615bbdfb9de65240bc28bd21bbc0d996645a3dd57e7b12bc2bdf6f192c82",
-  "0xea6c44ac03bff858b476bba40716402b03e41b8e97e276d1baec7c37d42484a0",
+  // "0xea6c44ac03bff858b476bba40716402b03e41b8e97e276d1baec7c37d42484a0",
   "0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e",
 ];
 
@@ -37,11 +38,11 @@ function startWorker(
     async (pid: string, node: string, publicKey: string) => {
       if (node.toLowerCase() !== wallet.address.toLowerCase()) return;
 
-      const pk = recoverPublicKey(publicKey);
-      const pkBytes = pk.buffer;
-
       const randomWord = await getRandomWord();
-      const wordEnc = await encryptWithKey(randomWord, pkBytes);
+      const wordEnc = await encryptWithKey(
+        randomWord,
+        Buffer.from(publicKey.slice(2), "hex")
+      );
 
       const nodePK = await generatePublicKey();
 
@@ -63,11 +64,12 @@ function startWorker(
   contract.on(
     "SIDEncryptionRequested",
     async (pid: string, nodes: string, sid: string, userPK: string) => {
-      const { buffer, pem } = recoverPublicKey(userPK);
-
       if (nodes.toLowerCase() !== wallet.address.toLowerCase()) return;
 
-      const encSID = await encryptWithKey(sid, buffer);
+      const encSID = await encryptWithKey(
+        sid,
+        Buffer.from(userPK.slice(2), "hex")
+      );
       const tx = await contract.submitEncryptedSID(pid, encSID, {
         gasLimit: 500000,
       });

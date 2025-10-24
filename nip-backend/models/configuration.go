@@ -26,6 +26,11 @@ type BlockchainConfiguration struct {
 	BlockchainPrivateKey string
 }
 
+type KeyPair struct {
+	PublicKey  string
+	PrivateKey string
+}
+
 type Configuration struct {
 	Environment EnvironmentType
 	HTTPHost    string
@@ -33,7 +38,7 @@ type Configuration struct {
 	CORS        CORSConfiguration
 	DB          DBConfiguration
 	SK          []byte
-	PublicKey   string
+	KeyPair     KeyPair
 	Blockchain  BlockchainConfiguration
 }
 
@@ -54,8 +59,8 @@ func NewConfiguration() Configuration {
 	os.Setenv("HTTP_HOST", "0.0.0.0")
 	os.Setenv("HTTP_PORT", "8888")
 
-	httpHost := stringOrPanic("HTTP_HOST")
-	httpPort := intOrPanic("HTTP_PORT")
+	host := stringOrPanic("HTTP_HOST")
+	port := intOrPanic("HTTP_PORT")
 
 	databaseURL := stringOrPanic("DATABASE_URL")
 
@@ -65,6 +70,7 @@ func NewConfiguration() Configuration {
 	copy(secretKey[:], stringOrPanic("SK"))
 
 	publicKey := stringOrPanic("PUBLIC_KEY")
+	privateKey := stringOrPanic("PRIVATE_KEY")
 
 	contractAddress := stringOrPanic("CONTRACT_ADDRESS")
 	blockchainPrivateKey := stringOrPanic("BLOCKCHAIN_PRIVATE_KEY")
@@ -77,8 +83,8 @@ func NewConfiguration() Configuration {
 
 	return Configuration{
 		Environment: env,
-		HTTPHost:    httpHost,
-		HTTPPort:    httpPort,
+		HTTPHost:    host,
+		HTTPPort:    port,
 		CORS: CORSConfiguration{
 			AllowOrigins: []string{"*"},
 			AllowHeaders: []string{},
@@ -86,8 +92,11 @@ func NewConfiguration() Configuration {
 		DB: DBConfiguration{
 			DatabaseURL: databaseURL,
 		},
-		SK:        secretKey[:],
-		PublicKey: publicKey,
+		SK: secretKey[:],
+		KeyPair: KeyPair{
+			PublicKey:  publicKey,
+			PrivateKey: privateKey,
+		},
 		Blockchain: BlockchainConfiguration{
 			EthNodeURL:           ethNodeUrl,
 			ContractAddress:      contractAddress,

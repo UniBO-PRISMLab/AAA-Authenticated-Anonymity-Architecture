@@ -38,7 +38,7 @@ func NewUIP(
 ) (*UIP, error) {
 	logger := utils.InitServiceAdvancedLogger("AAALogger")
 	addr := common.HexToAddress(contractAddr)
-	nodeAddr, err := GetBackendAddress(configuration.Blockchain.BlockchainPrivateKey)
+	nodeAddr, err := getBackendAddress(configuration.Blockchain.BlockchainPrivateKey)
 	logger.Info().Msgf("UIP listener started at %s", nodeAddr.Hex())
 
 	if err != nil {
@@ -100,7 +100,7 @@ func (u *UIP) loadTransactor(ctx context.Context) (*bind.TransactOpts, error) {
 	return transactOpts, nil
 }
 
-func EncryptWord(word string, key []byte) ([]byte, error) {
+func PublicEncrypt(data []byte, key []byte) ([]byte, error) {
 	rng := rand.Reader
 	publicKeyPemBlock, _ := pem.Decode(key)
 	if publicKeyPemBlock == nil || publicKeyPemBlock.Type != "PUBLIC KEY" {
@@ -111,15 +111,20 @@ func EncryptWord(word string, key []byte) ([]byte, error) {
 	if err != nil {
 		return nil, models.ErrorInvalidPublicKey
 	}
-	encryptedWord, err := rsa.EncryptOAEP(sha256.New(), rng, pk.(*rsa.PublicKey), []byte(word), nil)
+	encryptedData, err := rsa.EncryptOAEP(sha256.New(), rng, pk.(*rsa.PublicKey), data, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return encryptedWord, nil
+	return encryptedData, nil
 }
 
-func GetBackendAddress(hexKey string) (common.Address, error) {
+func SymEncrypt(data []byte, key []byte) ([]byte, error) {
+	// TODO: implement symmetric encryption
+	return data, nil
+}
+
+func getBackendAddress(hexKey string) (common.Address, error) {
 	if len(hexKey) >= 2 && hexKey[:2] == "0x" {
 		hexKey = hexKey[2:]
 	}

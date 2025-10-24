@@ -36,6 +36,7 @@ var ErrorLoadTransactor = errors.New("unable to load transactor")
 var ErrorSubscribeToLogs = errors.New("unable to subscribe to logs")
 var ErrorSubscribtion = errors.New("subscription error")
 var ErrorParseWordRequested = errors.New("failed to parse WordRequested event")
+var ErrorParseSIDEncryptionRequested = errors.New("failed to parse SIDEncryptionRequested event")
 var ErrorWordEncryption = errors.New("failed to encrypt word")
 var ErrorWordSubmission = errors.New("failed to submit encrypted word")
 
