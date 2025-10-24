@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/UniBO-PRISMLab/nip/api"
+	"github.com/UniBO-PRISMLab/nip/api/aaa"
 	"github.com/UniBO-PRISMLab/nip/api/auth"
 	"github.com/UniBO-PRISMLab/nip/api/identity"
 	"github.com/UniBO-PRISMLab/nip/db"
@@ -39,7 +40,7 @@ func main() {
 
 	dbpool, err := pgxpool.New(context.Background(), configuration.DB.DatabaseURL)
 	if err != nil {
-		log.Fatal().Err(err).Msg("Unable to create connection pool")
+		log.Fatal().Err(err).Msg(models.ErrorUnableToCreateConnPool.Error())
 		os.Exit(1)
 	}
 
@@ -51,22 +52,27 @@ func main() {
 
 	repos := db.InitRepositories()
 
-	identityService := identity.NewService(configuration, repos.Identity)
-	authService := auth.NewService(configuration, repos.Auth, identityService)
-
 	ethClient, err := eth.DialContext(ctx, configuration.Blockchain.EthNodeURL)
 	if err != nil {
-		log.Fatal().Err(err).Msg("Unable to connect to Ethereum client")
-		os.Exit(1)
+		log.Error().Err(err).Msg(models.ErrorUnableToConnectToEthClient.Error())
 	}
-	if _, err := ethClient.NetworkID(ctx); err != nil {
-		log.Fatal().Err(err).Msg("Unable to connect to Ethereum client")
-		os.Exit(1)
-	}
-
 	defer ethClient.Close()
 
-	log.Info().Msgf("Connected to Ethereum node at %s", configuration.Blockchain.EthNodeURL)
+	if ethClient != nil {
+		uip, err := aaa.NewUIP(
+			ethClient,
+			configuration.Blockchain.ContractAddress,
+			configuration,
+		)
+		if err != nil {
+			log.Error().Err(err).Msg(models.ErrorUnableToCreateUIPListener.Error())
+		}
+
+		go uip.Start(ctx)
+	}
+
+	identityService := identity.NewService(configuration, repos.Identity)
+	authService := auth.NewService(configuration, repos.Auth, identityService, ethClient)
 
 	if err = api.NewServer(
 		configuration,

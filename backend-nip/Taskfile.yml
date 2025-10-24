@@ -1,0 +1,20 @@
+version: "3"
+
+tasks:
+  up:
+    dir: "{{.USER_WORKING_DIR}}"
+    preconditions:
+      - test -f docker-compose.yaml
+    cmds:
+      - docker-compose up -d
+  down:
+    dir: "{{.USER_WORKING_DIR}}"
+    preconditions:
+      - test -f docker-compose.yaml
+    cmds:
+      - docker-compose down
+  abi-gen:
+    cmds:
+      - jq '.abi' ../contracts/artifacts/contracts/AAAContract.sol/AAAContract.json > AAAContract.abi
+      - abigen --abi AAAContract.abi --pkg bindings --type AAAContract --out api/aaa/bindings/aaa_contract.go
+      - rm AAAContract.abi

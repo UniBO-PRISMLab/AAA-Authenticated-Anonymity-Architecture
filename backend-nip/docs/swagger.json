@@ -22,7 +22,7 @@
     "paths": {
         "/v1/auth/pac": {
             "post": {
-                "description": "Allows a user to request a Public Authentication Code (PAC). It accepts a message `PID` and `SIGN(PID, SK)`, namely the PID signed with the private key of the public-private key pair used to obtain the PID.  When logging onto the public service, the user can show the PAC, and the service has only to query the NIP to verify that the code is associated with an authenticated user.",
+                "description": "Allows a user to request a Public Authentication Code (PAC). It accepts a payload `PID` and `SIGN(PID, SK)`, namely the PID signed with the private key of the public-private key pair used to obtain the PID. The PID must be sent as base64 (as it was retrieved originally from the NIP). The signed PID must be base64 encoded as well.",
                 "consumes": [
                     "application/json"
                 ],
@@ -74,7 +74,7 @@
         },
         "/v1/auth/sac": {
             "post": {
-                "description": "The SAC (Secret Authentication Code) is a one-time code used to authenticate the user as an anonymous user. It accepts `ENC(SID, SK)`, i.e., the SID signed with the private key associated with the public key saved on the blockchain at the moment of seed phrase creation and used in the record where the SID was stored. The NIP retrieves the SID record from the blockchain and checks that it was actually signed by that user via the PK saved in the record. This certifies that the user is the true owner of that SID.",
+                "description": "The SAC (Secret Authentication Code) is a one-time code used to authenticate the user as an anonymous user. It accepts a payload `SID`, `ENC(SID, SK)`, namely the SID and the SID signed with the private key associated with the public key saved on the blockchain at the moment of seed phrase creation and used in the record where the SID was stored. The SID must be retrieved from the blockchain and sent as base64 encoded (supposedly from hex). The signed SID must be base64 encoded as well.",
                 "consumes": [
                     "application/json"
                 ],
@@ -242,7 +242,7 @@
                 },
                 "signed_pid": {
                     "type": "string",
-                    "example": "signed_pid_payload_base64"
+                    "example": "Tn7dpsKMqbhC3j8/o7OH5juVrkejhhZYkDHNqVyp8Am8uRktEDKO5i09iH9GZO0NOQHRRKD6lpwD0wC5GEPiuHN6aAof3WtPO9bqEB8ZLup4FjnyDh3mMX1UlvlYjKi6eTLMD2J8dwObz0nkmZOVsjk51o8jMapJtfnzMkYhADh4vZVDLpWYWbtBsmmXhNHS4SuWc+K3ZKMLtCYE/MFK3JT+Zcyabmrd9jmqvHRgi9XT+kABZ6XnyUSp4VWo1M7pl767/hZM5CxqgXORUMk8z9M9lHCDOsLfjBOwi81ObMtd+4oVgXgAbzBBHXnicB6X5PEBb5Qyh0RNyWFFNOEvtA=="
                 }
             }
         },
@@ -323,11 +323,11 @@
             "properties": {
                 "sid": {
                     "type": "string",
-                    "example": "MHhhOTcwZWRkMTEyNTRjNTQ3OTIyMWVjOTFjZGU0YjNiMGI2MjQ1NzI3NmVmMzA0MmMzN2M2MDJkMWRlMTg4Njc5"
+                    "example": "MHhmMzZmMmRlNWFmNmVkODg0ODM3NTgwMmZjOWIxNWMyNzBkN2NmNWUwNmI0MTYxZGY2ZGM5YjYyNWZhMmU4NzE2"
                 },
                 "signed_sid": {
                     "type": "string",
-                    "example": "QEZZSiBAF1TPbSgHAlcwlrG4unRGZBGYOf8yjiSfP8wUcnkvdm+yQTOzGpqWG/m4/qCG7stlDYqZrQIyRWC7mb0sbTe2MhMYrZOzyz6uH8hCxIJh5JQ6ivsntufaeg9HOoZ9M6wdhp1/BsbwuGG27CQ7BcuuKZu2Mi1cNu32dnTGxv4PORoCy1JqgV519JsuwL3aekdZ2jVrYaepTTDT1vJR4vhLZ76gV1ywUAIEMm8q+R12ydntAroOd8EaiCXx0pyM3zVAE1G0Qv1g0qRGrnogmMhCIpljJ79KEFtOQDHLd0RnbPuoh99eszx99qc911VXTjiHMNdIxhanp31odA=="
+                    "example": "lOY7KkjuT3HV7R0/l66LR/0vR5URqy6i0cMH4nEHebks4ZSIHPO63FY+DCZX9QRu3VPt/eO21Fwm69pXk1lWbETll5vXbpChkKjaOAsuJfIRqWBX+bXHfiBCPvdjGr0f5YfWDx8xL1ndbXntNYF1WBt02Z/2JG06XsPsYwrT1FFDw6GiJiliJrBBJ7CYj4GhgdrgD70ZPdadKl7ChAgp9erc9s1nZ3Kdhnp9xmUR+aHcxi0RfikCvhgZvVvbHneSviI8tjp8zxT4VJhX2gbIJ/0fp4CVIaiHxHsMzCPB3rFdNNo5Pqr4TyDG/IP5k3QLD1yQXY+a9wlw6MGUBEiXrw=="
                 }
             }
         },

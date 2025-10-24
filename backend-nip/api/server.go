@@ -50,7 +50,8 @@ func (s *Server) setupRoutes() {
 	unauthenticatedRoute := s.engine.Group("/")
 	// internalRoute := s.engine.Group("/")
 
-	unauthenticatedRoute.GET("/health", s.createHealthRoute())
+	unauthenticatedRoute.GET("/", s.healthRoute())
+	unauthenticatedRoute.GET("/health", s.healthRoute())
 
 	routes := models.DefaultRoutes{
 		UnauthenticatedRoute: unauthenticatedRoute,
@@ -67,7 +68,7 @@ func (s *Server) setupRoutes() {
 	}
 }
 
-func (s *Server) createHealthRoute() gin.HandlerFunc {
+func (s *Server) healthRoute() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{
 			"status": "UP",

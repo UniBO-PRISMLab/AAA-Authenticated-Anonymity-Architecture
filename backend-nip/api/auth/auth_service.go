@@ -14,6 +14,7 @@ import (
 	"github.com/UniBO-PRISMLab/nip/api/identity"
 	"github.com/UniBO-PRISMLab/nip/db"
 	"github.com/UniBO-PRISMLab/nip/models"
+	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -21,22 +22,28 @@ type Service struct {
 	configuration   models.Configuration
 	identityService *identity.Service
 	authRepo        *db.AuthRepository
+	ethClient       *ethclient.Client
 }
 
 func NewService(
 	configuration models.Configuration,
 	authRepo *db.AuthRepository,
 	identityService *identity.Service,
+	ethClient *ethclient.Client,
 ) *Service {
 	return &Service{
 		configuration:   configuration,
 		authRepo:        authRepo,
 		identityService: identityService,
+		ethClient:       ethClient,
 	}
 }
 
 // https://www.rfc-editor.org/rfc/rfc8017
-func (s *Service) IssuePAC(ctx context.Context, req *models.PACRequestModel) (*models.PACResponseModel, error) {
+func (s *Service) IssuePAC(
+	ctx context.Context,
+	req *models.PACRequestModel,
+) (*models.PACResponseModel, error) {
 	user, err := s.identityService.GetUserByPID(ctx, &req.PID)
 	if err != nil {
 		return nil, models.ErrorUserWithPIDNotFound
@@ -78,13 +85,14 @@ func (s *Service) IssuePAC(ctx context.Context, req *models.PACRequestModel) (*m
 	return s.authRepo.IssuePAC(ctx, &user.PID, pac, expiration)
 }
 
-func (s *Service) IssueSAC(ctx context.Context) (*models.SACResponseModel, error) {
+func (s *Service) IssueSAC(
+	ctx context.Context,
+	req *models.SACRequestModel,
+) (*models.SACResponseModel, error) {
 	var err error
 	var tx pgx.Tx
 	var sid string
 	var resp *models.SACResponseModel
-
-	// TODO: retrieve form the blockchain the SID record SID : ENC(PID, symK), PK
 
 	// TODO: check that the received payload was actually signed by that user via the PK saved in the record
 

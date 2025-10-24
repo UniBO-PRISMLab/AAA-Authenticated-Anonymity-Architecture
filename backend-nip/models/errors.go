@@ -29,8 +29,17 @@ var ErrorResponseModelWithMsg = func(code int, message string) ErrorResponseMode
 	}
 }
 
-var ErrorUserWithPIDNotFound = errors.New("no user found with the provided PID")
+var ErrorUnableToCreateConnPool = errors.New("unable to create connection pool")
+var ErrorUnableToConnectToEthClient = errors.New("unable to connect to Ethereum client")
+var ErrorUnableToCreateUIPListener = errors.New("unable to create UIP listener")
+var ErrorLoadTransactor = errors.New("unable to load transactor")
+var ErrorSubscribeToLogs = errors.New("unable to subscribe to logs")
+var ErrorSubscribtion = errors.New("subscription error")
+var ErrorParseWordRequested = errors.New("failed to parse WordRequested event")
+var ErrorWordEncryption = errors.New("failed to encrypt word")
+var ErrorWordSubmission = errors.New("failed to submit encrypted word")
 
+var ErrorUserWithPIDNotFound = errors.New("no user found with the provided PID")
 var ErrorInvalidPublicKey = errors.New("invalid public key")
 var ErrorInvalidPublicKeyHeader = errors.New("invalid public key header")
 var ErrorPKAlreadyAssociated = errors.New("this public key has been already associated with a PID")

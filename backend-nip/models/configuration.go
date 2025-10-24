@@ -21,7 +21,9 @@ type DBConfiguration struct {
 }
 
 type BlockchainConfiguration struct {
-	EthNodeURL string
+	EthNodeURL           string
+	ContractAddress      string
+	BlockchainPrivateKey string
 }
 
 type Configuration struct {
@@ -31,6 +33,7 @@ type Configuration struct {
 	CORS        CORSConfiguration
 	DB          DBConfiguration
 	SK          []byte
+	PublicKey   string
 	Blockchain  BlockchainConfiguration
 }
 
@@ -61,6 +64,11 @@ func NewConfiguration() Configuration {
 	secretKey := [32]byte{}
 	copy(secretKey[:], stringOrPanic("SK"))
 
+	publicKey := stringOrPanic("PUBLIC_KEY")
+
+	contractAddress := stringOrPanic("CONTRACT_ADDRESS")
+	blockchainPrivateKey := stringOrPanic("BLOCKCHAIN_PRIVATE_KEY")
+
 	if stringFromEnv("GIN_MODE", "development") == "production" {
 		env = Production
 	} else {
@@ -78,9 +86,12 @@ func NewConfiguration() Configuration {
 		DB: DBConfiguration{
 			DatabaseURL: databaseURL,
 		},
-		SK: secretKey[:],
+		SK:        secretKey[:],
+		PublicKey: publicKey,
 		Blockchain: BlockchainConfiguration{
-			EthNodeURL: ethNodeUrl,
+			EthNodeURL:           ethNodeUrl,
+			ContractAddress:      contractAddress,
+			BlockchainPrivateKey: blockchainPrivateKey,
 		},
 	}
 }

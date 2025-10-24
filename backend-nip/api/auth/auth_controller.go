@@ -75,7 +75,7 @@ func (c *AuthController) injectUnAuthenticatedRoutes() {
 //	@Schemes		http
 //	@Router			/v1/auth/pac [post]
 //	@Summary		PAC issuance request
-//	@Description	Allows a user to request a Public Authentication Code (PAC). It accepts a message `PID` and `SIGN(PID, SK)`, namely the PID signed with the private key of the public-private key pair used to obtain the PID.  When logging onto the public service, the user can show the PAC, and the service has only to query the NIP to verify that the code is associated with an authenticated user.
+//	@Description	Allows a user to request a Public Authentication Code (PAC). It accepts a payload `PID` and `SIGN(PID, SK)`, namely the PID signed with the private key of the public-private key pair used to obtain the PID. The PID must be sent as base64 (as it was retrieved originally from the NIP). The signed PID must be base64 encoded as well.
 //	@Accept			json
 //	@Produce		json
 //	@Param			models.PACRequestModel	body		models.PACRequestModel		true	"PAC Request Model"
@@ -167,7 +167,7 @@ func (c *AuthController) verifyPAC() gin.HandlerFunc {
 //	@Schemes		http
 //	@Router			/v1/auth/sac [post]
 //	@Summary		SAC issuance request
-//	@Description	The SAC (Secret Authentication Code) is a one-time code used to authenticate the user as an anonymous user. It accepts `ENC(SID, SK)`, i.e., the SID signed with the private key associated with the public key saved on the blockchain at the moment of seed phrase creation and used in the record where the SID was stored. The NIP retrieves the SID record from the blockchain and checks that it was actually signed by that user via the PK saved in the record. This certifies that the user is the true owner of that SID.
+//	@Description	The SAC (Secret Authentication Code) is a one-time code used to authenticate the user as an anonymous user. It accepts a payload `SID`, `ENC(SID, SK)`, namely the SID and the SID signed with the private key associated with the public key saved on the blockchain at the moment of seed phrase creation and used in the record where the SID was stored. The SID must be retrieved from the blockchain and sent as base64 encoded (supposedly from hex). The signed SID must be base64 encoded as well.
 //	@Accept			json
 //	@Produce		json
 //	@Param			models.SACRequestModel	body		models.SACRequestModel		true	"SAC Request Model"
@@ -178,8 +178,15 @@ func (c *AuthController) issueSAC() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var resp *models.SACResponseModel
 		var err error
+		var req models.SACRequestModel
 
-		resp, err = c.authService.IssueSAC(ctx)
+		if err := ctx.ShouldBindJSON(&req); err != nil {
+			c.logger.Error().Err(err).Msg("Error during SAC issuance")
+			ctx.JSON(400, models.ErrorBadRequestResponseModel)
+			return
+		}
+
+		resp, err = c.authService.IssueSAC(ctx, &req)
 		if err != nil {
 			c.logger.Error().Err(err).Msg("Error during SAC issuance")
 			ctx.JSON(500, models.ErrorInternalServerErrorResponseModel)

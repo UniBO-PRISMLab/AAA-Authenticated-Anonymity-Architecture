@@ -1,25 +1,27 @@
 services:
-  nip:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    develop:
-      watch:
-        - path: ./docs
-          action: rebuild
-        - path: ./api
-          action: rebuild
-        - path: ./db
-          action: rebuild
-    image: nip:latest
-    networks:
-      - nip-net
-    ports:
-      - "8888:8888"
-    environment:
-      - DATABASE_URL=postgres://nipadmin:password@db:5432/nip
-    depends_on:
-      - db
+  # nip:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   develop:
+  #     watch:
+  #       - path: ./docs
+  #         action: rebuild
+  #       - path: ./api
+  #         action: rebuild
+  #       - path: ./db
+  #         action: rebuild
+  #   image: nip:latest
+  #   networks:
+  #     - nip-net
+  #   ports:
+  #     - "8888:8888"
+  #   environment:
+  #     - DATABASE_URL=postgres://nipadmin:password@db:5432/nip
+  #     - ETH_NODE_URL="http://host.docker.internal:8545"
+  #     - CONTRACT_ADDRESS="0x5FbDB2315678afecb367f032d93F642f64180aa3"
+  #   depends_on:
+  #     - db
 
   db:
     image: postgres:15

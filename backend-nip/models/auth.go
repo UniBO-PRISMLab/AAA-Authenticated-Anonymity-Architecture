@@ -4,7 +4,7 @@ import "time"
 
 type PACRequestModel struct {
 	PID       string `json:"pid" example:"DmIq8x2JNs+E2qGBr16LxP6lUK+i/5nJRLuzvYEymtY=" binding:"required"`
-	SignedPID string `json:"signed_pid" example:"signed_pid_payload_base64" binding:"required"`
+	SignedPID string `json:"signed_pid" example:"Tn7dpsKMqbhC3j8/o7OH5juVrkejhhZYkDHNqVyp8Am8uRktEDKO5i09iH9GZO0NOQHRRKD6lpwD0wC5GEPiuHN6aAof3WtPO9bqEB8ZLup4FjnyDh3mMX1UlvlYjKi6eTLMD2J8dwObz0nkmZOVsjk51o8jMapJtfnzMkYhADh4vZVDLpWYWbtBsmmXhNHS4SuWc+K3ZKMLtCYE/MFK3JT+Zcyabmrd9jmqvHRgi9XT+kABZ6XnyUSp4VWo1M7pl767/hZM5CxqgXORUMk8z9M9lHCDOsLfjBOwi81ObMtd+4oVgXgAbzBBHXnicB6X5PEBb5Qyh0RNyWFFNOEvtA==" binding:"required"`
 }
 
 type PACVerificationRequestModel struct {
@@ -23,8 +23,8 @@ type PACVerificationResponseModel struct {
 }
 
 type SACRequestModel struct {
-	SID       string `json:"sid" example:"MHhhOTcwZWRkMTEyNTRjNTQ3OTIyMWVjOTFjZGU0YjNiMGI2MjQ1NzI3NmVmMzA0MmMzN2M2MDJkMWRlMTg4Njc5" binding:"required"`
-	SignedSID string `json:"signed_sid" example:"QEZZSiBAF1TPbSgHAlcwlrG4unRGZBGYOf8yjiSfP8wUcnkvdm+yQTOzGpqWG/m4/qCG7stlDYqZrQIyRWC7mb0sbTe2MhMYrZOzyz6uH8hCxIJh5JQ6ivsntufaeg9HOoZ9M6wdhp1/BsbwuGG27CQ7BcuuKZu2Mi1cNu32dnTGxv4PORoCy1JqgV519JsuwL3aekdZ2jVrYaepTTDT1vJR4vhLZ76gV1ywUAIEMm8q+R12ydntAroOd8EaiCXx0pyM3zVAE1G0Qv1g0qRGrnogmMhCIpljJ79KEFtOQDHLd0RnbPuoh99eszx99qc911VXTjiHMNdIxhanp31odA==" binding:"required"`
+	SID       string `json:"sid" example:"MHhmMzZmMmRlNWFmNmVkODg0ODM3NTgwMmZjOWIxNWMyNzBkN2NmNWUwNmI0MTYxZGY2ZGM5YjYyNWZhMmU4NzE2" binding:"required"`
+	SignedSID string `json:"signed_sid" example:"lOY7KkjuT3HV7R0/l66LR/0vR5URqy6i0cMH4nEHebks4ZSIHPO63FY+DCZX9QRu3VPt/eO21Fwm69pXk1lWbETll5vXbpChkKjaOAsuJfIRqWBX+bXHfiBCPvdjGr0f5YfWDx8xL1ndbXntNYF1WBt02Z/2JG06XsPsYwrT1FFDw6GiJiliJrBBJ7CYj4GhgdrgD70ZPdadKl7ChAgp9erc9s1nZ3Kdhnp9xmUR+aHcxi0RfikCvhgZvVvbHneSviI8tjp8zxT4VJhX2gbIJ/0fp4CVIaiHxHsMzCPB3rFdNNo5Pqr4TyDG/IP5k3QLD1yQXY+a9wlw6MGUBEiXrw==" binding:"required"`
 }
 
 type SACResponseModel struct {
