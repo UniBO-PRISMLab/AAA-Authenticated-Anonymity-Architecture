@@ -11,9 +11,9 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/UniBO-PRISMLab/nip/api/identity"
-	"github.com/UniBO-PRISMLab/nip/db"
-	"github.com/UniBO-PRISMLab/nip/models"
+	"github.com/UniBO-PRISMLab/nip-backend/api/identity"
+	"github.com/UniBO-PRISMLab/nip-backend/db"
+	"github.com/UniBO-PRISMLab/nip-backend/models"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/jackc/pgx/v5"
 )

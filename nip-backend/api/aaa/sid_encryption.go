@@ -36,11 +36,13 @@ func (u *UIP) ListenSIDEncryption(ctx context.Context) error {
 			return err
 
 		case vLog := <-logs:
-			_, err := u.contract.ParseSIDEncryptionRequested(vLog)
+			event, err := u.contract.ParseSIDEncryptionRequested(vLog)
 			if err != nil {
 				u.logger.Error().Err(err).Msg("failed to parse SIDEncryptionRequested event")
 				continue
 			}
+			u.logger.Info().Msg("Received SIDEncryptionRequested event")
+			u.logger.Info().Msgf("PID: %s", event.Pid)
 
 		case <-ctx.Done():
 			u.logger.Info().Msg("context cancelled, stopping listener")

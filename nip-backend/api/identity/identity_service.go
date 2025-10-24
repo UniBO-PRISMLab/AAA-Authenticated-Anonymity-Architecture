@@ -9,8 +9,8 @@ import (
 	"encoding/base64"
 	"encoding/pem"
 
-	"github.com/UniBO-PRISMLab/nip/db"
-	"github.com/UniBO-PRISMLab/nip/models"
+	"github.com/UniBO-PRISMLab/nip-backend/db"
+	"github.com/UniBO-PRISMLab/nip-backend/models"
 )
 
 type Service struct {

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/UniBO-PRISMLab/nip/api/auth"
-	"github.com/UniBO-PRISMLab/nip/api/identity"
-	"github.com/UniBO-PRISMLab/nip/models"
+	"github.com/UniBO-PRISMLab/nip-backend/api/auth"
+	"github.com/UniBO-PRISMLab/nip-backend/api/identity"
+	"github.com/UniBO-PRISMLab/nip-backend/models"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"

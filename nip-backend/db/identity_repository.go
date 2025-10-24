@@ -4,7 +4,7 @@ import (
 	"context"
 	_ "embed"
 
-	"github.com/UniBO-PRISMLab/nip/models"
+	"github.com/UniBO-PRISMLab/nip-backend/models"
 )
 
 //go:embed sql/identity/insert_pid.sql

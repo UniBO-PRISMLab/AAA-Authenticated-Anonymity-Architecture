@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	"github.com/UniBO-PRISMLab/nip/models"
+	"github.com/UniBO-PRISMLab/nip-backend/models"
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"

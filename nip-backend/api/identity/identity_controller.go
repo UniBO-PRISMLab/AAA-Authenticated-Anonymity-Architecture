@@ -3,8 +3,8 @@ package identity
 import (
 	"errors"
 
-	"github.com/UniBO-PRISMLab/nip/models"
-	"github.com/UniBO-PRISMLab/nip/utils"
+	"github.com/UniBO-PRISMLab/nip-backend/models"
+	"github.com/UniBO-PRISMLab/nip-backend/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
 )

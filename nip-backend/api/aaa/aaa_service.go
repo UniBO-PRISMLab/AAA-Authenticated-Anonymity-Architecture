@@ -10,9 +10,9 @@ import (
 	"encoding/pem"
 	"fmt"
 
-	"github.com/UniBO-PRISMLab/nip/api/aaa/bindings"
-	"github.com/UniBO-PRISMLab/nip/models"
-	"github.com/UniBO-PRISMLab/nip/utils"
+	"github.com/UniBO-PRISMLab/nip-backend/api/aaa/bindings"
+	"github.com/UniBO-PRISMLab/nip-backend/models"
+	"github.com/UniBO-PRISMLab/nip-backend/utils"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"

@@ -1,4 +1,4 @@
-module github.com/UniBO-PRISMLab/nip
+module github.com/UniBO-PRISMLab/nip-backend
 
 go 1.24.0
 

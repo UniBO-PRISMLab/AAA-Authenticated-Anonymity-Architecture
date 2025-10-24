@@ -5,7 +5,7 @@ import (
 	_ "embed"
 	"time"
 
-	"github.com/UniBO-PRISMLab/nip/models"
+	"github.com/UniBO-PRISMLab/nip-backend/models"
 	"github.com/jackc/pgx/v5"
 )
 
