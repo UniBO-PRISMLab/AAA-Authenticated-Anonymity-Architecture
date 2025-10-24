@@ -1,0 +1,6 @@
+[submodule "nip-client"]
+	path = nip-client
+	url = https://github.com/UniBO-PRISMLab/nip-client
+[submodule "aaa-client"]
+	path = aaa-client
+	url = https://github.com/UniBO-PRISMLab/aaa-client
