@@ -33,8 +33,6 @@ func (s *Service) IssuePID(ctx context.Context, req *models.PIDRequestModel) (*m
 	var pkBytes []byte
 	var err error
 
-	// TODO: validate user personal data with public key
-
 	pkBytes, err = base64.StdEncoding.DecodeString(req.PublicKey)
 	if err != nil {
 		return nil, models.ErrorPublicKeyDecoding

@@ -1,14 +1,12 @@
 version: "3"
 
 tasks:
-  up:*:
-    vars:
-      build: "{{index .MATCH 0}}"
+  up:
     dir: "{{.USER_WORKING_DIR}}"
     preconditions:
       - test -f docker-compose.yaml
     cmds:
-      - docker-compose up {{.build}} -d
+      - docker-compose up {{.build}}
   down:
     dir: "{{.USER_WORKING_DIR}}"
     preconditions:

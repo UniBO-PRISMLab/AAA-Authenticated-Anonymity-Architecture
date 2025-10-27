@@ -23,7 +23,7 @@ type PACVerificationResponseModel struct {
 }
 
 type SACRequestModel struct {
-	SID       string `json:"sid" example:"MHhmMzZmMmRlNWFmNmVkODg0ODM3NTgwMmZjOWIxNWMyNzBkN2NmNWUwNmI0MTYxZGY2ZGM5YjYyNWZhMmU4NzE2" binding:"required"`
+	SID       string `json:"sid" example:"Y2I4NjBmMmQ1YmM1YTFjODQ4ZTA3OTdiMzE5MTU5NzE4OTBhMTRmMzA0MmFjY2ZjMjZjYjk4Y2EwNWI1OWE2Yg==" binding:"required"`
 	SignedSID string `json:"signed_sid" example:"lOY7KkjuT3HV7R0/l66LR/0vR5URqy6i0cMH4nEHebks4ZSIHPO63FY+DCZX9QRu3VPt/eO21Fwm69pXk1lWbETll5vXbpChkKjaOAsuJfIRqWBX+bXHfiBCPvdjGr0f5YfWDx8xL1ndbXntNYF1WBt02Z/2JG06XsPsYwrT1FFDw6GiJiliJrBBJ7CYj4GhgdrgD70ZPdadKl7ChAgp9erc9s1nZ3Kdhnp9xmUR+aHcxi0RfikCvhgZvVvbHneSviI8tjp8zxT4VJhX2gbIJ/0fp4CVIaiHxHsMzCPB3rFdNNo5Pqr4TyDG/IP5k3QLD1yQXY+a9wlw6MGUBEiXrw==" binding:"required"`
 }
 

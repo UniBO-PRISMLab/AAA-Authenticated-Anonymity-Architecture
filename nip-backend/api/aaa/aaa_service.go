@@ -6,9 +6,11 @@ import (
 	"crypto/rsa"
 	"crypto/sha256"
 	"crypto/x509"
+	"encoding/base64"
 	"encoding/hex"
 	"encoding/pem"
 	"fmt"
+	"strings"
 
 	"github.com/UniBO-PRISMLab/nip-backend/api/aaa/bindings"
 	"github.com/UniBO-PRISMLab/nip-backend/models"
@@ -21,7 +23,7 @@ import (
 	"github.com/tjarratt/babble"
 )
 
-type UIP struct {
+type Service struct {
 	client          *ethclient.Client
 	contract        *bindings.AAAContract
 	babbler         *babble.Babbler
@@ -31,11 +33,11 @@ type UIP struct {
 	logger          *zerolog.Logger
 }
 
-func NewUIP(
+func NewAAAService(
 	client *ethclient.Client,
 	contractAddr string,
 	configuration models.Configuration,
-) (*UIP, error) {
+) (*Service, error) {
 	logger := utils.InitServiceAdvancedLogger("AAALogger")
 	addr := common.HexToAddress(contractAddr)
 	nodeAddr, err := getBackendAddress(configuration.Blockchain.BlockchainPrivateKey)
@@ -53,7 +55,7 @@ func NewUIP(
 	babbler := babble.NewBabbler()
 	babbler.Count = 1
 
-	return &UIP{
+	return &Service{
 		client:          client,
 		contract:        contract,
 		contractAddress: addr,
@@ -64,13 +66,13 @@ func NewUIP(
 	}, nil
 }
 
-func (u *UIP) Start(ctx context.Context) {
+func (u *Service) Start(ctx context.Context) {
 	go u.ListenWordRequested(ctx)
 	go u.ListenPIDEncryption(ctx)
 	go u.ListenSIDEncryption(ctx)
 }
 
-func (u *UIP) loadTransactor(ctx context.Context) (*bind.TransactOpts, error) {
+func (u *Service) loadTransactor(ctx context.Context) (*bind.TransactOpts, error) {
 	keyHex := u.configuration.Blockchain.BlockchainPrivateKey
 	if len(keyHex) >= 2 && keyHex[:2] == "0x" {
 		keyHex = keyHex[2:]
@@ -122,6 +124,33 @@ func PublicEncrypt(data []byte, key []byte) ([]byte, error) {
 func SymEncrypt(data []byte, key []byte) ([]byte, error) {
 	// TODO: implement symmetric encryption
 	return data, nil
+}
+
+func (u *Service) GetSIDRecord(ctx context.Context, sidBase64 string) ([]byte, []byte, error) {
+	decoded, err := base64.StdEncoding.DecodeString(sidBase64)
+	if err != nil {
+		return nil, nil, fmt.Errorf("invalid base64 SID: %w", err)
+	}
+
+	sidHex := strings.TrimSpace(string(decoded))
+	sidHex = strings.TrimPrefix(sidHex, "0x")
+	sidBytes, err := hex.DecodeString(sidHex)
+	if err != nil {
+		return nil, nil, fmt.Errorf("invalid SID hex: %w", err)
+	}
+	if len(sidBytes) != 32 {
+		return nil, nil, fmt.Errorf("SID must be 32 bytes, got %d", len(sidBytes))
+	}
+
+	var sid [32]byte
+	copy(sid[:], sidBytes)
+
+	encPID, pk, err := u.contract.GetSIDRecord(&bind.CallOpts{Context: ctx}, sid)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to read SID record: %w", err)
+	}
+
+	return encPID, pk, nil
 }
 
 func getBackendAddress(hexKey string) (common.Address, error) {

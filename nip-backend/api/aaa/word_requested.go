@@ -11,7 +11,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
-func (u *UIP) ListenWordRequested(ctx context.Context) error {
+func (u *Service) ListenWordRequested(ctx context.Context) error {
 	wordRequestedSig := crypto.Keccak256Hash([]byte("WordRequested(bytes32,address,bytes)"))
 	query := ethereum.FilterQuery{
 		Addresses: []common.Address{u.contractAddress},

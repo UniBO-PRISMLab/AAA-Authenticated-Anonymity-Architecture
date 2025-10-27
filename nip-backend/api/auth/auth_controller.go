@@ -188,6 +188,11 @@ func (c *AuthController) issueSAC() gin.HandlerFunc {
 
 		resp, err = c.authService.IssueSAC(ctx, &req)
 		if err != nil {
+			if errors.Is(err, models.ErrorSIDSignatureVerification) {
+				ctx.JSON(400, models.ErrorResponseModelWithMsg(400, err.Error()))
+				return
+			}
+
 			c.logger.Error().Err(err).Msg("Error during SAC issuance")
 			ctx.JSON(500, models.ErrorInternalServerErrorResponseModel)
 			return

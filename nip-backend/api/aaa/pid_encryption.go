@@ -11,7 +11,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
-func (u *UIP) ListenPIDEncryption(ctx context.Context) error {
+func (u *Service) ListenPIDEncryption(ctx context.Context) error {
 	pidRequestedSig := crypto.Keccak256Hash([]byte("PIDEncryptionRequested(bytes32,address,bytes32,bytes32)"))
 	query := ethereum.FilterQuery{
 		Addresses: []common.Address{u.contractAddress},
@@ -51,6 +51,8 @@ func (u *UIP) ListenPIDEncryption(ctx context.Context) error {
 			if err != nil {
 				return models.ErrorWordEncryption
 			}
+
+			u.logger.Info().Msgf("Received PID encryption request for SID: %x", event.Sid)
 
 			tx, err := u.contract.SubmitEncryptedPID(
 				transactOpts,

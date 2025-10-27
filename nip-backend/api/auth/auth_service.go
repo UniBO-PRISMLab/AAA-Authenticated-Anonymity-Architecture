@@ -8,34 +8,34 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/pem"
+	"fmt"
 	"math/big"
 	"time"
 
+	"github.com/UniBO-PRISMLab/nip-backend/api/aaa"
 	"github.com/UniBO-PRISMLab/nip-backend/api/identity"
 	"github.com/UniBO-PRISMLab/nip-backend/db"
 	"github.com/UniBO-PRISMLab/nip-backend/models"
-	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/jackc/pgx/v5"
 )
 
 type Service struct {
 	configuration   models.Configuration
 	identityService *identity.Service
 	authRepo        *db.AuthRepository
-	ethClient       *ethclient.Client
+	uip             *aaa.Service
 }
 
 func NewService(
 	configuration models.Configuration,
 	authRepo *db.AuthRepository,
 	identityService *identity.Service,
-	ethClient *ethclient.Client,
+	uip *aaa.Service,
 ) *Service {
 	return &Service{
 		configuration:   configuration,
 		authRepo:        authRepo,
 		identityService: identityService,
-		ethClient:       ethClient,
+		uip:             uip,
 	}
 }
 
@@ -63,6 +63,10 @@ func (s *Service) IssuePAC(
 	if err != nil {
 		return nil, models.ErrorInvalidPublicKey
 	}
+	rsaPub, ok := pk.(*rsa.PublicKey)
+	if !ok {
+		return nil, models.ErrorInvalidPublicKey
+	}
 
 	h := crypto.SHA256.New()
 	h.Write([]byte(user.PID))
@@ -73,7 +77,7 @@ func (s *Service) IssuePAC(
 		return nil, models.ErrorInvalidSignatureEncoding
 	}
 
-	if err := rsa.VerifyPKCS1v15(pk.(*rsa.PublicKey), crypto.SHA256, pidHash, sig); err != nil {
+	if err := rsa.VerifyPKCS1v15(rsaPub, crypto.SHA256, pidHash, sig); err != nil {
 		return nil, models.ErrorPIDSignatureVerification
 	}
 
@@ -90,32 +94,50 @@ func (s *Service) IssueSAC(
 	req *models.SACRequestModel,
 ) (*models.SACResponseModel, error) {
 	var err error
-	var tx pgx.Tx
 	var sid string
 	var resp *models.SACResponseModel
 
-	// TODO: check that the received payload was actually signed by that user via the PK saved in the record
-
-	tx, err = s.authRepo.DB.Pool.Begin(ctx)
+	_, pkBytes, err := s.uip.GetSIDRecord(ctx, req.SID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get SID record: %w", err)
 	}
 
-	defer tx.Rollback(ctx)
+	// Print the retrieved public key in a readable format
+	fmt.Printf("Retrieved public key (base64): %s\n", base64.StdEncoding.EncodeToString(pkBytes))
+
+	publicKeyPemBlock, _ := pem.Decode(pkBytes)
+	if publicKeyPemBlock == nil || publicKeyPemBlock.Type != "PUBLIC KEY" {
+		return nil, models.ErrorInvalidPublicKeyHeader
+	}
+
+	pub, err := x509.ParsePKIXPublicKey(publicKeyPemBlock.Bytes)
+	if err != nil {
+		return nil, models.ErrorInvalidPublicKey
+	}
+	rsaPub, ok := pub.(*rsa.PublicKey)
+	if !ok {
+		return nil, models.ErrorInvalidPublicKey
+	}
+
+	sig, err := base64.StdEncoding.DecodeString(req.SignedSID)
+	if err != nil {
+		return nil, models.ErrorInvalidSignatureEncoding
+	}
+
+	h := crypto.SHA256.New()
+	h.Write([]byte(req.SID))
+	sidHash := h.Sum(nil)
+
+	if err := rsa.VerifyPKCS1v15(rsaPub, crypto.SHA256, sidHash, sig); err != nil {
+		return nil, models.ErrorSIDSignatureVerification
+	}
 
 	a, _ := rand.Int(rand.Reader, big.NewInt(900000))
 	sac := a.Int64() + 100000
-
 	expiration := time.Now().Add(2 * time.Minute).UTC()
 
-	resp, err = s.authRepo.IssueSAC(ctx, &tx, sac, &sid, expiration)
+	resp, err = s.authRepo.IssueSAC(ctx, nil, sac, &sid, expiration)
 	if err != nil {
-		return nil, err
-	}
-
-	// TODO: store the mapping SAC on the blockchain
-
-	if err := tx.Commit(ctx); err != nil {
 		return nil, err
 	}
 

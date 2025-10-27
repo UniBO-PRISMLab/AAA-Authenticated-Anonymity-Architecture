@@ -33,6 +33,8 @@ services:
   nip-backend-1:
     image: nip-backend:latest
     container_name: nip-backend-1
+    networks:
+      - nip-net
     ports:
       - "8888:8888"
     env_file:
@@ -41,10 +43,52 @@ services:
   nip-backend-2:
     image: nip-backend:latest
     container_name: nip-backend-2
+    networks:
+      - nip-net
     ports:
       - "8889:8888"
     env_file:
       - .env.instance2
+
+  nip-backend-3:
+    image: nip-backend:latest
+    container_name: nip-backend-3
+    networks:
+      - nip-net
+    ports:
+      - "8890:8888"
+    env_file:
+      - .env.instance3
+
+  nip-backend-4:
+    image: nip-backend:latest
+    container_name: nip-backend-4
+    networks:
+      - nip-net
+    ports:
+      - "8891:8888"
+    env_file:
+      - .env.instance4
+
+  nip-backend-5:
+    image: nip-backend:latest
+    container_name: nip-backend-5
+    networks:
+      - nip-net
+    ports:
+      - "8892:8888"
+    env_file:
+      - .env.instance5
+
+  nip-backend-6:
+    image: nip-backend:latest
+    container_name: nip-backend-6
+    networks:
+      - nip-net
+    ports:
+      - "8893:8888"
+    env_file:
+      - .env.instance6
 
   db:
     image: postgres:15

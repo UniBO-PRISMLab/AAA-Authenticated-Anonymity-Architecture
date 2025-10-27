@@ -325,7 +325,7 @@ const docTemplate = `{
             "properties": {
                 "sid": {
                     "type": "string",
-                    "example": "MHhmMzZmMmRlNWFmNmVkODg0ODM3NTgwMmZjOWIxNWMyNzBkN2NmNWUwNmI0MTYxZGY2ZGM5YjYyNWZhMmU4NzE2"
+                    "example": "ZmFjODEyMWYyNTU2ZjJkYTA5MjI0OWI1ZDk5MzA0ZjY4ZTk4NDQzZTlhZWNkYmYwMGYyMTEzMmI0MzQ5NmNkYQ=="
                 },
                 "signed_sid": {
                     "type": "string",

@@ -11,7 +11,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
-func (u *UIP) ListenSIDEncryption(ctx context.Context) error {
+func (u *Service) ListenSIDEncryption(ctx context.Context) error {
 	sidRequestedSig := crypto.Keccak256Hash([]byte("SIDEncryptionRequested(bytes32,address,bytes,bytes)"))
 	query := ethereum.FilterQuery{
 		Addresses: []common.Address{u.contractAddress},
