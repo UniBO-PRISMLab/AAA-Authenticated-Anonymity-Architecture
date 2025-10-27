@@ -24,4 +24,16 @@ task up
 
 ## Scale Instances
 
-Currently `docker-compose.yaml` runs 2 instances of `nip-backend`. To increase the number of instances either switch to [swarm mode](https://docs.docker.com/engine/swarm/) or manually add a `env.instanceN` file and add a new `nip-backend` service in `docker-compose.yaml`.
+Currently `docker-compose.yaml` runs 6 instances of `nip-backend` with a shared PostgreSQL databse. To increase the number of instances either switch to [swarm mode](https://docs.docker.com/engine/swarm/) or manually add a `env.instanceN` file and a new `nip-backend` entry in `docker-compose.yaml`.
+
+```yaml
+nip-backend-{n}:
+  image: nip-backend:latest
+  container_name: nip-backend-{n}
+  networks:
+    - nip-net
+  ports:
+    - "{port}:8888"
+  env_file:
+    - .env.instance{n}
+```
