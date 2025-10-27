@@ -7,10 +7,12 @@
 |                                       |     Min |     Max |     Avg | Calls | eur avg |
 | :------------------------------------ | ------: | ------: | ------: | ----: | ------: |
 | **AAAContract**                       |         |         |         |       |         |
-|        *seedPhraseGenerationProtocol* | 541,980 | 542,004 | 542,003 |    16 |       - |
-|        *submitEncryptedPID*           |       - |       - | 149,295 |     4 |       - |
-|        *submitEncryptedSID*           | 333,400 | 333,448 | 333,432 |     6 |       - |
-|        *submitEncryptedWord*          | 634,920 | 788,301 | 673,194 |    50 |       - |
+|        *seedPhraseGenerationProtocol* | 541,970 | 541,982 | 541,981 |    16 |       - |
+|        *submitEncryptedPID*           | 149,283 | 149,295 | 149,289 |     4 |       - |
+|        *submitEncryptedSID*           | 333,402 | 333,426 | 333,414 |     6 |       - |
+|        *submitEncryptedWord*          | 634,884 | 788,301 | 673,188 |    50 |       - |
+|        *submitSAC*                    |       - |       - |  54,900 |     8 |       - |
+|        *submitSACRecord*              |       - |       - |  53,901 |     4 |       - |
 | **MockUIPRegistry**                   |         |         |         |       |         |
 |        *addNode*                      |       - |       - |  74,522 |     5 |       - |
 |        *onlyNodeFn*                   |       - |       - |  23,465 |     2 |       - |
@@ -20,7 +22,7 @@
 ## Deployments
 |                     |       Min |      Max  |       Avg | Block % | eur avg |
 | :------------------ | --------: | --------: | --------: | ------: | ------: |
-| **AAAContract**     | 2,356,394 | 2,402,892 | 2,397,726 |     8 % |       - |
+| **AAAContract**     | 2,571,204 | 2,617,702 | 2,613,475 |   8.7 % |       - |
 | **MockAAALib**      |         - |         - |   472,628 |   1.6 % |       - |
 | **MockUIPRegistry** |   583,653 |   630,139 |   588,818 |     2 % |       - |
 

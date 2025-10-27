@@ -28,6 +28,14 @@ contract AAAContract is UIPRegistry {
     /// @dev Mapping from PID to SID encrypted with user's public key.
     mapping(bytes32 => bytes) private pidToEncSid;
 
+    /// @dev Mapping from SID to SAC codes.
+    mapping(bytes32 => uint256[]) private sidToSac;
+
+    mapping(uint256 => bool) private sacCodes;
+
+    /// @dev Mapping from a public key to its associated SAC code.
+    mapping(bytes => uint256) private pkToSac;
+
     /// @dev Emitted to request word generation requested to a UIP node.
     event WordRequested(
         bytes32 indexed pid,
@@ -288,6 +296,40 @@ contract AAAContract is UIPRegistry {
     }
 
     /**
+     * @dev Submits a SAC record linking a public key to a SAC code.
+     *
+     * Requirements:
+     * - The public key must not be empty.
+     * - The SAC code must be greater than zero.
+     * - The public key must not have been already stored.
+     * - The SAC code must exist.
+     *
+     * @param sac The SAC code to be linked.
+     * @param pk The public key to be linked.
+     */
+    function submitSACRecord(uint256 sac, bytes calldata pk) external {
+        require(pk.length > 0, "invalid pk");
+        require(sac > 0, "invalid sac");
+        require(pkToSac[pk] == 0, "already stored");
+        require(sacCodes[sac], "sac not found");
+        pkToSac[pk] = sac;
+    }
+
+    /**
+     * @dev Submits a SAC code.
+     *
+     * Requirements:
+     * - The sender must be a UIP node.
+     *
+     * @param sac The SAC code to be submitted.
+     */
+    function submitSAC(uint256 sac) external nonReentrant onlyUIPNode {
+        require(sac > 0, "invalid sac");
+        require(!sacCodes[sac], "already stored");
+        sacCodes[sac] = true;
+    }
+
+    /**
      * @dev Returns the encrypted SID for a given pid.
      *
      * @param pid User's PID.
@@ -310,6 +352,18 @@ contract AAAContract is UIPRegistry {
         SIDRecord storage record = sidRecords[sid];
         require(record.exists, "not found");
         return (record.encPID, record.pk);
+    }
+
+    /**
+     * @dev Returns the SAC code for a given public key.
+     *
+     * @param pk User's public key.
+     * @return The SAC code associated with the public key.
+     */
+    function getSACRecord(bytes calldata pk) external view returns (uint256) {
+        uint256 sac = pkToSac[pk];
+        require(sac > 0, "not found");
+        return sac;
     }
 
     /**

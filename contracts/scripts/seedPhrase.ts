@@ -21,17 +21,29 @@ const contractAddress: string = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 const contract: Contract = new ethers.Contract(contractAddress, abi, wallet);
 
 async function main(): Promise<void> {
-  const pid: Buffer = generateRandomBytes(32);
-  const { publicKey, privateKey } = generateKeyPairSync("rsa", {
-    modulusLength: 2048,
-    publicKeyEncoding: { type: "spki", format: "pem" },
-    privateKeyEncoding: { type: "pkcs8", format: "pem" },
-  });
+  // For deterministic testing
+  const pid: Buffer = Buffer.from(
+    "wjnuZkNtmbpPl/vROMXgSLfgO+rpZ3FpUGvr1czhT6Q=",
+    "base64"
+  );
+  const publicKey: Buffer = Buffer.from(
+    "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUFxR2ZvQTJrVEYrZldQWm5kMGZKVwowWGpEMjd1eFVJQnJuUkErQisyc3J0UFZ6R21OVUFqSDNZaVVNVXovZmsySGN6dU5KVFZUVUJzODRaNE41ZDd3ClBhSEhUVjlMeGMwVVhMRWxxMGR1QTdiY0RhaU5TVllGQzNwRjlKVU45c2hGdGxmWXBtd3l3bldDYVBGQlZ4ZE4KUVFvMnNkZGxLRTM5K0hsKy92b0RsUWF5T1c5TE9lb0pzeTdGNWRxYmtwVVVSN0lVUW11UTFFMlpEVG5IcHZkNgo0Y0ZleVltV3pvYlh6WWRjNmZnUjdWS0I5MHRXSXIzRFBMWkRaS2VuOXF0Tkt3QWRDazNrdlVCdW5IYVQxczNyCnRjeGpsejEvd2cvcUxVRWpZQWhaOUlRakRycW92Njg3ZUd0ZlR0Qi9iRVYwV2VMTC9WdkU1UTFkMVJEMk1uNnEKWndJREFRQUIKLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg==",
+    "base64"
+  );
+
+  // For random testing
+  // const pid: Buffer = generateRandomBytes(32);
+  // const { publicKey, privateKey } = generateKeyPairSync("rsa", {
+  //   modulusLength: 2048,
+  //   publicKeyEncoding: { type: "spki", format: "pem" },
+  //   privateKeyEncoding: { type: "pkcs8", format: "pem" },
+  // });
+
   console.log("Submitting PID (b64): ", pid.toString("base64"));
-  console.log("Submitting PK: ", publicKey);
+  console.log("Submitting PK: ", publicKey.toString("base64"));
 
   const tx: ethers.TransactionResponse =
-    await contract.seedPhraseGenerationProtocol(pid, Buffer.from(publicKey));
+    await contract.seedPhraseGenerationProtocol(pid, publicKey);
   console.log("Tx hash:", tx.hash);
 }
 

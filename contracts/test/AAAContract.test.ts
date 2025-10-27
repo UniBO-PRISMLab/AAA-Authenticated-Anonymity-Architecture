@@ -8,9 +8,7 @@ import {
   generateRandomBytes,
   encryptWithKey,
   decryptWithKey,
-  recoverPublicKey,
   generateKeypair,
-  encryptSym,
   encryptWithSymK,
 } from "../utils/crypto";
 import { BytesLike } from "ethers";
@@ -370,6 +368,42 @@ describe("AAAContract", function () {
     });
   });
 
+  describe("SAC", function () {
+    it("should allow UIP nodes to submit SAC codes", async function () {
+      const sacCodes = [123456, 234567, 345678];
+
+      for (const sac of sacCodes) {
+        await expect(aaa.connect(nodes[0]).submitSAC(sac)).to.not.be.reverted;
+      }
+    });
+
+    it("should not allow non-UIP nodes to submit SAC codes", async function () {
+      const sac = 123456;
+      await expect(aaa.connect(nonNode).submitSAC(sac)).to.be.revertedWith(
+        "Not UIP node"
+      );
+    });
+
+    it("should store SAC records", async function () {
+      const sac = 123456;
+      await aaa.connect(nodes[0]).submitSAC(sac);
+      const pk = await generatePublicKey();
+      await expect(aaa.connect(nodes[0]).submitSACRecord(sac, pk)).to.not.be
+        .reverted;
+    });
+
+    it("should not allow storing multiple SAC for the same public key", async function () {
+      const sac = 123456;
+      await aaa.connect(nodes[0]).submitSAC(sac);
+      const pk = await generatePublicKey();
+      await expect(aaa.connect(nodes[0]).submitSACRecord(sac, pk)).to.not.be
+        .reverted;
+      await expect(
+        aaa.connect(nodes[0]).submitSACRecord(sac, pk)
+      ).to.be.revertedWith("already stored");
+    });
+  });
+
   describe("Getters", function () {
     it("should retrieve the SID", async function () {
       const pid = generateRandomBytes(32);
@@ -403,6 +437,11 @@ describe("AAAContract", function () {
         (addr) => addr === selectedNode
       );
       const selectedSigner = nodes[selectedIndex];
+      console.log("Received SID:", sid);
+      console.log(
+        "Received SID base64:",
+        Buffer.from(sid.slice(2)).toString("base64")
+      );
 
       // Encrypt SID with user's public key
       const pem = Buffer.from(userPK.slice(2), "hex");
