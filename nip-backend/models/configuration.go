@@ -2,7 +2,6 @@ package models
 
 import (
 	"errors"
-	"log"
 	"os"
 	"strconv"
 
@@ -49,11 +48,8 @@ type CORSConfiguration struct {
 
 func NewConfiguration() Configuration {
 	var env EnvironmentType
-	var err error
 
-	if err = godotenv.Load(); err != nil {
-		log.Println("Couldn't load .env file")
-	}
+	godotenv.Load()
 
 	os.Setenv("GIN_MODE", stringFromEnv("GIN_MODE", "development"))
 	os.Setenv("HTTP_HOST", "0.0.0.0")
