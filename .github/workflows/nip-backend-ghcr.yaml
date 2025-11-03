@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - development
-    paths:
-      - "nip-backend/**"
+    # paths:
+    #   - "nip-backend/**"
 
 env:
   REGISTRY: ghcr.io
