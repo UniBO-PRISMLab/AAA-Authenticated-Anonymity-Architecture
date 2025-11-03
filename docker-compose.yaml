@@ -5,6 +5,11 @@ services:
       dockerfile: Dockerfile
     image: contracts:latest
     container_name: contracts
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8545"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - uip-net
     ports:
@@ -34,8 +39,10 @@ services:
       context: ./nip-backend
       dockerfile: Dockerfile
     depends_on:
-      - db
-      - contracts
+      db:
+        condition: service_started
+      contracts:
+        condition: service_healthy
     networks:
       - uip-net
     ports:
@@ -51,8 +58,10 @@ services:
       context: ./nip-backend
       dockerfile: Dockerfile
     depends_on:
-      - db
-      - contracts
+      db:
+        condition: service_started
+      contracts:
+        condition: service_healthy
     networks:
       - uip-net
     ports:
@@ -68,8 +77,10 @@ services:
       context: ./nip-backend
       dockerfile: Dockerfile
     depends_on:
-      - db
-      - contracts
+      db:
+        condition: service_started
+      contracts:
+        condition: service_healthy
     networks:
       - uip-net
     ports:
@@ -85,8 +96,10 @@ services:
       context: ./nip-backend
       dockerfile: Dockerfile
     depends_on:
-      - db
-      - contracts
+      db:
+        condition: service_started
+      contracts:
+        condition: service_healthy
     networks:
       - uip-net
     ports:
@@ -102,8 +115,10 @@ services:
       context: ./nip-backend
       dockerfile: Dockerfile
     depends_on:
-      - db
-      - contracts
+      db:
+        condition: service_started
+      contracts:
+        condition: service_healthy
     networks:
       - uip-net
     ports:
@@ -119,8 +134,10 @@ services:
       context: ./nip-backend
       dockerfile: Dockerfile
     depends_on:
-      - db
-      - contracts
+      db:
+        condition: service_started
+      contracts:
+        condition: service_healthy
     networks:
       - uip-net
     ports:
@@ -143,6 +160,5 @@ volumes:
 
 networks:
   uip-net:
-    # external: true
     name: uip-net
     driver: bridge
