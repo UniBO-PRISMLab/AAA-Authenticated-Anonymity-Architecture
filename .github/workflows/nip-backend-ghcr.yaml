@@ -5,11 +5,11 @@ on:
     branches:
       - development
     paths:
-      - "backend-nip/**"
+      - "nip-backend/**"
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository_owner }}/backend-nip
+  IMAGE_NAME: ${{ github.repository_owner }}/nip-backend
 
 jobs:
   build-and-push-image:
