@@ -3,7 +3,7 @@ name: Push to ghcr.io
 on:
   push:
     branches:
-      - development
+      - main
     # paths:
     #   - "nip-backend/**"
 
