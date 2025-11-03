@@ -13,6 +13,7 @@ import (
 	"strings"
 
 	"github.com/UniBO-PRISMLab/nip-backend/api/aaa/bindings"
+	"github.com/UniBO-PRISMLab/nip-backend/api/identity"
 	"github.com/UniBO-PRISMLab/nip-backend/models"
 	"github.com/UniBO-PRISMLab/nip-backend/utils"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -31,10 +32,12 @@ type Service struct {
 	contractAddress common.Address
 	nodeAddress     common.Address
 	logger          *zerolog.Logger
+	identityService *identity.Service
 }
 
 func NewAAAService(
 	client *ethclient.Client,
+	identityService *identity.Service,
 	contractAddr string,
 	configuration models.Configuration,
 ) (*Service, error) {
@@ -63,6 +66,7 @@ func NewAAAService(
 		babbler:         &babbler,
 		configuration:   configuration,
 		logger:          logger,
+		identityService: identityService,
 	}, nil
 }
 

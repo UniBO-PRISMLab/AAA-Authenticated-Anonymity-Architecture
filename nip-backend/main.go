@@ -51,6 +51,7 @@ func main() {
 	}
 
 	repos := db.InitRepositories()
+	identityService := identity.NewService(configuration, repos.Identity)
 
 	ethClient, err := eth.DialContext(ctx, configuration.Blockchain.EthNodeURL)
 	if err != nil {
@@ -61,6 +62,7 @@ func main() {
 
 	uip, err := aaa.NewAAAService(
 		ethClient,
+		identityService,
 		configuration.Blockchain.ContractAddress,
 		configuration,
 	)
@@ -68,10 +70,9 @@ func main() {
 		log.Error().Err(err).Msg(models.ErrorUnableToCreateUIPListener.Error())
 	}
 
-	go uip.Start(ctx)
-
-	identityService := identity.NewService(configuration, repos.Identity)
 	authService := auth.NewService(configuration, repos.Auth, identityService, uip)
+
+	go uip.Start(ctx)
 
 	if err = api.NewServer(
 		configuration,

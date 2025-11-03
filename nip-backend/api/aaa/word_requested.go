@@ -2,6 +2,7 @@ package aaa
 
 import (
 	"context"
+	"encoding/base64"
 	"strings"
 
 	"github.com/UniBO-PRISMLab/nip-backend/models"
@@ -44,6 +45,12 @@ func (u *Service) ListenWordRequested(ctx context.Context) error {
 			}
 
 			if u.nodeAddress.Hex() != event.Node.Hex() {
+				continue
+			}
+
+			pidB64 := base64.StdEncoding.EncodeToString(event.Pid[:])
+			if _, err = u.identityService.GetUserByPID(ctx, &pidB64); err != nil {
+				u.logger.Error().Err(err).Msg(models.ErrorUserWithPIDNotFound.Error())
 				continue
 			}
 

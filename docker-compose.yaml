@@ -1,0 +1,148 @@
+services:
+  contracts:
+    build:
+      context: ./contracts
+      dockerfile: Dockerfile
+    image: contracts:latest
+    container_name: contracts
+    networks:
+      - uip-net
+    ports:
+      - "8545:8545"
+
+  db:
+    image: postgres:15
+    restart: always
+    shm_size: 128mb
+    networks:
+      - uip-net
+    environment:
+      POSTGRES_USER: nipadmin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: nip
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./nip-backend/init-scripts:/docker-entrypoint-initdb.d
+
+  nip-backend-1:
+    image: nip-backend:latest
+    container_name: nip-backend-1
+    restart: always
+    build:
+      context: ./nip-backend
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+      - contracts
+    networks:
+      - uip-net
+    ports:
+      - "8888:8888"
+    env_file:
+      - ./nip-backend/.env.instance1
+
+  nip-backend-2:
+    image: nip-backend:latest
+    container_name: nip-backend-2
+    restart: always
+    build:
+      context: ./nip-backend
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+      - contracts
+    networks:
+      - uip-net
+    ports:
+      - "8889:8888"
+    env_file:
+      - ./nip-backend/.env.instance2
+
+  nip-backend-3:
+    image: nip-backend:latest
+    container_name: nip-backend-3
+    restart: always
+    build:
+      context: ./nip-backend
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+      - contracts
+    networks:
+      - uip-net
+    ports:
+      - "8890:8888"
+    env_file:
+      - ./nip-backend/.env.instance3
+
+  nip-backend-4:
+    image: nip-backend:latest
+    container_name: nip-backend-4
+    restart: always
+    build:
+      context: ./nip-backend
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+      - contracts
+    networks:
+      - uip-net
+    ports:
+      - "8891:8888"
+    env_file:
+      - ./nip-backend/.env.instance4
+
+  nip-backend-5:
+    image: nip-backend:latest
+    container_name: nip-backend-5
+    restart: always
+    build:
+      context: ./nip-backend
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+      - contracts
+    networks:
+      - uip-net
+    ports:
+      - "8892:8888"
+    env_file:
+      - ./nip-backend/.env.instance5
+
+  nip-backend-6:
+    image: nip-backend:latest
+    container_name: nip-backend-6
+    restart: always
+    build:
+      context: ./nip-backend
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+      - contracts
+    networks:
+      - uip-net
+    ports:
+      - "8893:8888"
+    env_file:
+      - ./nip-backend/.env.instance6
+
+  adminer:
+    image: adminer
+    restart: always
+    networks:
+      - uip-net
+    depends_on:
+      - db
+    ports:
+      - 8080:8080
+
+volumes:
+  db_data:
+
+networks:
+  uip-net:
+    # external: true
+    name: uip-net
+    driver: bridge
