@@ -4,31 +4,23 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/UniBO-PRISMLab/nip-backend/api/aaa/bindings"
 	"github.com/UniBO-PRISMLab/nip-backend/models"
-	"github.com/ethereum/go-ethereum"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 )
 
 func (u *Service) ListenSIDEncryption(ctx context.Context) error {
-	sidRequestedSig := crypto.Keccak256Hash([]byte("SIDEncryptionRequested(bytes32,address,bytes,bytes)"))
-	query := ethereum.FilterQuery{
-		Addresses: []common.Address{u.contractAddress},
-		Topics:    [][]common.Hash{{sidRequestedSig}},
-	}
-
-	logs := make(chan types.Log)
-	sub, err := u.client.SubscribeFilterLogs(ctx, query, logs)
+	eventChan := make(chan *bindings.AAAContractSIDEncryptionRequested)
+	sub, err := u.contract.WatchSIDEncryptionRequested(
+		&bind.WatchOpts{Context: ctx},
+		eventChan,
+		nil,
+		nil, // TODO: filter only events for this node
+	)
 	if err != nil {
-		return fmt.Errorf("failed to subscribe to logs: %w", err)
+		return fmt.Errorf("failed to subscribe via WatchSIDEncryptionRequested: %w", err)
 	}
 	defer sub.Unsubscribe()
-
-	transactOpts, err := u.loadTransactor(ctx)
-	if err != nil {
-		return fmt.Errorf("failed to load transactor: %w", err)
-	}
 
 	for {
 		select {
@@ -36,25 +28,34 @@ func (u *Service) ListenSIDEncryption(ctx context.Context) error {
 			u.logger.Error().Err(err).Msg(models.ErrorSubscribtion.Error())
 			return err
 
-		case vLog := <-logs:
-			event, err := u.contract.ParseSIDEncryptionRequested(vLog)
-			if err != nil {
-				u.logger.Error().Err(err).Msg(models.ErrorParseSIDEncryptionRequested.Error())
+		case evt := <-eventChan:
+			if evt == nil {
+				u.logger.Error().Msg("received nil event")
 				continue
 			}
 
-			if u.nodeAddress.Hex() != event.Node.Hex() {
+			if u.nodeAddress.Hex() != evt.Node.Hex() {
 				continue
 			}
 
-			encryptedSID, err := PublicEncrypt(event.Sid, event.UserPK[:])
+			u.logger.Debug().
+				Str("pid", fmt.Sprintf("%x", evt.Pid)).
+				Str("sid", fmt.Sprintf("%x", evt.Sid)).
+				Msg("Received SIDEncryptionRequested")
+
+			encryptedSID, err := PublicEncrypt(evt.Sid, evt.UserPK[:])
 			if err != nil {
 				return models.ErrorWordEncryption
 			}
 
+			transactOpts, err := u.newTransactor(ctx)
+			if err != nil {
+				return models.ErrorLoadTransactor
+			}
+
 			tx, err := u.contract.SubmitEncryptedSID(
 				transactOpts,
-				event.Pid,
+				evt.Pid,
 				encryptedSID,
 			)
 			if err != nil {

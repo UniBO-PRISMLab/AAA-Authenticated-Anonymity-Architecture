@@ -7,6 +7,7 @@ const abi: string[] = [
   "function seedPhraseGenerationProtocol(bytes32 pid, bytes publicKey)",
   "event WordRequested(bytes32 indexed pid, address indexed node, bytes publicKey)",
   "event SeedPhraseProtocoloInitiated(bytes32 indexed pid)",
+  "function getWords(bytes32 pid) external view returns(bytes32[] words)",
 ];
 
 const provider: ethers.JsonRpcProvider = new ethers.JsonRpcProvider(
@@ -23,11 +24,11 @@ const contract: Contract = new ethers.Contract(contractAddress, abi, wallet);
 async function main(): Promise<void> {
   // For deterministic testing
   const pid: Buffer = Buffer.from(
-    "wjnuZkNtmbpPl/vROMXgSLfgO+rpZ3FpUGvr1czhT6Q=",
+    "dy0QlcEMneBt+zTk219tEaTpVYWErxl7umC6pVJmZhE=",
     "base64"
   );
   const publicKey: Buffer = Buffer.from(
-    "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUFxR2ZvQTJrVEYrZldQWm5kMGZKVwowWGpEMjd1eFVJQnJuUkErQisyc3J0UFZ6R21OVUFqSDNZaVVNVXovZmsySGN6dU5KVFZUVUJzODRaNE41ZDd3ClBhSEhUVjlMeGMwVVhMRWxxMGR1QTdiY0RhaU5TVllGQzNwRjlKVU45c2hGdGxmWXBtd3l3bldDYVBGQlZ4ZE4KUVFvMnNkZGxLRTM5K0hsKy92b0RsUWF5T1c5TE9lb0pzeTdGNWRxYmtwVVVSN0lVUW11UTFFMlpEVG5IcHZkNgo0Y0ZleVltV3pvYlh6WWRjNmZnUjdWS0I5MHRXSXIzRFBMWkRaS2VuOXF0Tkt3QWRDazNrdlVCdW5IYVQxczNyCnRjeGpsejEvd2cvcUxVRWpZQWhaOUlRakRycW92Njg3ZUd0ZlR0Qi9iRVYwV2VMTC9WdkU1UTFkMVJEMk1uNnEKWndJREFRQUIKLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg==",
+    "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUFtVmRYZlhXQjBzVGRkanJzWWt0OAp0OXN3elNpUFRiRnhlcnpZUFNKWkkyUlQ3aDBYM3o5VmJkbDN0VTNxaFZJcWFUbHFMeVI5SjBVY1ZnYkpZRVMzCnN5MUF3ejNMUXZBR2hLTzZsczJGTGhPVE5DSUZWb3VxK3cvSnB2b2JDaml5QjFMbjhpNk5HVU55UkEwT3lueTMKU1UwM3owNGM2QlBtYnVrZ3YzL0M1REdVcnNaQ2JmczQ4N0xhYytnakpPbXY5RExjS3VBZWNqdEhNWW54Z1RaVgpUZlROb2h5UDV1Y0tlRExETW5FR250RVQ3enBPenNaWmUrcHJkR0w3T2tEUUpQVkhvYm1xejJzbSs5RFVoRWpOCitieHdRaHd1czRlOVZ5azRPREwydk14cDFFVGVQa2NPbXdiNmJlRTJpUkxkVDVQV2s5YndpMm8wK1FrUzl1QjQKQndJREFRQUIKLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg==",
     "base64"
   );
 
@@ -45,6 +46,9 @@ async function main(): Promise<void> {
   const tx: ethers.TransactionResponse =
     await contract.seedPhraseGenerationProtocol(pid, publicKey);
   console.log("Tx hash:", tx.hash);
+
+  // const words = await contract.getWords(pid);
+  // console.log(words);
 }
 
 main().catch((error: any) => {

@@ -76,15 +76,11 @@ func (u *Service) Start(ctx context.Context) {
 	go u.ListenSIDEncryption(ctx)
 }
 
-func (u *Service) loadTransactor(ctx context.Context) (*bind.TransactOpts, error) {
-	keyHex := u.configuration.Blockchain.BlockchainPrivateKey
-	if len(keyHex) >= 2 && keyHex[:2] == "0x" {
-		keyHex = keyHex[2:]
-	}
-
+func (u *Service) newTransactor(ctx context.Context) (*bind.TransactOpts, error) {
+	keyHex := strings.TrimPrefix(u.configuration.Blockchain.BlockchainPrivateKey, "0x")
 	keyBytes, err := hex.DecodeString(keyHex)
 	if err != nil {
-		return nil, fmt.Errorf("failed to decode private key hex: %w", err)
+		return nil, fmt.Errorf("failed to decode private key: %w", err)
 	}
 
 	privateKey, err := crypto.ToECDSA(keyBytes)
@@ -97,13 +93,14 @@ func (u *Service) loadTransactor(ctx context.Context) (*bind.TransactOpts, error
 		return nil, fmt.Errorf("failed to get network ID: %w", err)
 	}
 
-	transactOpts, err := bind.NewKeyedTransactorWithChainID(privateKey, chainID)
+	opts, err := bind.NewKeyedTransactorWithChainID(privateKey, chainID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create transactor: %w", err)
 	}
 
-	transactOpts.GasLimit = 5_000_000
-	return transactOpts, nil
+	opts.GasLimit = 5_000_000
+
+	return opts, nil
 }
 
 func PublicEncrypt(data []byte, key []byte) ([]byte, error) {

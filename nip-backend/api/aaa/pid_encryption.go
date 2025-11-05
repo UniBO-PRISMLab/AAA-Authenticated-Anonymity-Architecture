@@ -3,71 +3,81 @@ package aaa
 import (
 	"context"
 	"fmt"
+	"time"
 
+	"github.com/UniBO-PRISMLab/nip-backend/api/aaa/bindings"
 	"github.com/UniBO-PRISMLab/nip-backend/models"
-	"github.com/ethereum/go-ethereum"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 )
 
 func (u *Service) ListenPIDEncryption(ctx context.Context) error {
-	pidRequestedSig := crypto.Keccak256Hash([]byte("PIDEncryptionRequested(bytes32,address,bytes32,bytes32)"))
-	query := ethereum.FilterQuery{
-		Addresses: []common.Address{u.contractAddress},
-		Topics:    [][]common.Hash{{pidRequestedSig}},
-	}
-
-	logs := make(chan types.Log)
-	sub, err := u.client.SubscribeFilterLogs(ctx, query, logs)
+	eventChan := make(chan *bindings.AAAContractPIDEncryptionRequested)
+	sub, err := u.contract.WatchPIDEncryptionRequested(
+		&bind.WatchOpts{Context: ctx},
+		eventChan,
+		nil,
+		nil, // TODO: filter only events for this node
+	)
 	if err != nil {
-		return fmt.Errorf("failed to subscribe to logs: %w", err)
+		return fmt.Errorf("failed to subscribe via WatchPIDEncryptionRequested: %w", err)
 	}
 	defer sub.Unsubscribe()
 
-	transactOpts, err := u.loadTransactor(ctx)
-	if err != nil {
-		return fmt.Errorf("failed to load transactor: %w", err)
-	}
-
 	for {
 		select {
-		case err := <-sub.Err():
-			u.logger.Error().Err(err).Msg("subscription error")
-			return err
 
-		case vLog := <-logs:
-			event, err := u.contract.ParsePIDEncryptionRequested(vLog)
-			if err != nil {
-				u.logger.Error().Err(err).Msg("failed to parse PIDEncryptionRequested event")
+		case evt := <-eventChan:
+			if evt == nil {
+				u.logger.Error().Msg("received nil event")
 				continue
 			}
 
-			if u.nodeAddress.Hex() != event.Node.Hex() {
+			if u.nodeAddress.Hex() != evt.Node.Hex() {
 				continue
 			}
 
-			encryptedPID, err := SymEncrypt(event.Pid[:], event.SymK[:])
+			u.logger.Debug().
+				Str("pid", fmt.Sprintf("%x", evt.Pid)).
+				Str("sid", fmt.Sprintf("%x", evt.Sid)).
+				Msg("Received PIDEncryptionRequested")
+
+			encryptedPID, err := SymEncrypt(evt.Pid[:], evt.SymK[:])
 			if err != nil {
-				return models.ErrorWordEncryption
+				u.logger.Error().Err(err).Msg(models.ErrorPIDEncryption.Error())
+				return models.ErrorPIDEncryption
 			}
 
-			u.logger.Info().Msgf("Received PID encryption request for SID: %x", event.Sid)
+			transactOpts, err := u.newTransactor(ctx)
+			if err != nil {
+				return models.ErrorLoadTransactor
+			}
 
 			tx, err := u.contract.SubmitEncryptedPID(
 				transactOpts,
-				event.Pid,
-				event.Sid,
+				evt.Pid,
+				evt.Sid,
 				encryptedPID,
 			)
 			if err != nil {
-				return models.ErrorWordSubmission
+				u.logger.Error().Err(err).Msg("failed to submit encrypted PID")
+				continue
 			}
 
-			u.logger.Debug().Msgf("Submitted encrypted pid. Tx: %s", tx.Hash().Hex())
+			u.logger.Debug().Msgf("Submitted encrypted PID. Tx: %s", tx.Hash().Hex())
+
+		case err := <-sub.Err():
+			u.logger.Error().Err(err).Msg("subscription error, restarting watcher")
+
+			time.Sleep(2 * time.Second)
+			go func() {
+				if restartErr := u.ListenPIDEncryption(ctx); restartErr != nil {
+					u.logger.Error().Err(restartErr).Msg("failed to restart listener")
+				}
+			}()
+			return err
 
 		case <-ctx.Done():
-			u.logger.Info().Msg("context cancelled, stopping listener")
+			u.logger.Info().Msg("context cancelled, stopping watcher")
 			return nil
 		}
 	}

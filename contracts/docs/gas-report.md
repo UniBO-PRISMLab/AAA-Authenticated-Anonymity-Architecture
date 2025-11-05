@@ -8,9 +8,9 @@
 | :------------------------------------ | ------: | ------: | ------: | ----: | ------: |
 | **AAAContract**                       |         |         |         |       |         |
 |        *seedPhraseGenerationProtocol* | 541,970 | 541,982 | 541,981 |    16 |       - |
-|        *submitEncryptedPID*           | 149,283 | 149,295 | 149,289 |     4 |       - |
+|        *submitEncryptedPID*           |       - |       - | 149,295 |     4 |       - |
 |        *submitEncryptedSID*           | 333,402 | 333,426 | 333,414 |     6 |       - |
-|        *submitEncryptedWord*          | 634,884 | 788,301 | 673,188 |    50 |       - |
+|        *submitEncryptedWord*          | 634,920 | 788,301 | 673,194 |    50 |       - |
 |        *submitSAC*                    |       - |       - |  54,900 |     8 |       - |
 |        *submitSACRecord*              |       - |       - |  53,901 |     4 |       - |
 | **MockUIPRegistry**                   |         |         |         |       |         |
