@@ -11,6 +11,7 @@ import (
 	"encoding/pem"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/UniBO-PRISMLab/nip-backend/api/aaa/bindings"
 	"github.com/UniBO-PRISMLab/nip-backend/api/identity"
@@ -43,12 +44,7 @@ func NewAAAService(
 ) (*Service, error) {
 	logger := utils.InitServiceAdvancedLogger("AAALogger")
 	addr := common.HexToAddress(contractAddr)
-	nodeAddr, err := getBackendAddress(configuration.Blockchain.BlockchainPrivateKey)
-	logger.Info().Msgf("UIP listener started at %s", nodeAddr.Hex())
-
-	if err != nil {
-		return nil, fmt.Errorf("failed to get backend address: %w", err)
-	}
+	nodeAddr := common.HexToAddress(configuration.Blockchain.BlockchainAddress)
 
 	contract, err := bindings.NewAAAContract(addr, client)
 	if err != nil {
@@ -71,9 +67,35 @@ func NewAAAService(
 }
 
 func (u *Service) Start(ctx context.Context) {
-	go u.ListenWordRequested(ctx)
-	go u.ListenPIDEncryption(ctx)
-	go u.ListenSIDEncryption(ctx)
+	go u.watchLoop(ctx, "WordRequested", u.ListenWordRequested)
+	go u.watchLoop(ctx, "PIDEncryption", u.ListenPIDEncryption)
+	go u.watchLoop(ctx, "SIDEncryption", u.ListenSIDEncryption)
+}
+
+func (u *Service) watchLoop(ctx context.Context, name string, fn func(context.Context) error) {
+	for {
+		func() {
+			defer func() {
+				if r := recover(); r != nil {
+					u.logger.Error().Msgf("[%s] panic recovered: %v", name, r)
+				}
+			}()
+
+			u.logger.Info().Msgf("[%s] listener started", name)
+			err := fn(ctx)
+			if err != nil {
+				u.logger.Error().Err(err).Msgf("[%s] listener failed", name)
+			}
+		}()
+
+		select {
+		case <-ctx.Done():
+			u.logger.Info().Msgf("[%s] listener stopped due to context", name)
+			return
+		case <-time.After(5 * time.Second):
+			u.logger.Warn().Msgf("[%s] restarting listener after 5s", name)
+		}
+	}
 }
 
 func (u *Service) newTransactor(ctx context.Context) (*bind.TransactOpts, error) {
@@ -152,24 +174,4 @@ func (u *Service) GetSIDRecord(ctx context.Context, sidBase64 string) ([]byte, [
 	}
 
 	return encPID, pk, nil
-}
-
-func getBackendAddress(hexKey string) (common.Address, error) {
-	if len(hexKey) >= 2 && hexKey[:2] == "0x" {
-		hexKey = hexKey[2:]
-	}
-
-	keyBytes, err := hex.DecodeString(hexKey)
-	if err != nil {
-		return common.Address{}, fmt.Errorf("failed to decode private key: %w", err)
-	}
-
-	privateKey, err := crypto.ToECDSA(keyBytes)
-	if err != nil {
-		return common.Address{}, fmt.Errorf("invalid private key: %w", err)
-	}
-
-	address := crypto.PubkeyToAddress(privateKey.PublicKey)
-
-	return address, nil
 }
