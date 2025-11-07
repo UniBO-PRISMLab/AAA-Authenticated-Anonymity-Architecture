@@ -23,6 +23,7 @@ type BlockchainConfiguration struct {
 	EthNodeURL           string
 	ContractAddress      string
 	BlockchainPrivateKey string
+	BlockchainAddress    string
 }
 
 type KeyPair struct {
@@ -70,6 +71,7 @@ func NewConfiguration() Configuration {
 
 	contractAddress := stringOrPanic("CONTRACT_ADDRESS")
 	blockchainPrivateKey := stringOrPanic("BLOCKCHAIN_PRIVATE_KEY")
+	blockchainAddress := stringOrPanic("BLOCKCHAIN_ADDRESS")
 
 	if stringFromEnv("GIN_MODE", "development") == "production" {
 		env = Production
@@ -97,6 +99,7 @@ func NewConfiguration() Configuration {
 			EthNodeURL:           ethNodeUrl,
 			ContractAddress:      contractAddress,
 			BlockchainPrivateKey: blockchainPrivateKey,
+			BlockchainAddress:    blockchainAddress,
 		},
 	}
 }

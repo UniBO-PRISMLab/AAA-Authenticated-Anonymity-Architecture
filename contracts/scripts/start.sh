@@ -1,15 +1,16 @@
 #!/bin/sh
 set -e
 
-npx hardhat node --hostname 0.0.0.0 &
-HARDHAT_PID=$!
+anvil --host 0.0.0.0 --chain-id 31337 &
+ANVIL_PID=$!
 
-echo "Waiting for Hardhat node to start..."
+echo "Waiting for Anvil node to start..."
 until curl -s http://127.0.0.1:8545 > /dev/null; do
   sleep 1
 done
 
-echo "Deploying contracts..."
+echo "Deploying contracts using Hardhat..."
 npx hardhat run scripts/deploy.js --network localhost
 
-wait $HARDHAT_PID
+echo "Contracts deployed!"
+wait $ANVIL_PID
