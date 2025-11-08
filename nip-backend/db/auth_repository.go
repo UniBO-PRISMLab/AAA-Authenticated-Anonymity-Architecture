@@ -15,8 +15,11 @@ var insertPACQuery string
 //go:embed sql/auth/get_active_pac.sql
 var getActivePACQuery string
 
+//go:embed sql/auth/delete_pac.sql
+var deletePACQuery string
+
 //go:embed sql/auth/insert_sac.sql
-var inserSACQuery string
+var insertSACQuery string
 
 type AuthRepository struct {
 	DB *DB
@@ -57,6 +60,36 @@ func (r *AuthRepository) IssuePAC(ctx context.Context, pid *string, pac int64, e
 	}, nil
 }
 
+func (r *AuthRepository) VerifyPAC(ctx context.Context, pid *string, pac int64) (*models.PACVerificationResponseModel, error) {
+	var expiration time.Time
+	var foundPAC int64
+
+	tx, err := r.DB.Pool.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback(ctx)
+
+	err = tx.QueryRow(ctx, getActivePACQuery, pid, pac).Scan(&foundPAC, &expiration)
+	if err != nil || foundPAC != pac {
+		return nil, models.ErrorPACNotValid
+	}
+
+	_, err = tx.Exec(ctx, deletePACQuery, pid, pac)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = tx.Commit(ctx); err != nil {
+		return nil, err
+	}
+
+	return &models.PACVerificationResponseModel{
+		Valid:      foundPAC == pac,
+		Expiration: expiration,
+	}, nil
+}
+
 func (r *AuthRepository) IssueSAC(ctx context.Context,
 	tx *pgx.Tx,
 	sac int64,
@@ -74,28 +107,13 @@ func (r *AuthRepository) IssueSAC(ctx context.Context,
 		}
 	}
 
-	err = (*tx).QueryRow(ctx, inserSACQuery, sac, expiration, sid).Scan(&insertedSAC, &expiration, &insertedSID)
+	err = (*tx).QueryRow(ctx, insertSACQuery, sac, expiration, sid).Scan(&insertedSAC, &expiration, &insertedSID)
 	if err != nil {
 		return nil, err
 	}
 
 	return &models.SACResponseModel{
 		SAC:        insertedSAC,
-		Expiration: expiration,
-	}, nil
-}
-
-func (r *AuthRepository) VerifyPAC(ctx context.Context, pid *string, pac int64) (*models.PACVerificationResponseModel, error) {
-	var expiration time.Time
-	var foundPAC int64
-
-	err := r.DB.Pool.QueryRow(ctx, getActivePACQuery, pid, pac).Scan(&foundPAC, &expiration)
-	if err != nil {
-		return nil, models.ErrorPACNotValid
-	}
-
-	return &models.PACVerificationResponseModel{
-		Valid:      foundPAC == pac,
 		Expiration: expiration,
 	}, nil
 }
