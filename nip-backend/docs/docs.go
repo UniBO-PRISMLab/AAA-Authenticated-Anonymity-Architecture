@@ -24,7 +24,7 @@ const docTemplate = `{
     "paths": {
         "/v1/auth/pac": {
             "post": {
-                "description": "Allows a user to request a Public Authentication Code (PAC). It accepts a payload ` + "`" + `PID` + "`" + ` and ` + "`" + `SIGN(PID, SK)` + "`" + `, namely the PID signed with the private key of the public-private key pair used to obtain the PID. The PID must be sent as base64 (as it was retrieved originally from the NIP). The signed PID must be base64 encoded as well.",
+                "description": "Public Authentication Code (PAC) is a one-time code that can be used to authenticate a user without sharing information about real identity. The API accepts a payload ` + "`" + `PID` + "`" + ` and ` + "`" + `SIGN(PID, SK)` + "`" + `, namely the PID signed with the private key of the public-private key pair used to obtain the PID. The PID must be sent as base64 (as it was retrieved originally from the NIP). The signature must be a RSA PKCS #1 v1.5 signature with SHA256 as the hash function. Signature payload must be encoded using base64.",
                 "consumes": [
                     "application/json"
                 ],
@@ -174,7 +174,7 @@ const docTemplate = `{
         },
         "/v1/identity/pid": {
             "post": {
-                "description": "The NIP issues a Public Identity Data (PID), i.e., an anonymous token that identifies the user without sharing information. The real identity of the user is carried by the PID alone. The NIP will be the only one able to connect a PID to the real information of the respective user. It accepts a 2048 bit RSA PKCS#8 key encoded in base64.",
+                "description": "Public Identity Data (PID) is an anonymous token which can be released only by the NIP and it identifies the user without explicitly sharing information. PID is derived from user's public key and a random nonce, the server calculates ` + "`" + `HMAC_SHA256(SHA256(PK) || nonce, SK)` + "`" + ` where ` + "`" + `HMAC_SHA256` + "`" + ` is a keyed-hash message authentication code (HMAC) using SHA256 as the hash function PK is the public key and SK is a secret key stored on the server. The resulting PID is a 32 byte string encoded using base64. The API accepts 2048 bit RSA PKCS#8 keys encoded in base64.",
                 "consumes": [
                     "application/json"
                 ],
@@ -325,7 +325,7 @@ const docTemplate = `{
             "properties": {
                 "sid": {
                     "type": "string",
-                    "example": "ZmFjODEyMWYyNTU2ZjJkYTA5MjI0OWI1ZDk5MzA0ZjY4ZTk4NDQzZTlhZWNkYmYwMGYyMTEzMmI0MzQ5NmNkYQ=="
+                    "example": "Y2I4NjBmMmQ1YmM1YTFjODQ4ZTA3OTdiMzE5MTU5NzE4OTBhMTRmMzA0MmFjY2ZjMjZjYjk4Y2EwNWI1OWE2Yg=="
                 },
                 "signed_sid": {
                     "type": "string",
@@ -356,7 +356,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/",
 	Schemes:          []string{"http", "https"},
 	Title:            "National Identity Provider (NIP)",
-	Description:      "API specification for the Authenticated Anonymity Architecture (AAA), a blockchain-based solution providing robust and ethical authenticated anonymous identities with deanonymization capabilities for criminal activity cases.",
+	Description:      "API specification for the NIP server of the Authenticated Anonymity Architecture (AAA).",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

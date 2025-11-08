@@ -1,4 +1,5 @@
-[![go](https://img.shields.io/badge/Go-1.23.1-00ADD8?logo=Go)](https://www.scala-lang.org/download/2.12.18.html)
+[![go](https://img.shields.io/badge/Go-1.24-00ADD8?logo=Go)](https://go.dev/doc/go1.24)
+![swagger](https://img.shields.io/badge/Swagger%20Preview-85EA2D?logo=Swagger&logoColor=black)
 
 NIP (National Identity Provider) server
 
@@ -37,3 +38,5 @@ nip-backend-{n}:
   env_file:
     - .env.instance{n}
 ```
+
+[Excalidraw Diagram](https://excalidraw.com/#json=J1hfecP489sIF7XvNlq45,GEvU67sRsKGebbV9XD-Cpw)

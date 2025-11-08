@@ -18,7 +18,7 @@ import (
 
 //	@title			National Identity Provider (NIP)
 //	@version		0.0.1
-//	@description	API specification for the Authenticated Anonymity Architecture (AAA), a blockchain-based solution providing robust and ethical authenticated anonymous identities with deanonymization capabilities for criminal activity cases.
+//	@description	API specification for the NIP server of the Authenticated Anonymity Architecture (AAA).
 //	@contact.email	m.dinelli@unibo.it
 //	@contact.name	Michele Dinelli
 

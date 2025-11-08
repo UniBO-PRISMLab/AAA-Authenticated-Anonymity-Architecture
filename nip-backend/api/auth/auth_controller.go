@@ -75,7 +75,7 @@ func (c *AuthController) injectUnAuthenticatedRoutes() {
 //	@Schemes		http
 //	@Router			/v1/auth/pac [post]
 //	@Summary		PAC issuance request
-//	@Description	Allows a user to request a Public Authentication Code (PAC). It accepts a payload `PID` and `SIGN(PID, SK)`, namely the PID signed with the private key of the public-private key pair used to obtain the PID. The PID must be sent as base64 (as it was retrieved originally from the NIP). The signed PID must be base64 encoded as well.
+//	@Description	Public Authentication Code (PAC) is a one-time code that can be used to authenticate a user without sharing information about real identity. The API accepts a payload `PID` and `SIGN(PID, SK)`, namely the PID signed with the private key of the public-private key pair used to obtain the PID. The PID must be sent as base64 (as it was retrieved originally from the NIP). The signature must be a RSA PKCS #1 v1.5 signature with SHA256 as the hash function. Signature payload must be encoded using base64.
 //	@Accept			json
 //	@Produce		json
 //	@Param			models.PACRequestModel	body		models.PACRequestModel		true	"PAC Request Model"
