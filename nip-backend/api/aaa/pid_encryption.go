@@ -10,7 +10,7 @@ import (
 )
 
 func (u *Service) ListenPIDEncryption(ctx context.Context) error {
-	eventChan := make(chan *bindings.AAAContractPIDEncryptionRequested, 100)
+	eventChan := make(chan *bindings.AAAPIDEncryptionRequested, 100)
 	sub, err := u.contract.WatchPIDEncryptionRequested(
 		&bind.WatchOpts{Context: ctx},
 		eventChan,
@@ -43,7 +43,7 @@ func (u *Service) ListenPIDEncryption(ctx context.Context) error {
 	}
 }
 
-func (u *Service) handlePIDEncryptionEvent(ctx context.Context, evt *bindings.AAAContractPIDEncryptionRequested) {
+func (u *Service) handlePIDEncryptionEvent(ctx context.Context, evt *bindings.AAAPIDEncryptionRequested) {
 	if evt == nil {
 		u.logger.Error().Msg("received nil event")
 		return

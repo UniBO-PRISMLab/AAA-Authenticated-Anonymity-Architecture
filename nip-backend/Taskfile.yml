@@ -15,6 +15,6 @@ tasks:
       - docker-compose down
   abi-gen:
     cmds:
-      - jq '.abi' ../contracts/artifacts/contracts/AAAContract.sol/AAAContract.json > AAAContract.abi
-      - abigen --abi AAAContract.abi --pkg bindings --type AAAContract --out api/aaa/bindings/aaa_contract.go
-      - rm AAAContract.abi
+      - jq '.abi' ../contracts/artifacts/contracts/AAA.sol/AAA.json > AAA.abi
+      - abigen --abi AAA.abi --pkg bindings --type AAA --out api/aaa/bindings/aaa.go
+      - rm AAA.abi

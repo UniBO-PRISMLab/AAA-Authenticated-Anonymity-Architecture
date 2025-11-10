@@ -102,9 +102,6 @@ func (s *Service) IssueSAC(
 		return nil, fmt.Errorf("failed to get SID record: %w", err)
 	}
 
-	// Print the retrieved public key in a readable format
-	fmt.Printf("Retrieved public key (base64): %s\n", base64.StdEncoding.EncodeToString(pkBytes))
-
 	publicKeyPemBlock, _ := pem.Decode(pkBytes)
 	if publicKeyPemBlock == nil || publicKeyPemBlock.Type != "PUBLIC KEY" {
 		return nil, models.ErrorInvalidPublicKeyHeader

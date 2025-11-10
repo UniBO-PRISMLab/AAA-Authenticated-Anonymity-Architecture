@@ -45,6 +45,7 @@ var ErrorRetrievingSIDRecord = errors.New("failed to retrieve SID record from bl
 var ErrorUserWithPIDNotFound = errors.New("no user found with the provided PID")
 var ErrorInvalidPublicKey = errors.New("invalid public key")
 var ErrorInvalidPublicKeyHeader = errors.New("invalid public key header")
+var ErrorInvalidSymK = errors.New("invalid symmetric key")
 var ErrorPKAlreadyAssociated = errors.New("this public key has been already associated with a PID")
 var ErrorPublicKeyDecoding = errors.New("error while decoding public key")
 var ErrorInvalidSignatureEncoding = errors.New("error while encoding signature")

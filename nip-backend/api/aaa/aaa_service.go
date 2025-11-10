@@ -1,7 +1,10 @@
 package aaa
 
 import (
+	"bytes"
 	"context"
+	"crypto/aes"
+	"crypto/cipher"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha256"
@@ -27,7 +30,7 @@ import (
 
 type Service struct {
 	client          *ethclient.Client
-	contract        *bindings.AAAContract
+	contract        *bindings.AAA
 	babbler         *babble.Babbler
 	configuration   models.Configuration
 	contractAddress common.Address
@@ -46,7 +49,7 @@ func NewAAAService(
 	addr := common.HexToAddress(contractAddr)
 	nodeAddr := common.HexToAddress(configuration.Blockchain.BlockchainAddress)
 
-	contract, err := bindings.NewAAAContract(addr, client)
+	contract, err := bindings.NewAAA(addr, client)
 	if err != nil {
 		return nil, fmt.Errorf("failed to instantiate contract: %w", err)
 	}
@@ -145,8 +148,23 @@ func PublicEncrypt(data []byte, key []byte) ([]byte, error) {
 }
 
 func SymEncrypt(data []byte, key []byte) ([]byte, error) {
-	// TODO: implement symmetric encryption
-	return data, nil
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, models.ErrorInvalidSymK
+	}
+	iv := make([]byte, aes.BlockSize)
+	rand.Read(iv)
+	enc := cipher.NewCBCEncrypter(block, iv)
+	plaintext := pad(data, aes.BlockSize)
+	ciphertext := make([]byte, len(plaintext))
+	enc.CryptBlocks(ciphertext, plaintext)
+	return ciphertext, nil
+}
+
+func pad(data []byte, blockSize int) []byte {
+	n := blockSize - len(data)%blockSize
+	padding := bytes.Repeat([]byte{byte(n)}, n)
+	return append(data, padding...)
 }
 
 func (u *Service) GetSIDRecord(ctx context.Context, sidBase64 string) ([]byte, []byte, error) {

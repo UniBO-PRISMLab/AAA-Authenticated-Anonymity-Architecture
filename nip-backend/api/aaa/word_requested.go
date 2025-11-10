@@ -12,7 +12,7 @@ import (
 )
 
 func (u *Service) ListenWordRequested(ctx context.Context) error {
-	eventChan := make(chan *bindings.AAAContractWordRequested, 100)
+	eventChan := make(chan *bindings.AAAWordRequested, 100)
 	sub, err := u.contract.WatchWordRequested(
 		&bind.WatchOpts{Context: ctx},
 		eventChan,
@@ -45,7 +45,7 @@ func (u *Service) ListenWordRequested(ctx context.Context) error {
 	}
 }
 
-func (u *Service) handleWordEncryptionEvent(ctx context.Context, evt *bindings.AAAContractWordRequested) {
+func (u *Service) handleWordEncryptionEvent(ctx context.Context, evt *bindings.AAAWordRequested) {
 	if evt == nil {
 		u.logger.Error().Msg("received nil event")
 		return
@@ -67,7 +67,7 @@ func (u *Service) handleWordEncryptionEvent(ctx context.Context, evt *bindings.A
 	}
 
 	word := strings.ToLower(u.babbler.Babble())
-	encryptedWord, err := PublicEncrypt([]byte(word), evt.UserPK[:])
+	encWord, err := PublicEncrypt([]byte(word), evt.UserPK[:])
 	if err != nil {
 		u.logger.Error().Err(err).Msg(models.ErrorWordEncryption.Error())
 		return
@@ -82,8 +82,7 @@ func (u *Service) handleWordEncryptionEvent(ctx context.Context, evt *bindings.A
 	tx, err := u.contract.SubmitEncryptedWord(
 		transactOpts,
 		evt.Pid,
-		encryptedWord,
-		[]byte(u.configuration.KeyPair.PublicKey),
+		encWord,
 	)
 	if err != nil {
 		u.logger.Error().Err(err).Msg(models.ErrorWordSubmission.Error())
