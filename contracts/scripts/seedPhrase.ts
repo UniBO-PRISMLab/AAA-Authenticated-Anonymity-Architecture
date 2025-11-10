@@ -24,7 +24,7 @@ const contract: Contract = new ethers.Contract(contractAddress, abi, wallet);
 async function main(): Promise<void> {
   // For deterministic testing
   const pid: Buffer = Buffer.from(
-    "dy0QlcEMneBt+zTk219tEaTpVYWErxl7umC6pVJmZhE=",
+    "tkuswtEE463L9z0DWu+op2vfoSpAyEQ3MHgD3WNKkQw=",
     "base64"
   );
   const publicKey: Buffer = Buffer.from(

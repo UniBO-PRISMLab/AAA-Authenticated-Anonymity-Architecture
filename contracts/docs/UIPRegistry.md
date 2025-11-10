@@ -36,6 +36,14 @@ mapping(bytes32 => address[]) selectedNodesByPID
 
 _Mapping from PID to selected UIP nodes._
 
+### redundantNodesByPID
+
+```solidity
+mapping(bytes32 => address[]) redundantNodesByPID
+```
+
+_Mapping from PID to redundant UIP nodes._
+
 ### NodeAdded
 
 ```solidity

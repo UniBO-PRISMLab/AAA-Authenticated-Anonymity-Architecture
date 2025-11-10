@@ -13,7 +13,7 @@ import {
 } from "../utils/crypto";
 import { BytesLike } from "ethers";
 
-describe("AAAContract", function () {
+describe("AAA", function () {
   const WORDS_NEEDED = 4;
   const REDUNDANCY_M = 2;
 
@@ -31,7 +31,7 @@ describe("AAAContract", function () {
     nodes = signers.slice(1, WORDS_NEEDED + 2);
     nonNode = signers[WORDS_NEEDED + 2];
 
-    const Factory = await ethers.getContractFactory("AAAContract");
+    const Factory = await ethers.getContractFactory("AAA");
     nodeAddrs = await Promise.all(nodes.map((n) => n.getAddress()));
 
     pk = await generatePublicKey();
@@ -234,17 +234,21 @@ describe("AAAContract", function () {
       const events = await aaa.queryFilter(filter);
       const sid = events[0].args?.sid;
       const userPK = events[0].args?.userPK;
+      const nodeResponsible = events[0].args?.node;
 
       // Encrypt SID with user's public key
       const pem = Buffer.from(userPK.slice(2), "hex");
       const encSID = await encryptWithKey(sid, pem);
 
-      // Submit from a non-selected node
+      // Try to submit from a non-selected node filtering out the responsible node
       const nonSelectedAddr = nodeAddrs.find(
-        (addr) => !selected.includes(addr)
+        (addr) => addr !== nodeResponsible && !selected.includes(addr)
       );
+      expect(nonSelectedAddr, "Expected at least one non-selected node").to.not
+        .be.undefined;
       const nonSelectedIndex = nodeAddrs.indexOf(nonSelectedAddr!);
       const nonSelectedSigner = nodes[nonSelectedIndex];
+
       await expect(
         aaa.connect(nonSelectedSigner).submitEncryptedSID(pid, encSID)
       ).to.be.revertedWith("not selected");
@@ -437,11 +441,6 @@ describe("AAAContract", function () {
         (addr) => addr === selectedNode
       );
       const selectedSigner = nodes[selectedIndex];
-      console.log("Received SID:", sid);
-      console.log(
-        "Received SID base64:",
-        Buffer.from(sid.slice(2)).toString("base64")
-      );
 
       // Encrypt SID with user's public key
       const pem = Buffer.from(userPK.slice(2), "hex");

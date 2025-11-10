@@ -1,7 +1,7 @@
 const { ethers } = require("hardhat");
 
 async function main() {
-  console.log("Deploying AAAContract.sol");
+  console.log("Deploying AAA.sol");
 
   const [deployer] = await ethers.getSigners();
   console.log("Deploying contracts with the account:", deployer.address);
@@ -15,11 +15,11 @@ async function main() {
     "0x976EA74026E726554dB657fA54763abd0C3a0aa9",
   ];
 
-  const AAAContract = await ethers.getContractFactory("AAAContract");
-  const aaaContract = await AAAContract.deploy(nodeAddresses, 6, 1);
-  await aaaContract.waitForDeployment();
+  const factory = await ethers.getContractFactory("AAA");
+  const aaa = await factory.deploy(nodeAddresses, 6, 1);
+  await aaa.waitForDeployment();
 
-  console.log("AAAContract deployed to:", await aaaContract.getAddress());
+  console.log("AAA deployed to:", await aaa.getAddress());
   console.log(`Initialized with ${nodeAddresses.length} nodes`);
 }
 

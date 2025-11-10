@@ -1,4 +1,4 @@
-# AAAContract
+# AAA
 
 Smart contract in solidity for the Authenticated Anonimity Architecture (AAA).
 

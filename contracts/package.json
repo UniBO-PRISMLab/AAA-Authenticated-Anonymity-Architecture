@@ -10,8 +10,8 @@
     "request-seed-phrase": "npx ts-node scripts/seedPhrase.ts",
     "uip-nodes": "npx ts-node scripts/uip.ts",
     "test": "npx hardhat test",
-    "abi": "jq '.abi' artifacts/contracts/AAAContract.sol/AAAContract.json > AAAContract.abi",
-    "go-bindings": "abigen --abi AAAContract.abi --pkg auth --out AAAContract.go"
+    "abi": "jq '.abi' artifacts/contracts/AAA.sol/AAA.json > AAA.abi",
+    "go-bindings": "abigen --abi AAA.abi --pkg auth --out AAA.go"
   },
   "author": "",
   "license": "ISC",
