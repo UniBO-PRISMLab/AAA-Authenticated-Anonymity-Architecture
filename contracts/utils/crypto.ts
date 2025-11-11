@@ -75,7 +75,7 @@ export async function decrypt(msg: Buffer): Promise<string | void> {
 export async function decryptWithKey(
   encrypted: Buffer,
   keypair: Enigma.RSA.Keypair
-): Promise<string | void> {
+): Promise<string> {
   const rsa = await new Enigma.RSA().init({ keypair });
   const decrypted = (await rsa.decrypt(encrypted)).toString();
   return decrypted;

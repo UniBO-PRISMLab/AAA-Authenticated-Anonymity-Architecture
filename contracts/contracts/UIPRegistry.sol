@@ -17,8 +17,9 @@ abstract contract UIPRegistry {
     /// @dev Mapping from PID to selected UIP nodes.
     mapping(bytes32 => address[]) public selectedNodesByPID;
 
-    /// @dev Mapping from PID to redundant UIP nodes.
-    mapping(bytes32 => address[]) public redundantNodesByPID;
+    /// @dev Mapping from PID to redundant UIP nodes .
+    mapping(bytes32 => mapping(uint256 => address[]))
+        public redundantNodesByPID;
 
     /// @dev Events for node addition and removal.
     event NodeAdded(address node);

@@ -47,7 +47,8 @@ contract AAA is UIPRegistry {
     event WordSubmitted(
         bytes32 indexed pid,
         address indexed node,
-        bytes32 wordHash
+        bytes32 wordHash,
+        uint index
     );
 
     /// @dev Redundancy requested from a UIP node.
@@ -94,8 +95,8 @@ contract AAA is UIPRegistry {
         bytes pk;
         address encryptionResp;
         mapping(address => bool) hasSubmitted;
-        mapping(bytes32 => Word[]) words;
-        mapping(address => bool) hasSubmittedRedundant;
+        Word[] words;
+        mapping(address => mapping(uint => bool)) hasSubmittedRedundant;
         mapping(uint => RedundantWord[]) redundantEncWords;
     }
 
@@ -103,7 +104,6 @@ contract AAA is UIPRegistry {
     struct RedundantWord {
         bytes word;
         bytes nodePK;
-        uint index;
     }
 
     struct Word {
@@ -154,7 +154,6 @@ contract AAA is UIPRegistry {
         p.started = true;
         p.pk = pk;
 
-        // TODO: produce a random seed (check VRF)
         address[] memory selected = AAALib.selectNodes(
             uint256(pid),
             nodeList,
@@ -192,41 +191,48 @@ contract AAA is UIPRegistry {
         require(encryptedWord.length > 0, "empty");
 
         bool isSelected;
-        uint index;
+        uint wordIndex;
         address[] memory selectedNodes = selectedNodesByPID[pid];
         for (uint i = 0; i < selectedNodes.length; i++) {
             if (selectedNodes[i] == msg.sender) {
                 isSelected = true;
-                index = i;
+                wordIndex = i;
                 break;
             }
         }
         require(isSelected, "not selected");
 
-        p.words[pid].push(Word({word: encryptedWord, index: index}));
+        p.words.push(Word({word: encryptedWord, index: wordIndex}));
         p.hasSubmitted[msg.sender] = true;
-        emit WordSubmitted(pid, msg.sender, keccak256(encryptedWord));
+        emit WordSubmitted(
+            pid,
+            msg.sender,
+            keccak256(encryptedWord),
+            wordIndex
+        );
 
         address[] memory redundantNodes = AAALib.selectNodes(
             uint256(keccak256(abi.encodePacked(pid, msg.sender))),
             nodeList,
             REDUNDANCY_FACTOR
         );
+
         for (uint i = 0; i < redundantNodes.length; i++) {
+            redundantNodesByPID[pid][wordIndex].push(redundantNodes[i]);
             emit RedundantWordRequested(
                 pid,
-                index,
+                wordIndex,
                 msg.sender,
                 redundantNodes[i]
             );
         }
 
-        if (p.words[pid].length == WORDS) {
+        if (p.words.length == WORDS) {
             bytes memory acc;
             bytes[] memory wordBytes = new bytes[](WORDS);
-            for (uint i = 0; i < p.words[pid].length; i++) {
-                bytes32 h = keccak256(p.words[pid][i].word);
-                wordBytes[i] = p.words[pid][i].word;
+            for (uint i = 0; i < p.words.length; i++) {
+                bytes32 h = keccak256(p.words[i].word);
+                wordBytes[i] = p.words[i].word;
                 acc = abi.encodePacked(acc, h);
             }
 
@@ -247,40 +253,46 @@ contract AAA is UIPRegistry {
      *
      * Requirements:
      * - The sender must be a UIP node.
+     * - The phrase must have been initiated.
+     * - The sender must not have already submitted the redundant word for the given index.
      *
      * @param pid User's PID.
      * @param encryptedWord The redundant word encrypted with the node's public key.
+     * @param wordIndex The index of the word being submitted.
      * @param nodePK The public key of the node submitting the redundant word.
      */
     function submitRedundantWord(
         bytes32 pid,
         bytes calldata encryptedWord,
+        uint256 wordIndex,
         bytes calldata nodePK
     ) external nonReentrant onlyUIPNode {
         Phrase storage p = phrases[pid];
         require(p.started, "not started");
-        require(!p.hasSubmittedRedundant[msg.sender], "already submitted");
+        require(
+            !p.hasSubmittedRedundant[msg.sender][wordIndex],
+            "already submitted"
+        );
         require(encryptedWord.length > 0, "empty");
 
         bool wasRequested = false;
-        uint index;
-        address[] memory redundantNodes = redundantNodesByPID[pid];
-        for (uint i = 0; i < WORDS; i++) {
+        address[] memory redundantNodes = redundantNodesByPID[pid][wordIndex];
+        for (uint i = 0; i < redundantNodes.length; i++) {
             if (redundantNodes[i] == msg.sender) {
                 wasRequested = true;
-                index = i;
                 break;
             }
         }
         require(wasRequested, "not selected");
 
-        p.redundantEncWords[index].push(
-            RedundantWord({word: encryptedWord, nodePK: nodePK, index: index})
+        p.redundantEncWords[wordIndex].push(
+            RedundantWord({word: encryptedWord, nodePK: nodePK})
         );
+        p.hasSubmittedRedundant[msg.sender][wordIndex] = true;
 
         emit RedundantWordSubmitted(
             pid,
-            index,
+            wordIndex,
             msg.sender,
             keccak256(encryptedWord)
         );
@@ -313,8 +325,8 @@ contract AAA is UIPRegistry {
         bytes[] memory wordBytes = new bytes[](WORDS);
         bytes memory acc;
         for (uint i = 0; i < WORDS; i++) {
-            wordBytes[i] = p.words[pid][i].word;
-            bytes32 h = keccak256(p.words[pid][i].word);
+            wordBytes[i] = p.words[i].word;
+            bytes32 h = keccak256(p.words[i].word);
             acc = abi.encodePacked(acc, h);
         }
 
@@ -442,11 +454,57 @@ contract AAA is UIPRegistry {
     function getWords(
         bytes32 pid
     ) external view returns (bytes[] memory words) {
-        Word[] storage encWords = phrases[pid].words[pid];
+        Word[] storage encWords = phrases[pid].words;
         uint len = encWords.length;
         words = new bytes[](len);
         for (uint i = 0; i < len; i++) {
             words[i] = encWords[i].word;
+        }
+    }
+
+    /**
+     * @dev Returns the phrase information for a given pid.
+     * @param pid User's PID.
+     * @return started Whether the phrase generation has started.
+     * @return pk The user's public key.
+     * @return encWords The array of encrypted words.
+     */
+    function getPhrase(
+        bytes32 pid
+    )
+        external
+        view
+        returns (bool started, bytes memory pk, bytes[] memory encWords)
+    {
+        Phrase storage p = phrases[pid];
+        bytes[] memory words = new bytes[](p.words.length);
+        for (uint i = 0; i < p.words.length; i++) {
+            words[i] = p.words[i].word;
+        }
+        return (p.started, p.pk, words);
+    }
+
+    /**
+     * @dev Returns the redundant encrypted words and node public keys for a given pid and index.
+     *
+     * @param pid User's PID.
+     * @param index The index of the word.
+     * @return words The array of redundant encrypted words.
+     * @return nodePKs The array of node public keys associated with the redundant words.
+     */
+    function getRedundantWords(
+        bytes32 pid,
+        uint index
+    ) external view returns (bytes[] memory words, bytes[] memory nodePKs) {
+        RedundantWord[] storage redWords = phrases[pid].redundantEncWords[
+            index
+        ];
+        uint len = redWords.length;
+        words = new bytes[](len);
+        nodePKs = new bytes[](len);
+        for (uint i = 0; i < len; i++) {
+            words[i] = redWords[i].word;
+            nodePKs[i] = redWords[i].nodePK;
         }
     }
 }
