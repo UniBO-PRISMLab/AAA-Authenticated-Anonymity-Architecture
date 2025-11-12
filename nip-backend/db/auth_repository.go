@@ -91,11 +91,11 @@ func (r *AuthRepository) VerifyPAC(ctx context.Context, pid *string, pac int64) 
 }
 
 func (r *AuthRepository) IssueSAC(ctx context.Context,
-	sac int64,
+	sac string,
 	sid *string,
 	expiration time.Time) (*models.SACResponseModel, error) {
 	var err error
-	var insertedSAC int64
+	var insertedSAC string
 	var insertedSID string
 
 	tx, err := r.DB.Pool.Begin(ctx)

@@ -22,6 +22,7 @@ import (
 	"github.com/UniBO-PRISMLab/nip-backend/utils"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/rs/zerolog"
@@ -187,4 +188,24 @@ func (u *Service) GetSIDRecord(ctx context.Context, sidBase64 string) ([]byte, [
 	}
 
 	return encPID, pk, nil
+}
+
+func (u *Service) SubmitSAC(ctx context.Context, sac []byte) error {
+	var opts *bind.TransactOpts
+	var err error
+	var tx *types.Transaction
+
+	if opts, err = u.newTransactor(ctx); err != nil {
+		return models.ErrorLoadTransactor
+	}
+	if tx, err = u.contract.SubmitSAC(opts, sac); err != nil {
+		return models.ErrorSACSubmission
+	}
+
+	u.logger.Debug().Msgf("Submitted sac %s. Tx: %s",
+		base64.StdEncoding.EncodeToString(sac),
+		tx.Hash().Hex(),
+	)
+
+	return nil
 }

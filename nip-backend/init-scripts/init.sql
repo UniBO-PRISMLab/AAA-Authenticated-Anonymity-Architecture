@@ -27,7 +27,7 @@ CREATE INDEX idx_pac_pid ON pac (pid);
 
 CREATE TABLE IF NOT EXISTS sac (
     id SERIAL PRIMARY KEY,
-    sac INTEGER NOT NULL,
+    sac TEXT NOT NULL,
     sid TEXT NOT NULL,
     expiration TIMESTAMP NOT NULL,
     timestamp TIMESTAMP DEFAULT current_timestamp

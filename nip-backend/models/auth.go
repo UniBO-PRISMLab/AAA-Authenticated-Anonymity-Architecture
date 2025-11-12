@@ -28,6 +28,6 @@ type SACRequestModel struct {
 }
 
 type SACResponseModel struct {
-	SAC        int64     `json:"sac" example:"874532"`
+	SAC        string    `json:"sac" example:"7MWorstwntw="`
 	Expiration time.Time `json:"expiration" example:"2024-12-31T23:59:59Z"`
 }

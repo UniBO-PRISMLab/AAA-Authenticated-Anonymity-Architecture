@@ -128,12 +128,20 @@ func (s *Service) IssueSAC(
 		return nil, models.ErrorSIDSignatureVerification
 	}
 
-	a, _ := rand.Int(rand.Reader, big.NewInt(900000))
-	sac := a.Int64() + 100000
+	sac := make([]byte, 8)
+	rand.Read(sac)
 	expiration := time.Now().Add(2 * time.Minute).UTC()
 
-	resp, err = s.authRepo.IssueSAC(ctx, sac, &req.SID, expiration)
-	if err != nil {
+	if resp, err = s.authRepo.IssueSAC(
+		ctx,
+		base64.StdEncoding.EncodeToString(sac),
+		&req.SID,
+		expiration,
+	); err != nil {
+		return nil, err
+	}
+
+	if err = s.uip.SubmitSAC(ctx, sac); err != nil {
 		return nil, err
 	}
 
