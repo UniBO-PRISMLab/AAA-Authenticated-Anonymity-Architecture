@@ -31,10 +31,10 @@ contract AAA is UIPRegistry {
     /// @dev Mapping from SID to SAC codes.
     mapping(bytes32 => uint256[]) private sidToSac;
 
-    mapping(uint256 => bool) private sacCodes;
+    mapping(bytes => bool) private sacCodes;
 
     /// @dev Mapping from a public key to its associated SAC code.
-    mapping(bytes => uint256) private pkToSac;
+    mapping(bytes => bytes) private pkToSac;
 
     /// @dev Emitted to request word generation requested to a UIP node.
     event WordRequested(
@@ -94,10 +94,10 @@ contract AAA is UIPRegistry {
         bool started;
         bytes pk;
         address encryptionResp;
-        mapping(address => bool) hasSubmitted;
         Word[] words;
-        mapping(address => mapping(uint => bool)) hasSubmittedRedundant;
+        mapping(address => bool) hasSubmitted;
         mapping(uint => RedundantWord[]) redundantEncWords;
+        mapping(address => mapping(uint => bool)) hasSubmittedRedundant;
     }
 
     /// @dev Represents a redundant word submitted by a node.
@@ -106,6 +106,7 @@ contract AAA is UIPRegistry {
         bytes nodePK;
     }
 
+    /// @dev Represents a word used in the seed phrase.
     struct Word {
         bytes word;
         uint index;
@@ -377,10 +378,9 @@ contract AAA is UIPRegistry {
      * @param sac The SAC code to be linked.
      * @param pk The public key to be linked.
      */
-    function submitSACRecord(uint256 sac, bytes calldata pk) external {
+    function submitSACRecord(bytes calldata sac, bytes calldata pk) external {
         require(pk.length > 0, "invalid pk");
-        require(sac > 0, "invalid sac");
-        require(pkToSac[pk] == 0, "already stored");
+        require(sac.length > 0, "invalid sac");
         require(sacCodes[sac], "sac not found");
         pkToSac[pk] = sac;
     }
@@ -393,8 +393,8 @@ contract AAA is UIPRegistry {
      *
      * @param sac The SAC code to be submitted.
      */
-    function submitSAC(uint256 sac) external nonReentrant onlyUIPNode {
-        require(sac > 0, "invalid sac");
+    function submitSAC(bytes calldata sac) external nonReentrant onlyUIPNode {
+        require(sac.length > 0, "invalid sac");
         require(!sacCodes[sac], "already stored");
         sacCodes[sac] = true;
     }
@@ -430,20 +430,13 @@ contract AAA is UIPRegistry {
      * @param pk User's public key.
      * @return The SAC code associated with the public key.
      */
-    function getSACRecord(bytes calldata pk) external view returns (uint256) {
-        uint256 sac = pkToSac[pk];
-        require(sac > 0, "not found");
+    function getSACRecord(
+        bytes calldata pk
+    ) external view returns (bytes memory) {
+        bytes memory sac = pkToSac[pk];
+        require(sac.length > 0, "not found");
         return sac;
     }
-
-    // function getWords(bytes32 pid) external view returns (bytes[] memory) {
-    //     EncryptedWord[] storage encWords = phrases[pid].words[pid];
-    //     bytes[] memory words = new bytes[](encWords.length);
-    //     for (uint i = 0; i < encWords.length; i++) {
-    //         words[i] = encWords[i].word;
-    //     }
-    //     return words;
-    // }
 
     /**
      * @dev Returns the encrypted words, node public keys, and indexes for a given pid.

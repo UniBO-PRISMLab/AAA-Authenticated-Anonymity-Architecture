@@ -39,10 +39,10 @@ _Mapping from PID to selected UIP nodes._
 ### redundantNodesByPID
 
 ```solidity
-mapping(bytes32 => address[]) redundantNodesByPID
+mapping(bytes32 => mapping(uint256 => address[])) redundantNodesByPID
 ```
 
-_Mapping from PID to redundant UIP nodes._
+_Mapping from PID to redundant UIP nodes ._
 
 ### NodeAdded
 

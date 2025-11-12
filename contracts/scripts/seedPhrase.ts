@@ -14,18 +14,16 @@ const abi: string[] = [
 const provider: ethers.JsonRpcProvider = new ethers.JsonRpcProvider(
   "http://127.0.0.1:8545"
 );
-
 const privateKey: string =
   "0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97";
 const wallet: Wallet = new ethers.Wallet(privateKey, provider);
-
 const contractAddress: string = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 const contract: Contract = new ethers.Contract(contractAddress, abi, wallet);
 
 async function main(): Promise<void> {
   // const pid = generateRandomBytes(32);
   const pid: Buffer = Buffer.from(
-    "tkuswtEE463L9z0DWu+op2vfoSpAyEQ3MHgD3WNKkQw=",
+    "3tuZJMqFaR6tLMtHXmcEj8vWYUDP99MLTi7Js7QpntQ=",
     "base64"
   );
 
