@@ -1,13 +1,14 @@
 import { ethers, Contract, Wallet } from "ethers";
 import { Buffer } from "buffer";
-import { generatePublicKey, generateRandomBytes } from "../utils/crypto";
-import { createPublicKey, generateKeyPairSync } from "crypto";
+import { generateRandomBytes } from "../utils/crypto";
+import { constants, generateKeyPairSync, privateDecrypt } from "crypto";
 
 const abi: string[] = [
   "function seedPhraseGenerationProtocol(bytes32 pid, bytes publicKey)",
   "event WordRequested(bytes32 indexed pid, address indexed node, bytes publicKey)",
   "event SeedPhraseProtocoloInitiated(bytes32 indexed pid)",
   "function getWords(bytes32 pid) external view returns(bytes32[] words)",
+  "event PhraseComplete(bytes32 indexed pid, bytes encSID)",
 ];
 
 const provider: ethers.JsonRpcProvider = new ethers.JsonRpcProvider(
@@ -22,33 +23,49 @@ const contractAddress: string = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 const contract: Contract = new ethers.Contract(contractAddress, abi, wallet);
 
 async function main(): Promise<void> {
-  // For deterministic testing
+  // const pid = generateRandomBytes(32);
   const pid: Buffer = Buffer.from(
     "tkuswtEE463L9z0DWu+op2vfoSpAyEQ3MHgD3WNKkQw=",
     "base64"
   );
-  const publicKey: Buffer = Buffer.from(
-    "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUFtVmRYZlhXQjBzVGRkanJzWWt0OAp0OXN3elNpUFRiRnhlcnpZUFNKWkkyUlQ3aDBYM3o5VmJkbDN0VTNxaFZJcWFUbHFMeVI5SjBVY1ZnYkpZRVMzCnN5MUF3ejNMUXZBR2hLTzZsczJGTGhPVE5DSUZWb3VxK3cvSnB2b2JDaml5QjFMbjhpNk5HVU55UkEwT3lueTMKU1UwM3owNGM2QlBtYnVrZ3YzL0M1REdVcnNaQ2JmczQ4N0xhYytnakpPbXY5RExjS3VBZWNqdEhNWW54Z1RaVgpUZlROb2h5UDV1Y0tlRExETW5FR250RVQ3enBPenNaWmUrcHJkR0w3T2tEUUpQVkhvYm1xejJzbSs5RFVoRWpOCitieHdRaHd1czRlOVZ5azRPREwydk14cDFFVGVQa2NPbXdiNmJlRTJpUkxkVDVQV2s5YndpMm8wK1FrUzl1QjQKQndJREFRQUIKLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg==",
-    "base64"
-  );
 
-  // For random testing
-  // const pid: Buffer = generateRandomBytes(32);
-  // const { publicKey, privateKey } = generateKeyPairSync("rsa", {
-  //   modulusLength: 2048,
-  //   publicKeyEncoding: { type: "spki", format: "pem" },
-  //   privateKeyEncoding: { type: "pkcs8", format: "pem" },
-  // });
+  const { publicKey, privateKey } = generateKeyPairSync("rsa", {
+    modulusLength: 2048,
+    publicExponent: 0x10001,
+    publicKeyEncoding: {
+      type: "spki",
+      format: "pem",
+    },
+    privateKeyEncoding: {
+      type: "pkcs8",
+      format: "pem",
+    },
+  });
 
   console.log("Submitting PID (b64): ", pid.toString("base64"));
-  console.log("Submitting PK: ", publicKey.toString("base64"));
+  console.log("Submitting PK: ", Buffer.from(publicKey).toString("base64"));
+  console.log("Private Key: ", Buffer.from(privateKey).toString("base64"));
 
   const tx: ethers.TransactionResponse =
-    await contract.seedPhraseGenerationProtocol(pid, publicKey);
+    await contract.seedPhraseGenerationProtocol(pid, Buffer.from(publicKey));
   console.log("Tx hash:", tx.hash);
 
-  // const words = await contract.getWords(pid);
-  // console.log(words);
+  contract.on("PhraseComplete", (pid: string, encSID: string) => {
+    console.log("\nPhrase completed for PID:", pid);
+    console.log("Encrypted SID:", encSID);
+
+    const sidBuffer = Buffer.from(encSID.slice(2), "hex");
+    const decryptedSID = privateDecrypt(
+      {
+        key: privateKey,
+        padding: constants.RSA_PKCS1_OAEP_PADDING,
+        oaepHash: "sha256",
+      },
+      sidBuffer
+    );
+
+    console.log("Decrypted SID (b64):", decryptedSID.toString("base64"));
+  });
 }
 
 main().catch((error: any) => {

@@ -55,8 +55,8 @@ contract AAA is UIPRegistry {
     event RedundantWordRequested(
         bytes32 indexed pid,
         uint indexed index,
-        address indexed fromNode,
-        address toNode
+        bytes32 hashedWord,
+        address indexed toNode
     );
 
     /// @dev Redundant word submitted by a UIP node
@@ -222,7 +222,7 @@ contract AAA is UIPRegistry {
             emit RedundantWordRequested(
                 pid,
                 wordIndex,
-                msg.sender,
+                keccak256(encryptedWord),
                 redundantNodes[i]
             );
         }

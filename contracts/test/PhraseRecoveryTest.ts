@@ -1,6 +1,5 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
 import { getRandomWord } from "../utils/dictionary";
 import {
   generateKeypair,
@@ -100,11 +99,7 @@ describe("User Phrase Recovery", function () {
         .to.emit(aaa, "WordSubmitted")
         .withArgs(pid, nodeAddr, ethers.keccak256(encWord), i);
 
-      const filter = aaa.filters.RedundantWordRequested(
-        pid,
-        i,
-        nodeSigner.address
-      );
+      const filter = aaa.filters.RedundantWordRequested(pid, i, null);
       const events = await aaa.queryFilter(filter);
       expect(events.length).to.equal(REDUNDANCY_FACTOR);
       const redundantNodeAddr = events[events.length - 1].args.toNode;

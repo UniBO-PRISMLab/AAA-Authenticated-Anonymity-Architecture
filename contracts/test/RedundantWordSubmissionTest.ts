@@ -53,7 +53,7 @@ describe("Redundant Word Submission", function () {
 
     await expect(aaa.connect(nodeSigner).submitEncryptedWord(pid, word))
       .to.emit(aaa, "RedundantWordRequested")
-      .withArgs(pid, 0, nodeSigner.address, anyValue);
+      .withArgs(pid, 0, ethers.keccak256(word), anyValue);
   });
 
   it("should revert if non-UIP node submits redundant word", async function () {

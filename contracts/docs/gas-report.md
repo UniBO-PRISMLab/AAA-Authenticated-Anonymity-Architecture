@@ -7,11 +7,11 @@
 |                                       |     Min |     Max |     Avg | Calls | eur avg |
 | :------------------------------------ | ------: | ------: | ------: | ----: | ------: |
 | **AAA**                               |         |         |         |       |         |
-|        *seedPhraseGenerationProtocol* | 541,971 | 541,983 | 541,981 |    34 |       - |
-|        *submitEncryptedPID*           |       - |       - | 489,416 |     3 |       - |
+|        *seedPhraseGenerationProtocol* | 541,971 | 541,983 | 541,982 |    34 |       - |
+|        *submitEncryptedPID*           | 489,404 | 489,416 | 489,408 |     3 |       - |
 |        *submitEncryptedSID*           | 173,948 | 173,960 | 173,958 |     6 |       - |
-|        *submitEncryptedWord*          | 382,357 | 522,872 | 412,550 |    68 |       - |
-|        *submitRedundantWord*          | 628,894 | 629,071 | 629,009 |    12 |       - |
+|        *submitEncryptedWord*          | 382,683 | 523,184 | 412,884 |    68 |       - |
+|        *submitRedundantWord*          | 628,894 | 629,071 | 628,999 |    12 |       - |
 | **MockUIPRegistry**                   |         |         |         |       |         |
 |        *addNode*                      |       - |       - |  74,522 |     5 |       - |
 |        *onlyNodeFn*                   |       - |       - |  23,465 |     2 |       - |
@@ -21,7 +21,7 @@
 ## Deployments
 |                     |       Min |      Max  |       Avg | Block % | eur avg |
 | :------------------ | --------: | --------: | --------: | ------: | ------: |
-| **AAA**             | 3,164,837 | 3,211,335 | 3,208,517 |  10.7 % |       - |
+| **AAA**             | 3,166,133 | 3,212,631 | 3,209,813 |  10.7 % |       - |
 | **MockAAALib**      |         - |         - |   472,628 |   1.6 % |       - |
 | **MockUIPRegistry** |   617,955 |   664,441 |   623,120 |   2.1 % |       - |
 
