@@ -94,7 +94,6 @@ func (s *Service) IssueSAC(
 	req *models.SACRequestModel,
 ) (*models.SACResponseModel, error) {
 	var err error
-	var sid string
 	var resp *models.SACResponseModel
 
 	_, pkBytes, err := s.uip.GetSIDRecord(ctx, req.SID)
@@ -133,7 +132,7 @@ func (s *Service) IssueSAC(
 	sac := a.Int64() + 100000
 	expiration := time.Now().Add(2 * time.Minute).UTC()
 
-	resp, err = s.authRepo.IssueSAC(ctx, nil, sac, &sid, expiration)
+	resp, err = s.authRepo.IssueSAC(ctx, sac, &req.SID, expiration)
 	if err != nil {
 		return nil, err
 	}

@@ -167,7 +167,7 @@ func (c *AuthController) verifyPAC() gin.HandlerFunc {
 //	@Schemes		http
 //	@Router			/v1/auth/sac [post]
 //	@Summary		SAC issuance request
-//	@Description	The SAC (Secret Authentication Code) is a one-time code used to authenticate the user as an anonymous user. It accepts a payload `SID`, `ENC(SID, SK)`, namely the SID and the SID signed with the private key associated with the public key saved on the blockchain at the moment of seed phrase creation and used in the record where the SID was stored. The SID must be retrieved from the blockchain and sent as base64 encoded (supposedly from hex). The signed SID must be base64 encoded as well.
+//	@Description	The SAC (Secret Authentication Code) is a one-time code used to authenticate the user as an anonymous user. The API accepts a payload `SID`, `ENC(SID, SK)`, namely the SID and the SID signed with the private key associated with the public key saved on the blockchain at the moment of seed phrase creation. The SID must be retrieved from the blockchain and sent as base64 encoded (supposedly from hex). The signed SID must be base64 encoded as well.
 //	@Accept			json
 //	@Produce		json
 //	@Param			models.SACRequestModel	body		models.SACRequestModel		true	"SAC Request Model"

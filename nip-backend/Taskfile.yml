@@ -13,6 +13,9 @@ tasks:
       - test -f docker-compose.yaml
     cmds:
       - docker-compose down
+  swag:
+    cmds:
+      - swag init ./docs
   abi-gen:
     cmds:
       - jq '.abi' ../contracts/artifacts/contracts/AAA.sol/AAA.json > AAA.abi

@@ -91,7 +91,6 @@ func (r *AuthRepository) VerifyPAC(ctx context.Context, pid *string, pac int64) 
 }
 
 func (r *AuthRepository) IssueSAC(ctx context.Context,
-	tx *pgx.Tx,
 	sac int64,
 	sid *string,
 	expiration time.Time) (*models.SACResponseModel, error) {
@@ -99,18 +98,17 @@ func (r *AuthRepository) IssueSAC(ctx context.Context,
 	var insertedSAC int64
 	var insertedSID string
 
-	if tx == nil {
-		if t, err := r.DB.Pool.Begin(ctx); err != nil {
-			return nil, err
-		} else {
-			tx = &t
-		}
-	}
-
-	err = (*tx).QueryRow(ctx, insertSACQuery, sac, expiration, sid).Scan(&insertedSAC, &expiration, &insertedSID)
+	tx, err := r.DB.Pool.Begin(ctx)
 	if err != nil {
 		return nil, err
 	}
+
+	err = tx.QueryRow(ctx, insertSACQuery, sac, expiration, sid).Scan(&insertedSAC, &expiration, &insertedSID)
+	if err != nil {
+		return nil, err
+	}
+
+	tx.Commit(ctx)
 
 	return &models.SACResponseModel{
 		SAC:        insertedSAC,

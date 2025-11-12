@@ -31,7 +31,7 @@ var (
 
 // AAAMetaData contains all meta data concerning the AAA contract.
 var AAAMetaData = &bind.MetaData{
-	ABI: "[{\"inputs\":[{\"internalType\":\"address[]\",\"name\":\"nodes\",\"type\":\"address[]\"},{\"internalType\":\"uint256\",\"name\":\"words\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"redundancyFactor\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"node\",\"type\":\"address\"}],\"name\":\"NodeAdded\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"node\",\"type\":\"address\"}],\"name\":\"NodeRemoved\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"node\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"symK\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"sid\",\"type\":\"bytes32\"}],\"name\":\"PIDEncryptionRequested\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"encSID\",\"type\":\"bytes\"}],\"name\":\"PhraseComplete\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"fromNode\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"toNode\",\"type\":\"address\"}],\"name\":\"RedundantWordRequested\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"node\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"wordHash\",\"type\":\"bytes32\"}],\"name\":\"RedundantWordSubmitted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"node\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"sid\",\"type\":\"bytes\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"userPK\",\"type\":\"bytes\"}],\"name\":\"SIDEncryptionRequested\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"}],\"name\":\"SeedPhraseProtocolInitiated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"node\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"userPK\",\"type\":\"bytes\"}],\"name\":\"WordRequested\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"node\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"wordHash\",\"type\":\"bytes32\"}],\"name\":\"WordSubmitted\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"REDUNDANCY_FACTOR\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"WORDS\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"node\",\"type\":\"address\"}],\"name\":\"addNode\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"pk\",\"type\":\"bytes\"}],\"name\":\"getSACRecord\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"}],\"name\":\"getSID\",\"outputs\":[{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"sid\",\"type\":\"bytes32\"}],\"name\":\"getSIDRecord\",\"outputs\":[{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"}],\"name\":\"getSelectedNodes\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"}],\"name\":\"getWords\",\"outputs\":[{\"internalType\":\"bytes[]\",\"name\":\"words\",\"type\":\"bytes[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"isNode\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"nodeList\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"redundantNodesByPID\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"node\",\"type\":\"address\"}],\"name\":\"removeNode\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"pk\",\"type\":\"bytes\"}],\"name\":\"seedPhraseGenerationProtocol\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"selectedNodesByPID\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"sid\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"encPID\",\"type\":\"bytes\"}],\"name\":\"submitEncryptedPID\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"encSID\",\"type\":\"bytes\"}],\"name\":\"submitEncryptedSID\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"encryptedWord\",\"type\":\"bytes\"}],\"name\":\"submitEncryptedWord\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"encryptedWord\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"nodePK\",\"type\":\"bytes\"}],\"name\":\"submitRedundantWord\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"sac\",\"type\":\"uint256\"}],\"name\":\"submitSAC\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"sac\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"pk\",\"type\":\"bytes\"}],\"name\":\"submitSACRecord\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
+	ABI: "[{\"inputs\":[{\"internalType\":\"address[]\",\"name\":\"nodes\",\"type\":\"address[]\"},{\"internalType\":\"uint256\",\"name\":\"words\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"redundancyFactor\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"node\",\"type\":\"address\"}],\"name\":\"NodeAdded\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"node\",\"type\":\"address\"}],\"name\":\"NodeRemoved\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"node\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"symK\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"sid\",\"type\":\"bytes32\"}],\"name\":\"PIDEncryptionRequested\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"encSID\",\"type\":\"bytes\"}],\"name\":\"PhraseComplete\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"hashedWord\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"toNode\",\"type\":\"address\"}],\"name\":\"RedundantWordRequested\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"node\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"wordHash\",\"type\":\"bytes32\"}],\"name\":\"RedundantWordSubmitted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"node\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"sid\",\"type\":\"bytes\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"userPK\",\"type\":\"bytes\"}],\"name\":\"SIDEncryptionRequested\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"}],\"name\":\"SeedPhraseProtocolInitiated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"node\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"userPK\",\"type\":\"bytes\"}],\"name\":\"WordRequested\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"node\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"wordHash\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"WordSubmitted\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"REDUNDANCY_FACTOR\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"WORDS\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"node\",\"type\":\"address\"}],\"name\":\"addNode\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"}],\"name\":\"getPhrase\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"started\",\"type\":\"bool\"},{\"internalType\":\"bytes\",\"name\":\"pk\",\"type\":\"bytes\"},{\"internalType\":\"bytes[]\",\"name\":\"encWords\",\"type\":\"bytes[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"getRedundantWords\",\"outputs\":[{\"internalType\":\"bytes[]\",\"name\":\"words\",\"type\":\"bytes[]\"},{\"internalType\":\"bytes[]\",\"name\":\"nodePKs\",\"type\":\"bytes[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"pk\",\"type\":\"bytes\"}],\"name\":\"getSACRecord\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"}],\"name\":\"getSID\",\"outputs\":[{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"sid\",\"type\":\"bytes32\"}],\"name\":\"getSIDRecord\",\"outputs\":[{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"}],\"name\":\"getSelectedNodes\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"}],\"name\":\"getWords\",\"outputs\":[{\"internalType\":\"bytes[]\",\"name\":\"words\",\"type\":\"bytes[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"isNode\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"nodeList\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"redundantNodesByPID\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"node\",\"type\":\"address\"}],\"name\":\"removeNode\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"pk\",\"type\":\"bytes\"}],\"name\":\"seedPhraseGenerationProtocol\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"selectedNodesByPID\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"sid\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"encPID\",\"type\":\"bytes\"}],\"name\":\"submitEncryptedPID\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"encSID\",\"type\":\"bytes\"}],\"name\":\"submitEncryptedSID\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"encryptedWord\",\"type\":\"bytes\"}],\"name\":\"submitEncryptedWord\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"encryptedWord\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"wordIndex\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"nodePK\",\"type\":\"bytes\"}],\"name\":\"submitRedundantWord\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"sac\",\"type\":\"uint256\"}],\"name\":\"submitSAC\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"sac\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"pk\",\"type\":\"bytes\"}],\"name\":\"submitSACRecord\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
 }
 
 // AAAABI is the input ABI used to generate the binding from.
@@ -240,6 +240,101 @@ func (_AAA *AAASession) WORDS() (*big.Int, error) {
 // Solidity: function WORDS() view returns(uint256)
 func (_AAA *AAACallerSession) WORDS() (*big.Int, error) {
 	return _AAA.Contract.WORDS(&_AAA.CallOpts)
+}
+
+// GetPhrase is a free data retrieval call binding the contract method 0xcef2ccc9.
+//
+// Solidity: function getPhrase(bytes32 pid) view returns(bool started, bytes pk, bytes[] encWords)
+func (_AAA *AAACaller) GetPhrase(opts *bind.CallOpts, pid [32]byte) (struct {
+	Started  bool
+	Pk       []byte
+	EncWords [][]byte
+}, error) {
+	var out []interface{}
+	err := _AAA.contract.Call(opts, &out, "getPhrase", pid)
+
+	outstruct := new(struct {
+		Started  bool
+		Pk       []byte
+		EncWords [][]byte
+	})
+	if err != nil {
+		return *outstruct, err
+	}
+
+	outstruct.Started = *abi.ConvertType(out[0], new(bool)).(*bool)
+	outstruct.Pk = *abi.ConvertType(out[1], new([]byte)).(*[]byte)
+	outstruct.EncWords = *abi.ConvertType(out[2], new([][]byte)).(*[][]byte)
+
+	return *outstruct, err
+
+}
+
+// GetPhrase is a free data retrieval call binding the contract method 0xcef2ccc9.
+//
+// Solidity: function getPhrase(bytes32 pid) view returns(bool started, bytes pk, bytes[] encWords)
+func (_AAA *AAASession) GetPhrase(pid [32]byte) (struct {
+	Started  bool
+	Pk       []byte
+	EncWords [][]byte
+}, error) {
+	return _AAA.Contract.GetPhrase(&_AAA.CallOpts, pid)
+}
+
+// GetPhrase is a free data retrieval call binding the contract method 0xcef2ccc9.
+//
+// Solidity: function getPhrase(bytes32 pid) view returns(bool started, bytes pk, bytes[] encWords)
+func (_AAA *AAACallerSession) GetPhrase(pid [32]byte) (struct {
+	Started  bool
+	Pk       []byte
+	EncWords [][]byte
+}, error) {
+	return _AAA.Contract.GetPhrase(&_AAA.CallOpts, pid)
+}
+
+// GetRedundantWords is a free data retrieval call binding the contract method 0x934ed944.
+//
+// Solidity: function getRedundantWords(bytes32 pid, uint256 index) view returns(bytes[] words, bytes[] nodePKs)
+func (_AAA *AAACaller) GetRedundantWords(opts *bind.CallOpts, pid [32]byte, index *big.Int) (struct {
+	Words   [][]byte
+	NodePKs [][]byte
+}, error) {
+	var out []interface{}
+	err := _AAA.contract.Call(opts, &out, "getRedundantWords", pid, index)
+
+	outstruct := new(struct {
+		Words   [][]byte
+		NodePKs [][]byte
+	})
+	if err != nil {
+		return *outstruct, err
+	}
+
+	outstruct.Words = *abi.ConvertType(out[0], new([][]byte)).(*[][]byte)
+	outstruct.NodePKs = *abi.ConvertType(out[1], new([][]byte)).(*[][]byte)
+
+	return *outstruct, err
+
+}
+
+// GetRedundantWords is a free data retrieval call binding the contract method 0x934ed944.
+//
+// Solidity: function getRedundantWords(bytes32 pid, uint256 index) view returns(bytes[] words, bytes[] nodePKs)
+func (_AAA *AAASession) GetRedundantWords(pid [32]byte, index *big.Int) (struct {
+	Words   [][]byte
+	NodePKs [][]byte
+}, error) {
+	return _AAA.Contract.GetRedundantWords(&_AAA.CallOpts, pid, index)
+}
+
+// GetRedundantWords is a free data retrieval call binding the contract method 0x934ed944.
+//
+// Solidity: function getRedundantWords(bytes32 pid, uint256 index) view returns(bytes[] words, bytes[] nodePKs)
+func (_AAA *AAACallerSession) GetRedundantWords(pid [32]byte, index *big.Int) (struct {
+	Words   [][]byte
+	NodePKs [][]byte
+}, error) {
+	return _AAA.Contract.GetRedundantWords(&_AAA.CallOpts, pid, index)
 }
 
 // GetSACRecord is a free data retrieval call binding the contract method 0xf0307989.
@@ -491,12 +586,12 @@ func (_AAA *AAACallerSession) Owner() (common.Address, error) {
 	return _AAA.Contract.Owner(&_AAA.CallOpts)
 }
 
-// RedundantNodesByPID is a free data retrieval call binding the contract method 0xd2ae1c59.
+// RedundantNodesByPID is a free data retrieval call binding the contract method 0x5e1616d2.
 //
-// Solidity: function redundantNodesByPID(bytes32 , uint256 ) view returns(address)
-func (_AAA *AAACaller) RedundantNodesByPID(opts *bind.CallOpts, arg0 [32]byte, arg1 *big.Int) (common.Address, error) {
+// Solidity: function redundantNodesByPID(bytes32 , uint256 , uint256 ) view returns(address)
+func (_AAA *AAACaller) RedundantNodesByPID(opts *bind.CallOpts, arg0 [32]byte, arg1 *big.Int, arg2 *big.Int) (common.Address, error) {
 	var out []interface{}
-	err := _AAA.contract.Call(opts, &out, "redundantNodesByPID", arg0, arg1)
+	err := _AAA.contract.Call(opts, &out, "redundantNodesByPID", arg0, arg1, arg2)
 
 	if err != nil {
 		return *new(common.Address), err
@@ -508,18 +603,18 @@ func (_AAA *AAACaller) RedundantNodesByPID(opts *bind.CallOpts, arg0 [32]byte, a
 
 }
 
-// RedundantNodesByPID is a free data retrieval call binding the contract method 0xd2ae1c59.
+// RedundantNodesByPID is a free data retrieval call binding the contract method 0x5e1616d2.
 //
-// Solidity: function redundantNodesByPID(bytes32 , uint256 ) view returns(address)
-func (_AAA *AAASession) RedundantNodesByPID(arg0 [32]byte, arg1 *big.Int) (common.Address, error) {
-	return _AAA.Contract.RedundantNodesByPID(&_AAA.CallOpts, arg0, arg1)
+// Solidity: function redundantNodesByPID(bytes32 , uint256 , uint256 ) view returns(address)
+func (_AAA *AAASession) RedundantNodesByPID(arg0 [32]byte, arg1 *big.Int, arg2 *big.Int) (common.Address, error) {
+	return _AAA.Contract.RedundantNodesByPID(&_AAA.CallOpts, arg0, arg1, arg2)
 }
 
-// RedundantNodesByPID is a free data retrieval call binding the contract method 0xd2ae1c59.
+// RedundantNodesByPID is a free data retrieval call binding the contract method 0x5e1616d2.
 //
-// Solidity: function redundantNodesByPID(bytes32 , uint256 ) view returns(address)
-func (_AAA *AAACallerSession) RedundantNodesByPID(arg0 [32]byte, arg1 *big.Int) (common.Address, error) {
-	return _AAA.Contract.RedundantNodesByPID(&_AAA.CallOpts, arg0, arg1)
+// Solidity: function redundantNodesByPID(bytes32 , uint256 , uint256 ) view returns(address)
+func (_AAA *AAACallerSession) RedundantNodesByPID(arg0 [32]byte, arg1 *big.Int, arg2 *big.Int) (common.Address, error) {
+	return _AAA.Contract.RedundantNodesByPID(&_AAA.CallOpts, arg0, arg1, arg2)
 }
 
 // SelectedNodesByPID is a free data retrieval call binding the contract method 0x6a978a99.
@@ -679,25 +774,25 @@ func (_AAA *AAATransactorSession) SubmitEncryptedWord(pid [32]byte, encryptedWor
 	return _AAA.Contract.SubmitEncryptedWord(&_AAA.TransactOpts, pid, encryptedWord)
 }
 
-// SubmitRedundantWord is a paid mutator transaction binding the contract method 0xb4d9e0e8.
+// SubmitRedundantWord is a paid mutator transaction binding the contract method 0xcef0ceba.
 //
-// Solidity: function submitRedundantWord(bytes32 pid, bytes encryptedWord, bytes nodePK) returns()
-func (_AAA *AAATransactor) SubmitRedundantWord(opts *bind.TransactOpts, pid [32]byte, encryptedWord []byte, nodePK []byte) (*types.Transaction, error) {
-	return _AAA.contract.Transact(opts, "submitRedundantWord", pid, encryptedWord, nodePK)
+// Solidity: function submitRedundantWord(bytes32 pid, bytes encryptedWord, uint256 wordIndex, bytes nodePK) returns()
+func (_AAA *AAATransactor) SubmitRedundantWord(opts *bind.TransactOpts, pid [32]byte, encryptedWord []byte, wordIndex *big.Int, nodePK []byte) (*types.Transaction, error) {
+	return _AAA.contract.Transact(opts, "submitRedundantWord", pid, encryptedWord, wordIndex, nodePK)
 }
 
-// SubmitRedundantWord is a paid mutator transaction binding the contract method 0xb4d9e0e8.
+// SubmitRedundantWord is a paid mutator transaction binding the contract method 0xcef0ceba.
 //
-// Solidity: function submitRedundantWord(bytes32 pid, bytes encryptedWord, bytes nodePK) returns()
-func (_AAA *AAASession) SubmitRedundantWord(pid [32]byte, encryptedWord []byte, nodePK []byte) (*types.Transaction, error) {
-	return _AAA.Contract.SubmitRedundantWord(&_AAA.TransactOpts, pid, encryptedWord, nodePK)
+// Solidity: function submitRedundantWord(bytes32 pid, bytes encryptedWord, uint256 wordIndex, bytes nodePK) returns()
+func (_AAA *AAASession) SubmitRedundantWord(pid [32]byte, encryptedWord []byte, wordIndex *big.Int, nodePK []byte) (*types.Transaction, error) {
+	return _AAA.Contract.SubmitRedundantWord(&_AAA.TransactOpts, pid, encryptedWord, wordIndex, nodePK)
 }
 
-// SubmitRedundantWord is a paid mutator transaction binding the contract method 0xb4d9e0e8.
+// SubmitRedundantWord is a paid mutator transaction binding the contract method 0xcef0ceba.
 //
-// Solidity: function submitRedundantWord(bytes32 pid, bytes encryptedWord, bytes nodePK) returns()
-func (_AAA *AAATransactorSession) SubmitRedundantWord(pid [32]byte, encryptedWord []byte, nodePK []byte) (*types.Transaction, error) {
-	return _AAA.Contract.SubmitRedundantWord(&_AAA.TransactOpts, pid, encryptedWord, nodePK)
+// Solidity: function submitRedundantWord(bytes32 pid, bytes encryptedWord, uint256 wordIndex, bytes nodePK) returns()
+func (_AAA *AAATransactorSession) SubmitRedundantWord(pid [32]byte, encryptedWord []byte, wordIndex *big.Int, nodePK []byte) (*types.Transaction, error) {
+	return _AAA.Contract.SubmitRedundantWord(&_AAA.TransactOpts, pid, encryptedWord, wordIndex, nodePK)
 }
 
 // SubmitSAC is a paid mutator transaction binding the contract method 0xff20d844.
@@ -1379,17 +1474,17 @@ func (it *AAARedundantWordRequestedIterator) Close() error {
 
 // AAARedundantWordRequested represents a RedundantWordRequested event raised by the AAA contract.
 type AAARedundantWordRequested struct {
-	Pid      [32]byte
-	Index    *big.Int
-	FromNode common.Address
-	ToNode   common.Address
-	Raw      types.Log // Blockchain specific contextual infos
+	Pid        [32]byte
+	Index      *big.Int
+	HashedWord [32]byte
+	ToNode     common.Address
+	Raw        types.Log // Blockchain specific contextual infos
 }
 
-// FilterRedundantWordRequested is a free log retrieval operation binding the contract event 0x86ce7f0b1e6444a211c35a988f6b1485428f864fd8abfdeb75e20b7dd1b041a9.
+// FilterRedundantWordRequested is a free log retrieval operation binding the contract event 0x0da8c63ed8c37525265fb127b3b89d28f1fb59d2f08fd85df8dbe9fd667fe89e.
 //
-// Solidity: event RedundantWordRequested(bytes32 indexed pid, uint256 indexed index, address indexed fromNode, address toNode)
-func (_AAA *AAAFilterer) FilterRedundantWordRequested(opts *bind.FilterOpts, pid [][32]byte, index []*big.Int, fromNode []common.Address) (*AAARedundantWordRequestedIterator, error) {
+// Solidity: event RedundantWordRequested(bytes32 indexed pid, uint256 indexed index, bytes32 hashedWord, address indexed toNode)
+func (_AAA *AAAFilterer) FilterRedundantWordRequested(opts *bind.FilterOpts, pid [][32]byte, index []*big.Int, toNode []common.Address) (*AAARedundantWordRequestedIterator, error) {
 
 	var pidRule []interface{}
 	for _, pidItem := range pid {
@@ -1399,22 +1494,23 @@ func (_AAA *AAAFilterer) FilterRedundantWordRequested(opts *bind.FilterOpts, pid
 	for _, indexItem := range index {
 		indexRule = append(indexRule, indexItem)
 	}
-	var fromNodeRule []interface{}
-	for _, fromNodeItem := range fromNode {
-		fromNodeRule = append(fromNodeRule, fromNodeItem)
+
+	var toNodeRule []interface{}
+	for _, toNodeItem := range toNode {
+		toNodeRule = append(toNodeRule, toNodeItem)
 	}
 
-	logs, sub, err := _AAA.contract.FilterLogs(opts, "RedundantWordRequested", pidRule, indexRule, fromNodeRule)
+	logs, sub, err := _AAA.contract.FilterLogs(opts, "RedundantWordRequested", pidRule, indexRule, toNodeRule)
 	if err != nil {
 		return nil, err
 	}
 	return &AAARedundantWordRequestedIterator{contract: _AAA.contract, event: "RedundantWordRequested", logs: logs, sub: sub}, nil
 }
 
-// WatchRedundantWordRequested is a free log subscription operation binding the contract event 0x86ce7f0b1e6444a211c35a988f6b1485428f864fd8abfdeb75e20b7dd1b041a9.
+// WatchRedundantWordRequested is a free log subscription operation binding the contract event 0x0da8c63ed8c37525265fb127b3b89d28f1fb59d2f08fd85df8dbe9fd667fe89e.
 //
-// Solidity: event RedundantWordRequested(bytes32 indexed pid, uint256 indexed index, address indexed fromNode, address toNode)
-func (_AAA *AAAFilterer) WatchRedundantWordRequested(opts *bind.WatchOpts, sink chan<- *AAARedundantWordRequested, pid [][32]byte, index []*big.Int, fromNode []common.Address) (event.Subscription, error) {
+// Solidity: event RedundantWordRequested(bytes32 indexed pid, uint256 indexed index, bytes32 hashedWord, address indexed toNode)
+func (_AAA *AAAFilterer) WatchRedundantWordRequested(opts *bind.WatchOpts, sink chan<- *AAARedundantWordRequested, pid [][32]byte, index []*big.Int, toNode []common.Address) (event.Subscription, error) {
 
 	var pidRule []interface{}
 	for _, pidItem := range pid {
@@ -1424,12 +1520,13 @@ func (_AAA *AAAFilterer) WatchRedundantWordRequested(opts *bind.WatchOpts, sink 
 	for _, indexItem := range index {
 		indexRule = append(indexRule, indexItem)
 	}
-	var fromNodeRule []interface{}
-	for _, fromNodeItem := range fromNode {
-		fromNodeRule = append(fromNodeRule, fromNodeItem)
+
+	var toNodeRule []interface{}
+	for _, toNodeItem := range toNode {
+		toNodeRule = append(toNodeRule, toNodeItem)
 	}
 
-	logs, sub, err := _AAA.contract.WatchLogs(opts, "RedundantWordRequested", pidRule, indexRule, fromNodeRule)
+	logs, sub, err := _AAA.contract.WatchLogs(opts, "RedundantWordRequested", pidRule, indexRule, toNodeRule)
 	if err != nil {
 		return nil, err
 	}
@@ -1461,9 +1558,9 @@ func (_AAA *AAAFilterer) WatchRedundantWordRequested(opts *bind.WatchOpts, sink 
 	}), nil
 }
 
-// ParseRedundantWordRequested is a log parse operation binding the contract event 0x86ce7f0b1e6444a211c35a988f6b1485428f864fd8abfdeb75e20b7dd1b041a9.
+// ParseRedundantWordRequested is a log parse operation binding the contract event 0x0da8c63ed8c37525265fb127b3b89d28f1fb59d2f08fd85df8dbe9fd667fe89e.
 //
-// Solidity: event RedundantWordRequested(bytes32 indexed pid, uint256 indexed index, address indexed fromNode, address toNode)
+// Solidity: event RedundantWordRequested(bytes32 indexed pid, uint256 indexed index, bytes32 hashedWord, address indexed toNode)
 func (_AAA *AAAFilterer) ParseRedundantWordRequested(log types.Log) (*AAARedundantWordRequested, error) {
 	event := new(AAARedundantWordRequested)
 	if err := _AAA.contract.UnpackLog(event, "RedundantWordRequested", log); err != nil {
@@ -2161,12 +2258,13 @@ type AAAWordSubmitted struct {
 	Pid      [32]byte
 	Node     common.Address
 	WordHash [32]byte
+	Index    *big.Int
 	Raw      types.Log // Blockchain specific contextual infos
 }
 
-// FilterWordSubmitted is a free log retrieval operation binding the contract event 0xd5f0fe48f0da0cd8acd3d0c9c62dff193e60ca8d2bc0344c6f1d03059115c251.
+// FilterWordSubmitted is a free log retrieval operation binding the contract event 0x2fe138d30802f64a9d3b26d90b0dae52cfb6d93ea2a79a4e0ed823c0922b1c48.
 //
-// Solidity: event WordSubmitted(bytes32 indexed pid, address indexed node, bytes32 wordHash)
+// Solidity: event WordSubmitted(bytes32 indexed pid, address indexed node, bytes32 wordHash, uint256 index)
 func (_AAA *AAAFilterer) FilterWordSubmitted(opts *bind.FilterOpts, pid [][32]byte, node []common.Address) (*AAAWordSubmittedIterator, error) {
 
 	var pidRule []interface{}
@@ -2185,9 +2283,9 @@ func (_AAA *AAAFilterer) FilterWordSubmitted(opts *bind.FilterOpts, pid [][32]by
 	return &AAAWordSubmittedIterator{contract: _AAA.contract, event: "WordSubmitted", logs: logs, sub: sub}, nil
 }
 
-// WatchWordSubmitted is a free log subscription operation binding the contract event 0xd5f0fe48f0da0cd8acd3d0c9c62dff193e60ca8d2bc0344c6f1d03059115c251.
+// WatchWordSubmitted is a free log subscription operation binding the contract event 0x2fe138d30802f64a9d3b26d90b0dae52cfb6d93ea2a79a4e0ed823c0922b1c48.
 //
-// Solidity: event WordSubmitted(bytes32 indexed pid, address indexed node, bytes32 wordHash)
+// Solidity: event WordSubmitted(bytes32 indexed pid, address indexed node, bytes32 wordHash, uint256 index)
 func (_AAA *AAAFilterer) WatchWordSubmitted(opts *bind.WatchOpts, sink chan<- *AAAWordSubmitted, pid [][32]byte, node []common.Address) (event.Subscription, error) {
 
 	var pidRule []interface{}
@@ -2231,9 +2329,9 @@ func (_AAA *AAAFilterer) WatchWordSubmitted(opts *bind.WatchOpts, sink chan<- *A
 	}), nil
 }
 
-// ParseWordSubmitted is a log parse operation binding the contract event 0xd5f0fe48f0da0cd8acd3d0c9c62dff193e60ca8d2bc0344c6f1d03059115c251.
+// ParseWordSubmitted is a log parse operation binding the contract event 0x2fe138d30802f64a9d3b26d90b0dae52cfb6d93ea2a79a4e0ed823c0922b1c48.
 //
-// Solidity: event WordSubmitted(bytes32 indexed pid, address indexed node, bytes32 wordHash)
+// Solidity: event WordSubmitted(bytes32 indexed pid, address indexed node, bytes32 wordHash, uint256 index)
 func (_AAA *AAAFilterer) ParseWordSubmitted(log types.Log) (*AAAWordSubmitted, error) {
 	event := new(AAAWordSubmitted)
 	if err := _AAA.contract.UnpackLog(event, "WordSubmitted", log); err != nil {

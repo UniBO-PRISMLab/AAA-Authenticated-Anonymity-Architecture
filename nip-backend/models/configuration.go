@@ -68,6 +68,15 @@ func NewConfiguration() Configuration {
 
 	publicKey := stringOrPanic("PUBLIC_KEY")
 	privateKey := stringOrPanic("PRIVATE_KEY")
+	// publicKey = strings.ReplaceAll(publicKey, "\n", "")
+	// publicKey = strings.ReplaceAll(publicKey, "\r", "")
+	// publicKey = strings.ReplaceAll(publicKey, " ", "")
+	// publicKey = strings.Trim(publicKey, `"`)
+
+	// privateKey = strings.ReplaceAll(privateKey, "\n", "")
+	// privateKey = strings.ReplaceAll(privateKey, "\r", "")
+	// privateKey = strings.ReplaceAll(privateKey, " ", "")
+	// privateKey = strings.Trim(privateKey, `"`)
 
 	contractAddress := stringOrPanic("CONTRACT_ADDRESS")
 	blockchainPrivateKey := stringOrPanic("BLOCKCHAIN_PRIVATE_KEY")

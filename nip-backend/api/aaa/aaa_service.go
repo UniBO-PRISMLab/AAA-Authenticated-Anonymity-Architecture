@@ -73,6 +73,7 @@ func (u *Service) Start(ctx context.Context) {
 	go u.watchLoop(ctx, "WordRequested", u.ListenWordRequested)
 	go u.watchLoop(ctx, "PIDEncryption", u.ListenPIDEncryption)
 	go u.watchLoop(ctx, "SIDEncryption", u.ListenSIDEncryption)
+	// go u.watchLoop(ctx, "RedundantWordRequested", u.ListenRedundantWordRequested)
 }
 
 func (u *Service) watchLoop(ctx context.Context, name string, fn func(context.Context) error) {
@@ -173,18 +174,12 @@ func (u *Service) GetSIDRecord(ctx context.Context, sidBase64 string) ([]byte, [
 		return nil, nil, fmt.Errorf("invalid base64 SID: %w", err)
 	}
 
-	sidHex := strings.TrimSpace(string(decoded))
-	sidHex = strings.TrimPrefix(sidHex, "0x")
-	sidBytes, err := hex.DecodeString(sidHex)
-	if err != nil {
-		return nil, nil, fmt.Errorf("invalid SID hex: %w", err)
-	}
-	if len(sidBytes) != 32 {
-		return nil, nil, fmt.Errorf("SID must be 32 bytes, got %d", len(sidBytes))
+	if len(decoded) != 32 {
+		return nil, nil, fmt.Errorf("SID must be 32 bytes, got %d", len(decoded))
 	}
 
 	var sid [32]byte
-	copy(sid[:], sidBytes)
+	copy(sid[:], decoded)
 
 	encPID, pk, err := u.contract.GetSIDRecord(&bind.CallOpts{Context: ctx}, sid)
 	if err != nil {

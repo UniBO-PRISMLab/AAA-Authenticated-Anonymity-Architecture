@@ -7,6 +7,7 @@ import (
 	"github.com/UniBO-PRISMLab/nip-backend/api/aaa/bindings"
 	"github.com/UniBO-PRISMLab/nip-backend/models"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
 )
 
 func (u *Service) ListenPIDEncryption(ctx context.Context) error {
@@ -15,7 +16,7 @@ func (u *Service) ListenPIDEncryption(ctx context.Context) error {
 		&bind.WatchOpts{Context: ctx},
 		eventChan,
 		nil,
-		nil, // TODO: filter only events for this node
+		[]common.Address{u.nodeAddress},
 	)
 	if err != nil {
 		return fmt.Errorf("failed to subscribe via WatchPIDEncryptionRequested: %w", err)
@@ -31,7 +32,7 @@ func (u *Service) ListenPIDEncryption(ctx context.Context) error {
 		select {
 
 		case evt := <-eventChan:
-			go u.handlePIDEncryptionEvent(ctx, evt)
+			u.handlePIDEncryptionEvent(ctx, evt)
 
 		case err := <-sub.Err():
 			return err
@@ -53,11 +54,6 @@ func (u *Service) handlePIDEncryptionEvent(ctx context.Context, evt *bindings.AA
 		return
 	}
 
-	u.logger.Debug().
-		Str("pid", fmt.Sprintf("%x", evt.Pid)).
-		Str("sid", fmt.Sprintf("%x", evt.Sid)).
-		Msg("Received PIDEncryptionRequested")
-
 	encryptedPID, err := SymEncrypt(evt.Pid[:], evt.SymK[:])
 	if err != nil {
 		u.logger.Error().Err(err).Msg(models.ErrorPIDEncryption.Error())
@@ -76,9 +72,9 @@ func (u *Service) handlePIDEncryptionEvent(ctx context.Context, evt *bindings.AA
 		encryptedPID,
 	)
 	if err != nil {
-		u.logger.Error().Err(err).Msg("failed to submit encrypted PID")
+		u.logger.Error().Err(err).Msg("failed to submit encrypted pid")
 		return
 	}
 
-	u.logger.Debug().Msgf("Submitted encrypted PID. Tx: %s", tx.Hash().Hex())
+	u.logger.Debug().Msgf("Submitted encrypted pid. Tx: %s", tx.Hash().Hex())
 }

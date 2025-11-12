@@ -2,11 +2,13 @@ package aaa
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 
 	"github.com/UniBO-PRISMLab/nip-backend/api/aaa/bindings"
 	"github.com/UniBO-PRISMLab/nip-backend/models"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
 )
 
 func (u *Service) ListenSIDEncryption(ctx context.Context) error {
@@ -15,7 +17,7 @@ func (u *Service) ListenSIDEncryption(ctx context.Context) error {
 		&bind.WatchOpts{Context: ctx},
 		eventChan,
 		nil,
-		nil, // TODO: filter only events for this node
+		[]common.Address{u.nodeAddress},
 	)
 	if err != nil {
 		return fmt.Errorf("failed to subscribe via WatchSIDEncryptionRequested: %w", err)
@@ -34,7 +36,7 @@ func (u *Service) ListenSIDEncryption(ctx context.Context) error {
 			return err
 
 		case evt := <-eventChan:
-			go u.handleSIDEncryptionEvent(ctx, evt)
+			u.handleSIDEncryptionEvent(ctx, evt)
 
 		case <-ctx.Done():
 			u.logger.Info().Msg("context cancelled, stopping listener")
@@ -53,10 +55,8 @@ func (u *Service) handleSIDEncryptionEvent(ctx context.Context, evt *bindings.AA
 		return
 	}
 
-	u.logger.Debug().
-		Str("pid", fmt.Sprintf("%x", evt.Pid)).
-		Str("sid", fmt.Sprintf("%x", evt.Sid)).
-		Msg("Received SIDEncryptionRequested")
+	b64 := base64.StdEncoding.EncodeToString(evt.Sid)
+	u.logger.Debug().Msgf("SID: %s", b64)
 
 	encryptedSID, err := PublicEncrypt(evt.Sid, evt.UserPK[:])
 	if err != nil {

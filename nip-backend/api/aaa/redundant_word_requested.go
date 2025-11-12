@@ -3,8 +3,8 @@ package aaa
 import (
 	"context"
 	"encoding/base64"
+	"encoding/pem"
 	"fmt"
-	"strings"
 
 	"github.com/UniBO-PRISMLab/nip-backend/api/aaa/bindings"
 	"github.com/UniBO-PRISMLab/nip-backend/models"
@@ -12,16 +12,17 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 )
 
-func (u *Service) ListenWordRequested(ctx context.Context) error {
-	eventChan := make(chan *bindings.AAAWordRequested, 100)
-	sub, err := u.contract.WatchWordRequested(
+func (u *Service) ListenRedundantWordRequested(ctx context.Context) error {
+	eventChan := make(chan *bindings.AAARedundantWordRequested, 100)
+	sub, err := u.contract.WatchRedundantWordRequested(
 		&bind.WatchOpts{Context: ctx},
 		eventChan,
+		nil,
 		nil,
 		[]common.Address{u.nodeAddress},
 	)
 	if err != nil {
-		return fmt.Errorf("failed to subscribe via WatchWordRequested: %w", err)
+		return fmt.Errorf("failed to subscribe via WatchRedundantWordRequested: %w", err)
 	}
 
 	defer func() {
@@ -33,10 +34,10 @@ func (u *Service) ListenWordRequested(ctx context.Context) error {
 	for {
 		select {
 		case evt := <-eventChan:
-			u.handleWordEncryptionEvent(ctx, evt)
+			u.handleRedundantWordEvent(ctx, evt)
 
 		case err := <-sub.Err():
-			u.logger.Error().Err(err).Msg("subscription error in WordRequested listener")
+			u.logger.Error().Err(err).Msg("subscription error in RedundantWordRequested listener")
 			return err
 
 		case <-ctx.Done():
@@ -46,13 +47,13 @@ func (u *Service) ListenWordRequested(ctx context.Context) error {
 	}
 }
 
-func (u *Service) handleWordEncryptionEvent(ctx context.Context, evt *bindings.AAAWordRequested) {
+func (u *Service) handleRedundantWordEvent(ctx context.Context, evt *bindings.AAARedundantWordRequested) {
 	if evt == nil {
 		u.logger.Error().Msg("received nil event")
 		return
 	}
 
-	if u.nodeAddress.Hex() != evt.Node.Hex() {
+	if u.nodeAddress.Hex() != evt.ToNode.Hex() {
 		return
 	}
 
@@ -62,11 +63,21 @@ func (u *Service) handleWordEncryptionEvent(ctx context.Context, evt *bindings.A
 		return
 	}
 
-	word := strings.ToLower(u.babbler.Babble())
-	encWord, err := PublicEncrypt([]byte(word), evt.UserPK[:])
+	pkBytes, err := base64.StdEncoding.DecodeString(u.configuration.KeyPair.PublicKey)
 	if err != nil {
-		u.logger.Error().Err(err).Msg(models.ErrorWordEncryption.Error())
+		u.logger.Error().Err(err).Msg(models.ErrorPublicKeyDecoding.Error())
 		return
+	}
+
+	pemBlock, _ := pem.Decode(pkBytes)
+	if pemBlock == nil || pemBlock.Type != "PUBLIC KEY" {
+		u.logger.Error().Err(err).Msg(models.ErrorInvalidPublicKeyHeader.Error())
+		return
+	}
+
+	encWord, err := PublicEncrypt(evt.HashedWord[:], pkBytes)
+	if err != nil {
+		u.logger.Error().Err(err).Msg(models.ErrorRedundantWordEncryption.Error())
 	}
 
 	transactOpts, err := u.newTransactor(ctx)
@@ -75,15 +86,18 @@ func (u *Service) handleWordEncryptionEvent(ctx context.Context, evt *bindings.A
 		return
 	}
 
-	tx, err := u.contract.SubmitEncryptedWord(
+	tx, err := u.contract.SubmitRedundantWord(
 		transactOpts,
 		evt.Pid,
 		encWord,
+		evt.Index,
+		pkBytes,
 	)
+
 	if err != nil {
 		u.logger.Error().Err(err).Msg(models.ErrorWordSubmission.Error())
 		return
 	}
 
-	u.logger.Debug().Msgf("Submitted encrypted word. Tx: %s", tx.Hash().Hex())
+	u.logger.Debug().Msgf("Submitted redundant word. Tx: %s", tx.Hash().Hex())
 }
