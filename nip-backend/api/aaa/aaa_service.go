@@ -27,6 +27,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/rs/zerolog"
 	"github.com/tjarratt/babble"
+	"golang.org/x/crypto/sha3"
 )
 
 type Service struct {
@@ -184,7 +185,7 @@ func (u *Service) GetSIDRecord(ctx context.Context, sidBase64 string) ([]byte, [
 
 	encPID, pk, err := u.contract.GetSIDRecord(&bind.CallOpts{Context: ctx}, sid)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to read SID record: %w", err)
+		return nil, nil, models.ErrorRetrieveSIDRecord
 	}
 
 	return encPID, pk, nil
@@ -208,4 +209,23 @@ func (u *Service) SubmitSAC(ctx context.Context, sac []byte) error {
 	)
 
 	return nil
+}
+
+func (u *Service) GetSACRecord(ctx context.Context, pk []byte) ([]byte, error) {
+	var sac []byte
+	var err error
+
+	hash := sha3.NewLegacyKeccak256()
+	hash.Write(pk)
+	sum := hash.Sum(nil)
+
+	var pkHash [32]byte
+	copy(pkHash[:], sum)
+
+	if sac, err = u.contract.GetSACRecord(&bind.CallOpts{Context: ctx}, pkHash); err != nil {
+		u.logger.Error().Err(err).Msg(models.ErrorRetrieveSACRecord.Error())
+		return nil, models.ErrorRetrieveSACRecord
+	}
+
+	return sac, nil
 }

@@ -66,6 +66,11 @@ func (c *AuthController) injectUnAuthenticatedRoutes() {
 			"auth/verify-pac",
 			c.verifyPAC(),
 		)
+
+		v1.POST(
+			"auth/verify-sac",
+			c.verifySAC(),
+		)
 	}
 }
 
@@ -194,6 +199,50 @@ func (c *AuthController) issueSAC() gin.HandlerFunc {
 			}
 
 			c.logger.Error().Err(err).Msg("Error during SAC issuance")
+			ctx.JSON(500, models.ErrorInternalServerErrorResponseModel)
+			return
+		}
+
+		ctx.JSON(200, resp)
+	}
+}
+
+// verifySAC godoc
+//
+//	@Tags			auth
+//	@Schemes		http
+//	@Router			/v1/auth/verify-sac [post]
+//	@Summary		SAC verification request
+//	@Description	Allows a user to verify a SAC (Public Authentication Code) simulating a service that supports anonymous authentication. The API accepts `SAC, PK, SIGN(SAC, SK)` namely the SAC, the public key that identifies the anonymous account and the SAC signed with the private key associated with the public key of the anonymous account.
+//	@Accept			json
+//	@Produce		json
+//	@Param			models.SACVerificationRequestModel	body		models.SACVerificationRequestModel	true	"SAC Verification Request Model"
+//	@Success		200									{object}	models.SACVerificationResponseModel	"The Secret Authentication Code Verification Response"
+//	@Failure		400									{object}	models.ErrorResponseModel			"Bad request"
+//	@Failure		404									{object}	models.ErrorResponseModel			"Not found"
+//	@Failure		500									{object}	models.ErrorResponseModel			"An error occurred"
+func (c *AuthController) verifySAC() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		var req models.SACVerificationRequestModel
+		var resp *models.SACVerificationResponseModel
+		var err error
+
+		if err := ctx.ShouldBindJSON(&req); err != nil {
+			c.logger.Error().Err(err).Msg("Error during SAC verification")
+			ctx.JSON(400, models.ErrorBadRequestResponseModel)
+			return
+		}
+
+		if resp, err = c.authService.VerifySAC(ctx, &req); err != nil {
+			if errors.Is(err, models.ErrorSACSignatureVerification) ||
+				errors.Is(err, models.ErrorSACMismatch) ||
+				errors.Is(err, models.ErrorPublicKeyDecoding) ||
+				errors.Is(err, models.ErrorInvalidPublicKey) {
+				ctx.JSON(400, models.ErrorResponseModelWithMsg(400, err.Error()))
+				return
+			}
+
+			c.logger.Error().Err(err).Msg("Error during SAC verification")
 			ctx.JSON(500, models.ErrorInternalServerErrorResponseModel)
 			return
 		}

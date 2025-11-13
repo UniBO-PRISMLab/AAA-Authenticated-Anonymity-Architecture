@@ -172,6 +172,58 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/auth/verify-sac": {
+            "post": {
+                "description": "Allows a user to verify a SAC (Public Authentication Code) simulating a service that supports anonymous authentication. The API accepts ` + "`" + `SAC, PK, SIGN(SAC, SK)` + "`" + ` namely the SAC, the public key that identifies the anonymous account and the SAC signed with the private key associated with the public key of the anonymous account.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "SAC verification request",
+                "parameters": [
+                    {
+                        "description": "SAC Verification Request Model",
+                        "name": "models.SACVerificationRequestModel",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.SACVerificationRequestModel"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The Secret Authentication Code Verification Response",
+                        "schema": {
+                            "$ref": "#/definitions/models.SACVerificationResponseModel"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponseModel"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponseModel"
+                        }
+                    },
+                    "500": {
+                        "description": "An error occurred",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponseModel"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/identity/pid": {
             "post": {
                 "description": "Public Identity Data (PID) is an anonymous token which can be released only by the NIP and it identifies the user without explicitly sharing information. PID is derived from user's public key and a random nonce, the server calculates ` + "`" + `HMAC_SHA256(SHA256(PK) || nonce, SK)` + "`" + ` where ` + "`" + `HMAC_SHA256` + "`" + ` is a keyed-hash message authentication code (HMAC) using SHA256 as the hash function PK is the public key and SK is a secret key stored on the server. The resulting PID is a 32 byte string encoded using base64. The API accepts 2048 bit RSA PKCS#8 keys encoded in base64.",
@@ -325,7 +377,7 @@ const docTemplate = `{
             "properties": {
                 "sid": {
                     "type": "string",
-                    "example": "Y2I4NjBmMmQ1YmM1YTFjODQ4ZTA3OTdiMzE5MTU5NzE4OTBhMTRmMzA0MmFjY2ZjMjZjYjk4Y2EwNWI1OWE2Yg=="
+                    "example": "jEA4/2q3Z4DcSllWmXtCbOaRrzyYAn3VXDHW5AN5U/8="
                 },
                 "signed_sid": {
                     "type": "string",
@@ -341,8 +393,39 @@ const docTemplate = `{
                     "example": "2024-12-31T23:59:59Z"
                 },
                 "sac": {
-                    "type": "integer",
-                    "example": 874532
+                    "type": "string",
+                    "example": "7MWorstwntw="
+                }
+            }
+        },
+        "models.SACVerificationRequestModel": {
+            "type": "object",
+            "required": [
+                "public_key",
+                "sac",
+                "signed_sac"
+            ],
+            "properties": {
+                "public_key": {
+                    "type": "string",
+                    "example": "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUF1aVRTYzZMY3NmaFRZbEY0WDk2OApEcStXVzNrRmx3U21UR2NJQXJ5eFZ2OVhBQ2VFSXJuL0JYZE9McTFNSU52enc5WTZvNmhTd3hqUkp2SzlvdFpMCnlXYzFvc2RUNGdlTDJaT2xEMHUwakFvbEpqVU9hVWVyMmJKQTUzQzhXMjd1MHJyQzVvc3Z3THRNVWYxWnpTR0MKL2hrY0VOcjNjRGl6YWJibkw2dzVFUEdCVjlNU2RnaUdlelJXaXVEeGIzcldEOFNwSlpNa2c5b3ZSK3dOMlI2YwpOK2RwTkNjdDdWYjQxaWhXU0VXT1o2djhFdTREV3FjVW0vQzBpLzZ3eVJkWU93Y0E3NktkMmkxcnNZdHFlQS84CnZuMklTTEp2eGdkM3ZCdXY1ZnFkS0kzRm0rd3NIVDhHdHlkQUw5VjF4V3g4bnFlcFlwMlIvaXJMNHFUeGFnVzkKMXdJREFRQUIKLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg=="
+                },
+                "sac": {
+                    "type": "string",
+                    "example": "7MWorstwntw="
+                },
+                "signed_sac": {
+                    "type": "string",
+                    "example": "Tn7dpsKMqbhC3j8/o7OH5juVrkejhhZYkDHNqVyp8Am8uRktEDKO5i09iH9GZO0NOQHRRKD6lpwD0wC5GEPiuHN6aAof3WtPO9bqEB8ZLup4FjnyDh3mMX1UlvlYjKi6eTLMD2J8dwObz0nkmZOVsjk51o8jMapJtfnzMkYhADh4vZVDLpWYWbtBsmmXhNHS4SuWc+K3ZKMLtCYE/MFK3JT+Zcyabmrd9jmqvHRgi9XT+kABZ6XnyUSp4VWo1M7pl767/hZM5CxqgXORUMk8z9M9lHCDOsLfjBOwi81ObMtd+4oVgXgAbzBBHXnicB6X5PEBb5Qyh0RNyWFFNOEvtA=="
+                }
+            }
+        },
+        "models.SACVerificationResponseModel": {
+            "type": "object",
+            "properties": {
+                "valid": {
+                    "type": "boolean",
+                    "example": true
                 }
             }
         }

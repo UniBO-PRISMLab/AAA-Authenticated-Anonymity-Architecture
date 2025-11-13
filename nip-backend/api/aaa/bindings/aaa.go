@@ -31,7 +31,7 @@ var (
 
 // AAAMetaData contains all meta data concerning the AAA contract.
 var AAAMetaData = &bind.MetaData{
-	ABI: "[{\"inputs\":[{\"internalType\":\"address[]\",\"name\":\"nodes\",\"type\":\"address[]\"},{\"internalType\":\"uint256\",\"name\":\"words\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"redundancyFactor\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"node\",\"type\":\"address\"}],\"name\":\"NodeAdded\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"node\",\"type\":\"address\"}],\"name\":\"NodeRemoved\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"node\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"symK\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"sid\",\"type\":\"bytes32\"}],\"name\":\"PIDEncryptionRequested\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"encSID\",\"type\":\"bytes\"}],\"name\":\"PhraseComplete\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"hashedWord\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"toNode\",\"type\":\"address\"}],\"name\":\"RedundantWordRequested\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"node\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"wordHash\",\"type\":\"bytes32\"}],\"name\":\"RedundantWordSubmitted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"node\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"sid\",\"type\":\"bytes\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"userPK\",\"type\":\"bytes\"}],\"name\":\"SIDEncryptionRequested\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"}],\"name\":\"SeedPhraseProtocolInitiated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"node\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"userPK\",\"type\":\"bytes\"}],\"name\":\"WordRequested\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"node\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"wordHash\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"WordSubmitted\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"REDUNDANCY_FACTOR\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"WORDS\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"node\",\"type\":\"address\"}],\"name\":\"addNode\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"}],\"name\":\"getPhrase\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"started\",\"type\":\"bool\"},{\"internalType\":\"bytes\",\"name\":\"pk\",\"type\":\"bytes\"},{\"internalType\":\"bytes[]\",\"name\":\"encWords\",\"type\":\"bytes[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"getRedundantWords\",\"outputs\":[{\"internalType\":\"bytes[]\",\"name\":\"words\",\"type\":\"bytes[]\"},{\"internalType\":\"bytes[]\",\"name\":\"nodePKs\",\"type\":\"bytes[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"pk\",\"type\":\"bytes\"}],\"name\":\"getSACRecord\",\"outputs\":[{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"}],\"name\":\"getSID\",\"outputs\":[{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"sid\",\"type\":\"bytes32\"}],\"name\":\"getSIDRecord\",\"outputs\":[{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"}],\"name\":\"getSelectedNodes\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"}],\"name\":\"getWords\",\"outputs\":[{\"internalType\":\"bytes[]\",\"name\":\"words\",\"type\":\"bytes[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"isNode\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"nodeList\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"redundantNodesByPID\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"node\",\"type\":\"address\"}],\"name\":\"removeNode\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"pk\",\"type\":\"bytes\"}],\"name\":\"seedPhraseGenerationProtocol\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"selectedNodesByPID\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"sid\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"encPID\",\"type\":\"bytes\"}],\"name\":\"submitEncryptedPID\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"encSID\",\"type\":\"bytes\"}],\"name\":\"submitEncryptedSID\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"encryptedWord\",\"type\":\"bytes\"}],\"name\":\"submitEncryptedWord\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"encryptedWord\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"wordIndex\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"nodePK\",\"type\":\"bytes\"}],\"name\":\"submitRedundantWord\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"sac\",\"type\":\"bytes\"}],\"name\":\"submitSAC\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"sac\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"pk\",\"type\":\"bytes\"}],\"name\":\"submitSACRecord\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
+	ABI: "[{\"inputs\":[{\"internalType\":\"address[]\",\"name\":\"nodes\",\"type\":\"address[]\"},{\"internalType\":\"uint256\",\"name\":\"words\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"redundancyFactor\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"node\",\"type\":\"address\"}],\"name\":\"NodeAdded\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"node\",\"type\":\"address\"}],\"name\":\"NodeRemoved\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"node\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"symK\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"sid\",\"type\":\"bytes32\"}],\"name\":\"PIDEncryptionRequested\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"encSID\",\"type\":\"bytes\"}],\"name\":\"PhraseComplete\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"hashedWord\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"toNode\",\"type\":\"address\"}],\"name\":\"RedundantWordRequested\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"node\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"wordHash\",\"type\":\"bytes32\"}],\"name\":\"RedundantWordSubmitted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"node\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"sid\",\"type\":\"bytes\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"userPK\",\"type\":\"bytes\"}],\"name\":\"SIDEncryptionRequested\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"}],\"name\":\"SeedPhraseProtocolInitiated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"node\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"userPK\",\"type\":\"bytes\"}],\"name\":\"WordRequested\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"node\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"wordHash\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"WordSubmitted\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"REDUNDANCY_FACTOR\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"WORDS\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"node\",\"type\":\"address\"}],\"name\":\"addNode\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"}],\"name\":\"getPhrase\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"started\",\"type\":\"bool\"},{\"internalType\":\"bytes\",\"name\":\"pk\",\"type\":\"bytes\"},{\"internalType\":\"bytes[]\",\"name\":\"encWords\",\"type\":\"bytes[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"getRedundantWords\",\"outputs\":[{\"internalType\":\"bytes[]\",\"name\":\"words\",\"type\":\"bytes[]\"},{\"internalType\":\"bytes[]\",\"name\":\"nodePKs\",\"type\":\"bytes[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pkHash\",\"type\":\"bytes32\"}],\"name\":\"getSACRecord\",\"outputs\":[{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"}],\"name\":\"getSID\",\"outputs\":[{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"sid\",\"type\":\"bytes32\"}],\"name\":\"getSIDRecord\",\"outputs\":[{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"}],\"name\":\"getSelectedNodes\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"}],\"name\":\"getWords\",\"outputs\":[{\"internalType\":\"bytes[]\",\"name\":\"words\",\"type\":\"bytes[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"isNode\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"nodeList\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"redundantNodesByPID\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"node\",\"type\":\"address\"}],\"name\":\"removeNode\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"sac\",\"type\":\"bytes\"}],\"name\":\"sacExists\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"pk\",\"type\":\"bytes\"}],\"name\":\"seedPhraseGenerationProtocol\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"selectedNodesByPID\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"sid\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"encPID\",\"type\":\"bytes\"}],\"name\":\"submitEncryptedPID\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"encSID\",\"type\":\"bytes\"}],\"name\":\"submitEncryptedSID\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"encryptedWord\",\"type\":\"bytes\"}],\"name\":\"submitEncryptedWord\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"pid\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"encryptedWord\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"wordIndex\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"nodePK\",\"type\":\"bytes\"}],\"name\":\"submitRedundantWord\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"sac\",\"type\":\"bytes\"}],\"name\":\"submitSAC\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"sac\",\"type\":\"bytes\"},{\"internalType\":\"bytes32\",\"name\":\"pkHash\",\"type\":\"bytes32\"}],\"name\":\"submitSACRecord\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
 }
 
 // AAAABI is the input ABI used to generate the binding from.
@@ -337,12 +337,12 @@ func (_AAA *AAACallerSession) GetRedundantWords(pid [32]byte, index *big.Int) (s
 	return _AAA.Contract.GetRedundantWords(&_AAA.CallOpts, pid, index)
 }
 
-// GetSACRecord is a free data retrieval call binding the contract method 0xf0307989.
+// GetSACRecord is a free data retrieval call binding the contract method 0xd1a83232.
 //
-// Solidity: function getSACRecord(bytes pk) view returns(bytes)
-func (_AAA *AAACaller) GetSACRecord(opts *bind.CallOpts, pk []byte) ([]byte, error) {
+// Solidity: function getSACRecord(bytes32 pkHash) view returns(bytes)
+func (_AAA *AAACaller) GetSACRecord(opts *bind.CallOpts, pkHash [32]byte) ([]byte, error) {
 	var out []interface{}
-	err := _AAA.contract.Call(opts, &out, "getSACRecord", pk)
+	err := _AAA.contract.Call(opts, &out, "getSACRecord", pkHash)
 
 	if err != nil {
 		return *new([]byte), err
@@ -354,18 +354,18 @@ func (_AAA *AAACaller) GetSACRecord(opts *bind.CallOpts, pk []byte) ([]byte, err
 
 }
 
-// GetSACRecord is a free data retrieval call binding the contract method 0xf0307989.
+// GetSACRecord is a free data retrieval call binding the contract method 0xd1a83232.
 //
-// Solidity: function getSACRecord(bytes pk) view returns(bytes)
-func (_AAA *AAASession) GetSACRecord(pk []byte) ([]byte, error) {
-	return _AAA.Contract.GetSACRecord(&_AAA.CallOpts, pk)
+// Solidity: function getSACRecord(bytes32 pkHash) view returns(bytes)
+func (_AAA *AAASession) GetSACRecord(pkHash [32]byte) ([]byte, error) {
+	return _AAA.Contract.GetSACRecord(&_AAA.CallOpts, pkHash)
 }
 
-// GetSACRecord is a free data retrieval call binding the contract method 0xf0307989.
+// GetSACRecord is a free data retrieval call binding the contract method 0xd1a83232.
 //
-// Solidity: function getSACRecord(bytes pk) view returns(bytes)
-func (_AAA *AAACallerSession) GetSACRecord(pk []byte) ([]byte, error) {
-	return _AAA.Contract.GetSACRecord(&_AAA.CallOpts, pk)
+// Solidity: function getSACRecord(bytes32 pkHash) view returns(bytes)
+func (_AAA *AAACallerSession) GetSACRecord(pkHash [32]byte) ([]byte, error) {
+	return _AAA.Contract.GetSACRecord(&_AAA.CallOpts, pkHash)
 }
 
 // GetSID is a free data retrieval call binding the contract method 0xb7ed02d3.
@@ -617,6 +617,37 @@ func (_AAA *AAACallerSession) RedundantNodesByPID(arg0 [32]byte, arg1 *big.Int, 
 	return _AAA.Contract.RedundantNodesByPID(&_AAA.CallOpts, arg0, arg1, arg2)
 }
 
+// SacExists is a free data retrieval call binding the contract method 0x78d14d8a.
+//
+// Solidity: function sacExists(bytes sac) view returns(bool)
+func (_AAA *AAACaller) SacExists(opts *bind.CallOpts, sac []byte) (bool, error) {
+	var out []interface{}
+	err := _AAA.contract.Call(opts, &out, "sacExists", sac)
+
+	if err != nil {
+		return *new(bool), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(bool)).(*bool)
+
+	return out0, err
+
+}
+
+// SacExists is a free data retrieval call binding the contract method 0x78d14d8a.
+//
+// Solidity: function sacExists(bytes sac) view returns(bool)
+func (_AAA *AAASession) SacExists(sac []byte) (bool, error) {
+	return _AAA.Contract.SacExists(&_AAA.CallOpts, sac)
+}
+
+// SacExists is a free data retrieval call binding the contract method 0x78d14d8a.
+//
+// Solidity: function sacExists(bytes sac) view returns(bool)
+func (_AAA *AAACallerSession) SacExists(sac []byte) (bool, error) {
+	return _AAA.Contract.SacExists(&_AAA.CallOpts, sac)
+}
+
 // SelectedNodesByPID is a free data retrieval call binding the contract method 0x6a978a99.
 //
 // Solidity: function selectedNodesByPID(bytes32 , uint256 ) view returns(address)
@@ -816,25 +847,25 @@ func (_AAA *AAATransactorSession) SubmitSAC(sac []byte) (*types.Transaction, err
 	return _AAA.Contract.SubmitSAC(&_AAA.TransactOpts, sac)
 }
 
-// SubmitSACRecord is a paid mutator transaction binding the contract method 0xfaab0b96.
+// SubmitSACRecord is a paid mutator transaction binding the contract method 0x9516a01c.
 //
-// Solidity: function submitSACRecord(bytes sac, bytes pk) returns()
-func (_AAA *AAATransactor) SubmitSACRecord(opts *bind.TransactOpts, sac []byte, pk []byte) (*types.Transaction, error) {
-	return _AAA.contract.Transact(opts, "submitSACRecord", sac, pk)
+// Solidity: function submitSACRecord(bytes sac, bytes32 pkHash) returns()
+func (_AAA *AAATransactor) SubmitSACRecord(opts *bind.TransactOpts, sac []byte, pkHash [32]byte) (*types.Transaction, error) {
+	return _AAA.contract.Transact(opts, "submitSACRecord", sac, pkHash)
 }
 
-// SubmitSACRecord is a paid mutator transaction binding the contract method 0xfaab0b96.
+// SubmitSACRecord is a paid mutator transaction binding the contract method 0x9516a01c.
 //
-// Solidity: function submitSACRecord(bytes sac, bytes pk) returns()
-func (_AAA *AAASession) SubmitSACRecord(sac []byte, pk []byte) (*types.Transaction, error) {
-	return _AAA.Contract.SubmitSACRecord(&_AAA.TransactOpts, sac, pk)
+// Solidity: function submitSACRecord(bytes sac, bytes32 pkHash) returns()
+func (_AAA *AAASession) SubmitSACRecord(sac []byte, pkHash [32]byte) (*types.Transaction, error) {
+	return _AAA.Contract.SubmitSACRecord(&_AAA.TransactOpts, sac, pkHash)
 }
 
-// SubmitSACRecord is a paid mutator transaction binding the contract method 0xfaab0b96.
+// SubmitSACRecord is a paid mutator transaction binding the contract method 0x9516a01c.
 //
-// Solidity: function submitSACRecord(bytes sac, bytes pk) returns()
-func (_AAA *AAATransactorSession) SubmitSACRecord(sac []byte, pk []byte) (*types.Transaction, error) {
-	return _AAA.Contract.SubmitSACRecord(&_AAA.TransactOpts, sac, pk)
+// Solidity: function submitSACRecord(bytes sac, bytes32 pkHash) returns()
+func (_AAA *AAATransactorSession) SubmitSACRecord(sac []byte, pkHash [32]byte) (*types.Transaction, error) {
+	return _AAA.Contract.SubmitSACRecord(&_AAA.TransactOpts, sac, pkHash)
 }
 
 // AAANodeAddedIterator is returned from FilterNodeAdded and is used to iterate over the raw logs and unpacked data for NodeAdded events raised by the AAA contract.

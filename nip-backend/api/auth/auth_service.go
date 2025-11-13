@@ -148,11 +148,69 @@ func (s *Service) IssueSAC(
 	return resp, nil
 }
 
-func (s *Service) VerifyPAC(ctx context.Context, req *models.PACVerificationRequestModel) (*models.PACVerificationResponseModel, error) {
+func (s *Service) VerifyPAC(
+	ctx context.Context,
+	req *models.PACVerificationRequestModel,
+) (*models.PACVerificationResponseModel, error) {
 	user, err := s.identityService.GetUserByPID(ctx, &req.PID)
 	if err != nil {
 		return nil, models.ErrorUserWithPIDNotFound
 	}
 
 	return s.authRepo.VerifyPAC(ctx, &user.PID, req.PAC)
+}
+
+func (s *Service) VerifySAC(
+	ctx context.Context,
+	req *models.SACVerificationRequestModel,
+) (*models.SACVerificationResponseModel, error) {
+	var err error
+	var sac []byte
+	var pkBytes []byte
+	var pemBlock *pem.Block
+
+	if sac, err = s.uip.GetSACRecord(ctx, []byte(req.PublicKey)); err != nil {
+		return nil, err
+	}
+
+	if base64.StdEncoding.EncodeToString(sac) != req.SAC {
+		return nil, models.ErrorSACMismatch
+	}
+
+	pkBytes, err = base64.StdEncoding.DecodeString(req.PublicKey)
+	if err != nil {
+		return nil, models.ErrorPublicKeyDecoding
+	}
+
+	pemBlock, _ = pem.Decode(pkBytes)
+	if pemBlock == nil || pemBlock.Type != "PUBLIC KEY" {
+		return nil, models.ErrorInvalidPublicKeyHeader
+	}
+
+	pub, err := x509.ParsePKIXPublicKey(pemBlock.Bytes)
+	if err != nil {
+		return nil, models.ErrorInvalidPublicKey
+	}
+
+	rsaPub, ok := pub.(*rsa.PublicKey)
+	if !ok {
+		return nil, models.ErrorInvalidPublicKey
+	}
+
+	sig, err := base64.StdEncoding.DecodeString(req.SignedSAC)
+	if err != nil {
+		return nil, models.ErrorInvalidSignatureEncoding
+	}
+
+	h := crypto.SHA256.New()
+	h.Write([]byte(req.SAC))
+	sacHash := h.Sum(nil)
+
+	if err := rsa.VerifyPKCS1v15(rsaPub, crypto.SHA256, sacHash, sig); err != nil {
+		return nil, models.ErrorSIDSignatureVerification
+	}
+
+	return &models.SACVerificationResponseModel{
+		Valid: true,
+	}, nil
 }
