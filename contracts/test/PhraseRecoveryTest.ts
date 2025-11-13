@@ -101,7 +101,7 @@ describe("User Phrase Recovery", function () {
 
       const filter = aaa.filters.RedundantWordRequested(pid, i, null);
       const events = await aaa.queryFilter(filter);
-      expect(events.length).to.equal(REDUNDANCY_FACTOR);
+      expect(events.length).to.equal(REDUNDANCY_FACTOR - 1);
       const redundantNodeAddr = events[events.length - 1].args.toNode;
       const redundantNodeIndex = nodeAddrs.findIndex(
         (addr) => addr === redundantNodeAddr

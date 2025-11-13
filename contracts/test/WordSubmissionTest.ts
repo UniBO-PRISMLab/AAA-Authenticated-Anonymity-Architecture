@@ -199,7 +199,7 @@ describe("Word Submission", function () {
       })
       .filter((log: any) => log?.name === "RedundantWordRequested");
 
-    expect(parsed.length).to.equal(REDUNDANCY_M);
+    expect(parsed.length).to.equal(REDUNDANCY_M - 1);
   });
 
   it("should revert if phrase not started", async function () {
