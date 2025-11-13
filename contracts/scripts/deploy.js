@@ -16,7 +16,7 @@ async function main() {
   ];
 
   const factory = await ethers.getContractFactory("AAA");
-  const aaa = await factory.deploy(nodeAddresses, 6, 1);
+  const aaa = await factory.deploy(nodeAddresses, 6, 2);
   await aaa.waitForDeployment();
 
   console.log("AAA deployed to:", await aaa.getAddress());

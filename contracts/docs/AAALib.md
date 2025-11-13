@@ -38,7 +38,7 @@ _Selects a single node from a pool based on a given pid._
 ### deriveSymK
 
 ```solidity
-function deriveSymK(bytes[] words) internal pure returns (bytes32 acc)
+function deriveSymK(bytes[] words, bytes32 salt, bytes32 context) internal pure returns (bytes32 key)
 ```
 
 _Derives a symmetric key from the given words._
@@ -48,4 +48,6 @@ _Derives a symmetric key from the given words._
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | words | bytes[] | An array of encrypted words. |
+| salt | bytes32 |  |
+| context | bytes32 |  |
 

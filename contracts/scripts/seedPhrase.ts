@@ -23,7 +23,7 @@ const contract: Contract = new ethers.Contract(contractAddress, abi, wallet);
 async function main(): Promise<void> {
   // const pid = generateRandomBytes(32);
   const pid: Buffer = Buffer.from(
-    "3tuZJMqFaR6tLMtHXmcEj8vWYUDP99MLTi7Js7QpntQ=",
+    "y2BTuXt/+vU5dQ5nLNqKy39U6ypaS2J6tgPLGcWU8+k=",
     "base64"
   );
 

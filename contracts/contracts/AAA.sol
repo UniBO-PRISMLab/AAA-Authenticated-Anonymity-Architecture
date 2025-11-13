@@ -4,16 +4,17 @@ pragma solidity ^0.8.0;
 import "./AAALib.sol";
 import "./UIPRegistry.sol";
 
-/**
- * @dev AAA is a smart contract that manages the blockchain interactions for the AAA protocol.
- */
+/// @title A simulator for trees
+/// @dev AAA is a smart contract that manages the blockchain interactions for the AAA protocol.
+/// @author Michele Dinelli
+/// @notice Proof of concept implementation.
 contract AAA is UIPRegistry {
     using AAALib for *;
 
-    /// @dev Number of words needed to complete the seed phrase.
+    /// @dev Number of words needed to complete the seed phrase protocol.
     uint public immutable WORDS;
 
-    /// @dev Redundancy factor.
+    /// @dev Redundancy factor, each word will be duplicated REDUNDANCY_FACTOR - 1 times.
     uint public immutable REDUNDANCY_FACTOR;
 
     /// @dev Tells if the contract is locked or not to avoid reentrancy.
@@ -31,10 +32,11 @@ contract AAA is UIPRegistry {
     /// @dev Mapping from SID to SAC codes.
     mapping(bytes32 => uint256[]) private sidToSac;
 
+    /// @dev Determines the existence of SAC codes.
     mapping(bytes => bool) private sacCodes;
 
-    /// @dev Mapping from a public key to its associated SAC code.
-    mapping(bytes => bytes) private pkToSac;
+    /// @dev Mapping from a public key hash to its associated SAC code.
+    mapping(bytes32 => bytes) private pkToSac;
 
     /// @dev Emitted to request word generation requested to a UIP node.
     event WordRequested(
@@ -51,7 +53,7 @@ contract AAA is UIPRegistry {
         uint index
     );
 
-    /// @dev Redundancy requested from a UIP node.
+    /// @dev Emitted to request a redundant word from a UIP node.
     event RedundantWordRequested(
         bytes32 indexed pid,
         uint indexed index,
@@ -59,7 +61,7 @@ contract AAA is UIPRegistry {
         address indexed toNode
     );
 
-    /// @dev Redundant word submitted by a UIP node
+    /// @dev Emitted when a redundant word is submitted by a UIP node.
     event RedundantWordSubmitted(
         bytes32 indexed pid,
         uint indexed index,
@@ -83,10 +85,10 @@ contract AAA is UIPRegistry {
         bytes32 sid
     );
 
-    /// @dev Seed phrase generation protocol initiated.
+    /// @dev Emitted when the seed phrase protocol starts.
     event SeedPhraseProtocolInitiated(bytes32 indexed pid);
 
-    /// @dev Seed phrase protocol is completed.
+    /// @dev Emitted when the seed phrase protocol is completed.
     event PhraseComplete(bytes32 indexed pid, bytes encSID);
 
     /// @dev Represents a seed phrase.
@@ -132,18 +134,16 @@ contract AAA is UIPRegistry {
         uint redundancyFactor
     ) UIPRegistry(nodes) {
         require(nodes.length >= words, "too few nodes");
+        require(redundancyFactor > 1, "invalid redundancy");
         WORDS = words;
         REDUNDANCY_FACTOR = redundancyFactor;
     }
 
     /**
-     * @dev Initiates the seed phrase generation protocol.
-     *
-     * Requirements:
-     * - The phrase must not be started.
-     *
+     * @notice Starts the seed phrase generation protocol.
+     * @dev Requires that the protocol has not already been started for the given pid.
      * @param pid User's PID.
-     * @param pk User's Public Key.
+     * @param pk User's Public Key as 2048 bit RSA PKCS#8 keys submitted as plain bytes.
      */
     function seedPhraseGenerationProtocol(
         bytes32 pid,
@@ -215,7 +215,7 @@ contract AAA is UIPRegistry {
         address[] memory redundantNodes = AAALib.selectNodes(
             uint256(keccak256(abi.encodePacked(pid, msg.sender))),
             nodeList,
-            REDUNDANCY_FACTOR
+            REDUNDANCY_FACTOR - 1
         );
 
         for (uint i = 0; i < redundantNodes.length; i++) {
@@ -250,12 +250,10 @@ contract AAA is UIPRegistry {
     }
 
     /**
-     * @dev Submits a redundant encrypted word for a given pid.
-     *
-     * Requirements:
-     * - The sender must be a UIP node.
-     * - The phrase must have been initiated.
-     * - The sender must not have already submitted the redundant word for the given index.
+     * @notice Submits a redundant encrypted word for a given pid.
+     * @dev The sender must be a UIP node.
+     * The phrase must have been initiated.
+     * The sender must not have already submitted the redundant word for the given index.
      *
      * @param pid User's PID.
      * @param encryptedWord The redundant word encrypted with the node's public key.
@@ -331,7 +329,11 @@ contract AAA is UIPRegistry {
             acc = abi.encodePacked(acc, h);
         }
 
-        bytes32 symK = AAALib.deriveSymK(wordBytes);
+        bytes32 symK = AAALib.deriveSymK(
+            wordBytes,
+            keccak256(abi.encodePacked(block.timestamp, msg.sender)),
+            pid
+        );
 
         emit PIDEncryptionRequested(
             pid,
@@ -367,22 +369,20 @@ contract AAA is UIPRegistry {
     }
 
     /**
-     * @dev Submits a SAC record linking a public key to a SAC code.
-     *
-     * Requirements:
-     * - The public key must not be empty.
+     * @notice Submits a SAC record linking a public key to a SAC code.
+     * @dev Requires:
+     * - The public key hash must not be empty.
      * - The SAC code must be greater than zero.
-     * - The public key must not have been already stored.
+     * - The public key hash must not have been already stored.
      * - The SAC code must exist.
      *
      * @param sac The SAC code to be linked.
-     * @param pk The public key to be linked.
+     * @param pkHash The keccak256 hash of the user's public key.
      */
-    function submitSACRecord(bytes calldata sac, bytes calldata pk) external {
-        require(pk.length > 0, "invalid pk");
+    function submitSACRecord(bytes calldata sac, bytes32 pkHash) external {
         require(sac.length > 0, "invalid sac");
         require(sacCodes[sac], "sac not found");
-        pkToSac[pk] = sac;
+        pkToSac[pkHash] = sac;
     }
 
     /**
@@ -411,7 +411,6 @@ contract AAA is UIPRegistry {
 
     /**
      * @dev Returns the SID record for a given sid.
-     *
      * @param sid User's SID.
      * @return The encrypted PID.
      * @return The user's public key.
@@ -425,22 +424,27 @@ contract AAA is UIPRegistry {
     }
 
     /**
-     * @dev Returns the SAC code for a given public key.
-     *
-     * @param pk User's public key.
-     * @return The SAC code associated with the public key.
+     * @notice Returns the SAC code for a given public key hash.
+     * @param pkHash User's public key hash.
+     * @return The SAC code associated with the public key hash.
      */
-    function getSACRecord(
-        bytes calldata pk
-    ) external view returns (bytes memory) {
-        bytes memory sac = pkToSac[pk];
+    function getSACRecord(bytes32 pkHash) external view returns (bytes memory) {
+        bytes memory sac = pkToSac[pkHash];
         require(sac.length > 0, "not found");
         return sac;
     }
 
     /**
+     * @notice Checks if a SAC code exists.
+     * @param sac The SAC code to check.
+     * @return True if the SAC code exists, false otherwise.
+     */
+    function sacExists(bytes calldata sac) external view returns (bool) {
+        return sacCodes[sac];
+    }
+
+    /**
      * @dev Returns the encrypted words, node public keys, and indexes for a given pid.
-     *
      * @param pid User's PID.
      * @return words The array of encrypted words.
      */
@@ -479,7 +483,6 @@ contract AAA is UIPRegistry {
 
     /**
      * @dev Returns the redundant encrypted words and node public keys for a given pid and index.
-     *
      * @param pid User's PID.
      * @param index The index of the word.
      * @return words The array of redundant encrypted words.

@@ -2,6 +2,8 @@
 
 ## AAA
 
+Proof of concept implementation.
+
 _AAA is a smart contract that manages the blockchain interactions for the AAA protocol._
 
 ### WORDS
@@ -10,7 +12,7 @@ _AAA is a smart contract that manages the blockchain interactions for the AAA pr
 uint256 WORDS
 ```
 
-_Number of words needed to complete the seed phrase._
+_Number of words needed to complete the seed phrase protocol._
 
 ### REDUNDANCY_FACTOR
 
@@ -18,7 +20,7 @@ _Number of words needed to complete the seed phrase._
 uint256 REDUNDANCY_FACTOR
 ```
 
-_Redundancy factor._
+_Redundancy factor, each word will be duplicated REDUNDANCY_FACTOR - 1 times._
 
 ### WordRequested
 
@@ -42,7 +44,7 @@ _Emitted when a word is submitted by a UIP node._
 event RedundantWordRequested(bytes32 pid, uint256 index, bytes32 hashedWord, address toNode)
 ```
 
-_Redundancy requested from a UIP node._
+_Emitted to request a redundant word from a UIP node._
 
 ### RedundantWordSubmitted
 
@@ -50,7 +52,7 @@ _Redundancy requested from a UIP node._
 event RedundantWordSubmitted(bytes32 pid, uint256 index, address node, bytes32 wordHash)
 ```
 
-_Redundant word submitted by a UIP node_
+_Emitted when a redundant word is submitted by a UIP node._
 
 ### SIDEncryptionRequested
 
@@ -74,7 +76,7 @@ _Emitted to request PID encryption from a UIP node._
 event SeedPhraseProtocolInitiated(bytes32 pid)
 ```
 
-_Seed phrase generation protocol initiated._
+_Emitted when the seed phrase protocol starts._
 
 ### PhraseComplete
 
@@ -82,7 +84,7 @@ _Seed phrase generation protocol initiated._
 event PhraseComplete(bytes32 pid, bytes encSID)
 ```
 
-_Seed phrase protocol is completed._
+_Emitted when the seed phrase protocol is completed._
 
 ### Phrase
 
@@ -152,17 +154,16 @@ constructor(address[] nodes, uint256 words, uint256 redundancyFactor) public
 function seedPhraseGenerationProtocol(bytes32 pid, bytes pk) external
 ```
 
-_Initiates the seed phrase generation protocol.
+Starts the seed phrase generation protocol.
 
-Requirements:
-- The phrase must not be started._
+_Requires that the protocol has not already been started for the given pid._
 
 #### Parameters
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | pid | bytes32 | User's PID. |
-| pk | bytes | User's Public Key. |
+| pk | bytes | User's Public Key as 2048 bit RSA PKCS#8 keys submitted as plain bytes. |
 
 ### submitEncryptedWord
 
@@ -192,12 +193,11 @@ Requirements:
 function submitRedundantWord(bytes32 pid, bytes encryptedWord, uint256 wordIndex, bytes nodePK) external
 ```
 
-_Submits a redundant encrypted word for a given pid.
+Submits a redundant encrypted word for a given pid.
 
-Requirements:
-- The sender must be a UIP node.
-- The phrase must have been initiated.
-- The sender must not have already submitted the redundant word for the given index._
+_The sender must be a UIP node.
+The phrase must have been initiated.
+The sender must not have already submitted the redundant word for the given index._
 
 #### Parameters
 
@@ -254,15 +254,15 @@ Requirements:
 ### submitSACRecord
 
 ```solidity
-function submitSACRecord(bytes sac, bytes pk) external
+function submitSACRecord(bytes sac, bytes32 pkHash) external
 ```
 
-_Submits a SAC record linking a public key to a SAC code.
+Submits a SAC record linking a public key to a SAC code.
 
-Requirements:
-- The public key must not be empty.
+_Requirements:
+- The public key hash must not be empty.
 - The SAC code must be greater than zero.
-- The public key must not have been already stored.
+- The public key hash must not have been already stored.
 - The SAC code must exist._
 
 #### Parameters
@@ -270,7 +270,7 @@ Requirements:
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | sac | bytes | The SAC code to be linked. |
-| pk | bytes | The public key to be linked. |
+| pkHash | bytes32 | The keccak256 hash of the user's public key. |
 
 ### submitSAC
 
@@ -333,22 +333,42 @@ _Returns the SID record for a given sid._
 ### getSACRecord
 
 ```solidity
-function getSACRecord(bytes pk) external view returns (bytes)
+function getSACRecord(bytes32 pkHash) external view returns (bytes)
 ```
 
-_Returns the SAC code for a given public key._
+Returns the SAC code for a given public key hash.
 
 #### Parameters
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| pk | bytes | User's public key. |
+| pkHash | bytes32 | User's public key hash. |
 
 #### Return Values
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| [0] | bytes | The SAC code associated with the public key. |
+| [0] | bytes | The SAC code associated with the public key hash. |
+
+### sacExists
+
+```solidity
+function sacExists(bytes sac) external view returns (bool)
+```
+
+Checks if a SAC code exists.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| sac | bytes | The SAC code to check. |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | True if the SAC code exists, false otherwise. |
 
 ### getWords
 

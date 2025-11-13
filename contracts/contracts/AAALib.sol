@@ -47,7 +47,6 @@ library AAALib {
     ) internal pure returns (address selected) {
         require(pool.length > 0, "pool too small");
 
-        // TODO: this is deterministic and we don't like it much (check for VRF)
         uint idx = uint(keccak256(abi.encodePacked(pid))) % pool.length;
         selected = pool[idx];
     }
@@ -58,13 +57,16 @@ library AAALib {
      * @param words An array of encrypted words.
      */
     function deriveSymK(
-        bytes[] memory words
-    ) internal pure returns (bytes32 acc) {
-        // TODO: deterministic key derivation is not ideal (check for KDF)
+        bytes[] memory words,
+        bytes32 salt,
+        bytes32 context
+    ) internal pure returns (bytes32 key) {
+        key = salt;
         for (uint i = 0; i < words.length; i++) {
-            bytes32 h = keccak256(words[i]);
-            acc = keccak256(abi.encodePacked(acc, h));
+            key = keccak256(
+                abi.encodePacked(key, context, keccak256(words[i]))
+            );
         }
-        return acc;
+        return key;
     }
 }
