@@ -202,12 +202,13 @@ func (s *Service) VerifySAC(
 		return nil, models.ErrorInvalidSignatureEncoding
 	}
 
+	sacB64 := base64.StdEncoding.EncodeToString(sac)
 	h := crypto.SHA256.New()
-	h.Write([]byte(req.SAC))
+	h.Write([]byte(sacB64))
 	sacHash := h.Sum(nil)
 
 	if err := rsa.VerifyPKCS1v15(rsaPub, crypto.SHA256, sacHash, sig); err != nil {
-		return nil, models.ErrorSIDSignatureVerification
+		return nil, models.ErrorSACSignatureVerification
 	}
 
 	return &models.SACVerificationResponseModel{
