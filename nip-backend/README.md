@@ -11,16 +11,16 @@ Build the `nip-backend` image
 docker build . -t nip-backend
 ```
 
-Run it with
+Start a swarm
 
 ```bash
-docker compose up
+docker swarmi init
 ```
 
-or
+And deploy the backend stack
 
 ```bash
-task up
+docker stack deploy -c docker-compose.yaml aaa-backend-stack --detach=false --prune
 ```
 
 ## Scale Instances
