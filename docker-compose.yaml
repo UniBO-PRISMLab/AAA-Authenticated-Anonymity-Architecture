@@ -1,3 +1,11 @@
+secrets:
+  postgres_user_file:
+    file: ./db_user.txt
+  postgres_password_file:
+    file: ./db_password.txt
+  postgres_db_file:
+    file: ./db_name.txt
+
 services:
   contracts:
     build:
@@ -22,144 +30,40 @@ services:
     shm_size: 128mb
     networks:
       - uip-net
+    secrets:
+      - postgres_user_file
+      - postgres_password_file
+      - postgres_db_file
     environment:
-      POSTGRES_USER: nipadmin
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: nip
+      POSTGRES_USER_FILE: /run/secrets/postgres_user_file
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password_file
+      POSTGRES_DB_FILE: /run/secrets/postgres_db_file
     ports:
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
       - ./nip-backend/init-scripts:/docker-entrypoint-initdb.d
 
-  nip-backend-1:
+  nip-backend:
     image: nip-backend:latest
-    container_name: nip-backend-1
-    restart: always
-    build:
-      context: ./nip-backend
-      dockerfile: Dockerfile
+    deploy:
+      mode: replicated
+      replicas: 8
     depends_on:
-      db:
-        condition: service_started
-      contracts:
-        condition: service_healthy
+      - db
+      - contracts
     networks:
       - uip-net
     ports:
       - "8888:8888"
-    env_file:
-      - ./nip-backend/.env.instance1
-
-  nip-backend-2:
-    image: nip-backend:latest
-    container_name: nip-backend-2
-    restart: always
-    build:
-      context: ./nip-backend
-      dockerfile: Dockerfile
-    depends_on:
-      db:
-        condition: service_started
-      contracts:
-        condition: service_healthy
-    networks:
-      - uip-net
-    ports:
-      - "8889:8888"
-    env_file:
-      - ./nip-backend/.env.instance2
-
-  nip-backend-3:
-    image: nip-backend:latest
-    container_name: nip-backend-3
-    restart: always
-    build:
-      context: ./nip-backend
-      dockerfile: Dockerfile
-    depends_on:
-      db:
-        condition: service_started
-      contracts:
-        condition: service_healthy
-    networks:
-      - uip-net
-    ports:
-      - "8890:8888"
-    env_file:
-      - ./nip-backend/.env.instance3
-
-  nip-backend-4:
-    image: nip-backend:latest
-    container_name: nip-backend-4
-    restart: always
-    build:
-      context: ./nip-backend
-      dockerfile: Dockerfile
-    depends_on:
-      db:
-        condition: service_started
-      contracts:
-        condition: service_healthy
-    networks:
-      - uip-net
-    ports:
-      - "8891:8888"
-    env_file:
-      - ./nip-backend/.env.instance4
-
-  nip-backend-5:
-    image: nip-backend:latest
-    container_name: nip-backend-5
-    restart: always
-    build:
-      context: ./nip-backend
-      dockerfile: Dockerfile
-    depends_on:
-      db:
-        condition: service_started
-      contracts:
-        condition: service_healthy
-    networks:
-      - uip-net
-    ports:
-      - "8892:8888"
-    env_file:
-      - ./nip-backend/.env.instance5
-
-  nip-backend-6:
-    image: nip-backend:latest
-    container_name: nip-backend-6
-    restart: always
-    build:
-      context: ./nip-backend
-      dockerfile: Dockerfile
-    depends_on:
-      db:
-        condition: service_started
-      contracts:
-        condition: service_healthy
-    networks:
-      - uip-net
-    ports:
-      - "8893:8888"
-    env_file:
-      - ./nip-backend/.env.instance6
-
-  adminer:
-    image: adminer
-    restart: always
-    networks:
-      - uip-net
-    depends_on:
-      - db
-    ports:
-      - 8080:8080
+    environment:
+      - TASK_SLOT={{.Task.Slot}}
+    volumes:
+      - ./nip-backend/configs:/app/configs
 
 volumes:
   db_data:
 
 networks:
   uip-net:
-    name: uip-net
-    driver: bridge
+    driver: overlay
