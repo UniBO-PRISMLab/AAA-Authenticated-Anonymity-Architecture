@@ -7,17 +7,19 @@ NIP (National Identity Provider) server
 
 ### Setup the database
 
+Only need to specifiy the database name, a username and a password. Place them in `db_` file in the root directory.
+
 ```bash
 echo -n "<name>" > ../db_name.txt
 echo -n "<password>" > ../db_password.txt
 echo -n "<user>" > ../db_user.txt
 ```
 
+The docker-compose file will read them and inject them as environment variables in the database container.
+
 ### Instances Configurations
 
-Create a directory `nip-backend/config` and add as many configuration files as you want (as many instances you need).
-
-The configuration file must be named `.env.instanceN` e.g., `.env.instance1` and should look like this
+Create a directory `nip-backend/config` and add as many configuration files as you want (as many instances you need). The configuration file must be named `.env.instanceN` e.g., `.env.instance1` and should look like this:
 
 ```env
 GIN_MODE="release"
@@ -33,15 +35,24 @@ HTTP_HOST="0.0.0.0"
 HTTP_PORT="8888"
 ```
 
-### Build
+The database user, password and name must match the ones previously defined.
 
-Build the `nip-backend` image
+To get valid blockchain private keys and addresses you can start a container running the contracts with
 
-```bash
-docker build . -t nip-backend
+```zsh
+docker build ../contracts -t contracts
+docker run contracts
 ```
 
+and choose valid private keys and addresses from the logs.
+
 ### Run
+
+Build the images
+
+```zsh
+docker compose build
+```
 
 Start a swarm
 
