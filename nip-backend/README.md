@@ -19,32 +19,7 @@ The docker-compose file will read them and inject them as environment variables 
 
 ### Instances Configurations
 
-Create a directory `nip-backend/config` and add as many configuration files as you want (as many instances you need). The configuration file must be named `.env.instanceN` e.g., `.env.instance1` and should look like this:
-
-```env
-GIN_MODE="release"
-DATABASE_URL="postgres://<user>:<password>@db:5432/<dbname>"
-SK="<32 byte base64 encoded secret key>"
-ETH_NODE_URL="ws://contracts:8545"
-CONTRACT_ADDRESS="0x5FbDB2315678afecb367f032d93F642f64180aa3"
-PUBLIC_KEY="<RSA PKCS#8 base64 encoded public key>"
-PRIVATE_KEY="<RSA PKCS#8 base64 encoded private key>"
-BLOCKCHAIN_PRIVATE_KEY="<blockchain wallet private key from anvil>"
-BLOCKCHAIN_ADDRESS="<blockchain wallet address from anvil>"
-HTTP_HOST="0.0.0.0"
-HTTP_PORT="8888"
-```
-
-The database user, password and name must match the ones previously defined.
-
-To get valid blockchain private keys and addresses you can start a container running the contracts with
-
-```zsh
-docker build ../contracts -t contracts
-docker run contracts
-```
-
-and choose valid private keys and addresses from the logs.
+Create a directory `/nip-backend/config` and use the script `/gen.sh` (`./gen.sh <n>`) to generate `n` configuration files that will be placed under `/nip-backend/configs`. The script reads the files `/db_*.txt `, generate RSA keypairs using openssl and extract valid pairs (address, private key) from `/accounts.txt` producing valid `.env.instanceN` file.
 
 ### Run
 

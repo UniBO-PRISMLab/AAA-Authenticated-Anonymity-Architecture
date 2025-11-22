@@ -46,9 +46,12 @@ services:
 
   nip-backend:
     image: nip-backend:latest
+    build:
+      context: ./nip-backend
+      dockerfile: Dockerfile
     deploy:
       mode: replicated
-      replicas: 8
+      replicas: 16
     depends_on:
       - db
       - contracts

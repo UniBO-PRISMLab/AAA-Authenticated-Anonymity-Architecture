@@ -7,23 +7,13 @@
 |                                       |     Min |     Max |     Avg | Calls | eur avg |
 | :------------------------------------ | ------: | ------: | ------: | ----: | ------: |
 | **AAA**                               |         |         |         |       |         |
-|        *seedPhraseGenerationProtocol* | 542,015 | 542,027 | 542,024 |    34 |       - |
-|        *submitEncryptedPID*           | 489,404 | 489,416 | 489,412 |     3 |       - |
-|        *submitEncryptedSID*           |       - |       - | 174,223 |     6 |       - |
-|        *submitEncryptedWord*          | 356,923 | 497,411 | 387,110 |    68 |       - |
-|        *submitRedundantWord*          | 626,663 | 626,699 | 626,680 |    12 |       - |
-| **MockUIPRegistry**                   |         |         |         |       |         |
-|        *addNode*                      |       - |       - |  74,522 |     5 |       - |
-|        *onlyNodeFn*                   |       - |       - |  23,465 |     2 |       - |
-|        *onlyOwnerFn*                  |       - |       - |  23,415 |     2 |       - |
-|        *removeNode*                   |       - |       - |  37,307 |     2 |       - |
+|        *seedPhraseGenerationProtocol* | 921,420 | 921,432 | 921,431 |     8 |       - |
+|        *submitEncryptedWord*          | 411,497 | 836,466 | 439,344 |    69 |       - |
 
 ## Deployments
-|                     |       Min |      Max  |       Avg | Block % | eur avg |
-| :------------------ | --------: | --------: | --------: | ------: | ------: |
-| **AAA**             | 3,217,733 | 3,264,231 | 3,261,413 |  10.9 % |       - |
-| **MockAAALib**      |         - |         - |   472,628 |   1.6 % |       - |
-| **MockUIPRegistry** |   617,955 |   664,441 |   623,120 |   2.1 % |       - |
+|         | Min | Max  |       Avg | Block % | eur avg |
+| :------ | --: | ---: | --------: | ------: | ------: |
+| **AAA** |   - |    - | 3,822,195 |  12.7 % |       - |
 
 ## Solidity and Network Config
 | **Settings**        | **Value**  |
