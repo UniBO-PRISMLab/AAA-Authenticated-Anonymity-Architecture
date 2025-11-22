@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 N=$1
 
 echo "Generating configuration files for $1 instances..."
