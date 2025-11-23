@@ -109,7 +109,7 @@ async function main() {
     return;
   }
 
-  const indices = getRandomIndices(pids.length, 5);
+  const indices = getRandomIndices(pids.length, 50);
   console.log("Selected random indices:", indices);
 
   let count = 0;
@@ -125,6 +125,8 @@ async function main() {
     const output = `${count}\n PID: ${pidStr}\nSID: ${decryptedSID}\nPublic Key: ${publicKey} \nPrivate Key: ${privateKey}\n`;
     fs.appendFileSync(OUTPUT_FILE, output);
     count++;
+
+    await new Promise((res) => setTimeout(res, 2000));
   }
   console.log("\nOutput saved to:", OUTPUT_FILE);
 }

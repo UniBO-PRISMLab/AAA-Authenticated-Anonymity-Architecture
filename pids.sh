@@ -1,6 +1,5 @@
 #!/bin/bash
-
-for i in $(seq 1 100);
+for i in $(seq 1 1000);
 do
     echo "Generating pid $i"
     openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out private.key -quiet
