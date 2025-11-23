@@ -8,11 +8,10 @@ secrets:
 
 services:
   contracts:
+    image: ghcr.io/unibo-prismlab/contracts:main
     build:
       context: ./contracts
       dockerfile: Dockerfile
-    image: contracts:latest
-    container_name: contracts
     healthcheck:
       test: ["CMD", "curl", "-s", "http://localhost:8545"]
       interval: 10s
@@ -45,7 +44,7 @@ services:
       - ./nip-backend/init-scripts:/docker-entrypoint-initdb.d
 
   nip-backend:
-    image: nip-backend:latest
+    image: ghcr.io/unibo-prismlab/nip-backend:main
     build:
       context: ./nip-backend
       dockerfile: Dockerfile
