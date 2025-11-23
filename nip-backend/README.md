@@ -19,7 +19,7 @@ The docker-compose file will read them and inject them as environment variables 
 
 ### Instances Configurations
 
-Create a directory `/nip-backend/config` and use the script `/gen.sh` (`./gen.sh <n>`) to generate `n` configuration files that will be placed under `/nip-backend/configs`. The script reads the files `/db_*.txt `, generate RSA keypairs using openssl and extract valid pairs (address, private key) from `/accounts.txt` producing valid `.env.instanceN` file.
+Create a directory `/nip-backend/config` and use the script `/gen.sh` (`./gen.sh <n>`) to generate `n` configuration files that will be placed under `/nip-backend/configs`. The script reads the files `/db_*.txt `, generate RSA keypairs using openssl and extract pairs (address, private key) from `/accounts.txt` producing `.env.instanceN`.
 
 ### Run
 

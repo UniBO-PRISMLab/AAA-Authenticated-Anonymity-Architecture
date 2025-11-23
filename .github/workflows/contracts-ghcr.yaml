@@ -1,4 +1,4 @@
-name: Push nip-backend to ghcr.io
+name: Push contracts to ghcr.io
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository_owner }}/nip-backend
+  IMAGE_NAME: ${{ github.repository_owner }}/contracts
 
 jobs:
   build-and-push-image:
@@ -41,8 +41,8 @@ jobs:
         id: push
         uses: docker/build-push-action@v6
         with:
-          context: ./nip-backend
-          file: ./nip-backend/Dockerfile
+          context: ./contracts
+          file: ./contracts/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
