@@ -115,17 +115,20 @@ async function main() {
   let count = 0;
   for (const idx of indices) {
     const pid = pids[idx];
-    const {
-      pid: pidStr,
-      decryptedSID,
-      publicKey,
-      privateKey,
-    } = await runForPID(pid);
+    try {
+      const {
+        pid: pidStr,
+        decryptedSID,
+        publicKey,
+        privateKey,
+      } = await runForPID(pid);
 
-    const output = `${count}\n PID: ${pidStr}\nSID: ${decryptedSID}\nPublic Key: ${publicKey} \nPrivate Key: ${privateKey}\n`;
-    fs.appendFileSync(OUTPUT_FILE, output);
-    count++;
-
+      const output = `${count}\nPID: ${pidStr}\nSID: ${decryptedSID}\nPublic Key: ${publicKey} \nPrivate Key: ${privateKey}\n`;
+      fs.appendFileSync(OUTPUT_FILE, output);
+      count++;
+    } catch (err) {
+      console.error("Error for PID: ", pid.toString("base64"), err);
+    }
     await new Promise((res) => setTimeout(res, 2000));
   }
   console.log("\nOutput saved to:", OUTPUT_FILE);
