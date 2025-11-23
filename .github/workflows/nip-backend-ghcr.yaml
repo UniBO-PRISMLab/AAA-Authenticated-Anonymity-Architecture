@@ -1,4 +1,4 @@
-name: Push nip-backend to ghcr.io
+name: nip-backend image to ghcr.io
 
 on:
   push:

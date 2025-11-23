@@ -1,4 +1,4 @@
-name: Push contracts to ghcr.io
+name: contracts image to ghcr.io
 
 on:
   push:
