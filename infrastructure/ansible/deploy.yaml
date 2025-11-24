@@ -13,44 +13,23 @@
     gh_token: "{{ lookup('env', 'GH_TOKEN') }}"
 
   tasks:
-    - name: Init Docker swarm (if not already initialized)
-      community.docker.docker_swarm:
-        state: present
-        advertise_addr: "{{ ansible_host | default(ansible_default_ipv4.address) }}"
+    - name: Init Docker swarm
+      ansible.builtin.shell: "docker swarm init"
       become: yes
-      ignore_errors: true
-      run_once: true
 
-    - name: Clone the repo and ensure directory exists
-      ansible.builtin.git:
-        repo: "https://github.com/UniBO-PRISMLab/AAA-Authenticated-Anonymity-Architecture.git"
-        dest: "{{ deploy_dir }}"
-        version: main
-        force: yes
-        update: yes
+    - name: Clone the repo
+      ansible.builtin.shell: "git clone https://github.com/UniBO-PRISMLab/AAA-Authenticated-Anonymity-Architecture.git {{ deploy_dir }} || (cd {{ deploy_dir }} && git pull)"
       become: yes
       become_user: "{{ deploy_user }}"
 
     - name: Login to ghcr.io
-      ansible.builtin.command: "echo {{ gh_token }} | docker login ghcr.io -u {{ ghcr_username }} --password-stdin"
-      no_log: true
-      changed_when: false
-      become: yes
-      become_user: "{{ deploy_user }}"
+      shell: "echo {{ gh_token }} | docker login ghcr.io -u {{ ghcr_username }} --password-stdin"
+    - name: Pull backend image
+      shell: "docker pull ghcr.io/unibo-prismlab/nip-backend:main"
+    - name: Pull contracts image
+      shell: "docker pull ghcr.io/unibo-prismlab/contracts:main"
 
-    - name: Ensure Docker images are present
-      community.docker.docker_image:
-        name: "{{ item }}"
-        source: pull
-        state: present
-      loop:
-        - "ghcr.io/unibo-prismlab/nip-backend:main"
-        - "ghcr.io/unibo-prismlab/contracts:main"
-        - "postgres:15"
-      become: yes
-      become_user: "{{ deploy_user }}"
-
-    - name: Create db secrets files with base64 content
+    - name: Create db secrets
       ansible.builtin.copy:
         dest: "{{ deploy_dir }}/{{ item.name }}"
         content: "{{ item.content }}"

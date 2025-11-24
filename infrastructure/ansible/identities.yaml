@@ -30,13 +30,15 @@
         owner: student
         group: student
         mode: "0644"
+        remote_src: yes
       become: yes
 
-    - name: Copy student-anonymous-identities.txt for challenge
+    - name: Copy anonymous-identities.txt to /home/student
       ansible.builtin.copy:
         src: "/home/{{ deploy_user }}/student-anonymous-identities.txt"
         dest: "/home/student/anonymous-identities.txt"
         owner: student
         group: student
         mode: "0644"
+        remote_src: yes
       become: yes

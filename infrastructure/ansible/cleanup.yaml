@@ -34,10 +34,8 @@
       become: yes
       ignore_errors: yes
 
-    - name: Restart Docker service (optional, to clear lingering swarm states)
-      ansible.builtin.service:
-        name: docker
-        state: restarted
+    - name: Restart Docker service
+      ansible.builtin.shell: "service docker restart"
       become: yes
       ignore_errors: yes
 
@@ -57,22 +55,7 @@
       become_user: "{{ deploy_user }}"
       ignore_errors: yes
 
-    - name: Remove Bun installation directory
-      ansible.builtin.file:
-        path: "{{ bun_install_dir }}"
-        state: absent
-      become: yes
-      become_user: "{{ deploy_user }}"
-
-    - name: Remove Bun from PATH in .bashrc
-      ansible.builtin.lineinfile:
-        path: "/home/{{ deploy_user }}/.bashrc"
-        line: "export PATH=$HOME/.bun/bin:$PATH"
-        state: absent
-      become: yes
-      become_user: "{{ deploy_user }}"
-
-    - name: Remove cloned repo directory (and all contents, including secrets and configs)
+    - name: Remove cloned repo directory
       ansible.builtin.file:
         path: "{{ deploy_dir }}"
         state: absent
@@ -89,3 +72,11 @@
         - student-anonymous-identities.txt
       become: yes
       become_user: "{{ deploy_user }}"
+    - name: Remove public and anonymous identities from participant's home directory
+      ansible.builtin.file:
+          path: "/home/student/{{ item }}"
+          state: absent
+      loop:
+        - anonymous-identities.txt
+        - public-identities.txt
+      become: yes
