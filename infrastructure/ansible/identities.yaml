@@ -1,0 +1,42 @@
+---
+- name: Generate Identities
+  hosts: machines
+
+  vars:
+    deploy_user: "{{ username | default(ansible_user) }}"
+    deploy_dir: "/home/{{ deploy_user }}/aaa"
+    bun_path: "/home/{{ deploy_user }}/.bun/bin"
+
+  tasks:
+    - name: Generate Public Identities (PIDs) using pids.sh
+      ansible.builtin.shell: "./pids.sh"
+      args:
+        chdir: "{{ deploy_dir }}"
+      become_user: "{{ deploy_user }}"
+
+    - name: Install dependencies and Generate Secret Identities (SIDs)
+      ansible.builtin.shell: "bun i && bun scripts/sids.ts"
+      args:
+        chdir: "{{ deploy_dir }}/contracts"
+      become_user: "{{ deploy_user }}"
+      environment:
+        PATH: "{{ bun_path }}:{{ ansible_env.PATH }}"
+        HOME: "/home/{{ deploy_user }}"
+
+    - name: Copy public-identities.txt to /home/student
+      ansible.builtin.copy:
+        src: "/home/{{ deploy_user }}/public-identities.txt"
+        dest: "/home/student/public-identities.txt"
+        owner: student
+        group: student
+        mode: "0644"
+      become: yes
+
+    - name: Copy student-anonymous-identities.txt for challenge
+      ansible.builtin.copy:
+        src: "/home/{{ deploy_user }}/student-anonymous-identities.txt"
+        dest: "/home/student/anonymous-identities.txt"
+        owner: student
+        group: student
+        mode: "0644"
+      become: yes

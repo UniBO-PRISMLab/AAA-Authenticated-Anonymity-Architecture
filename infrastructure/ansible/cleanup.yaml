@@ -1,0 +1,91 @@
+- name: AAA Cleanup
+  hosts: machines
+  become: no
+
+  vars:
+    deploy_user: "{{ username | default(ansible_user) }}"
+    deploy_dir: "/home/{{ deploy_user }}/aaa"
+    bun_install_dir: "/home/{{ deploy_user }}/.bun"
+
+  tasks:
+    - name: Remove Docker stack
+      ansible.builtin.shell: "docker stack rm aaa-backend-stack"
+      args:
+        chdir: "{{ deploy_dir }}"
+      become: yes
+      become_user: "{{ deploy_user }}"
+      ignore_errors: yes
+
+    - name: Wait for stack removal to finish
+      ansible.builtin.shell: "while docker stack ls | grep -q aaa-backend-stack; do sleep 1; done"
+      become: yes
+      become_user: "{{ deploy_user }}"
+      ignore_errors: yes
+      changed_when: false
+
+    - name: Remove volumes created by the stack
+      ansible.builtin.shell: "docker volume rm aaa-backend-stack_db_data"
+      become: yes
+      become_user: "{{ deploy_user }}"
+      ignore_errors: yes
+
+    - name: Leave Docker swarm
+      ansible.builtin.command: "docker swarm leave --force"
+      become: yes
+      ignore_errors: yes
+
+    - name: Restart Docker service (optional, to clear lingering swarm states)
+      ansible.builtin.service:
+        name: docker
+        state: restarted
+      become: yes
+      ignore_errors: yes
+
+    - name: Remove local image tags and remote images
+      ansible.builtin.shell: |
+        docker rmi -f ghcr.io/unibo-prismlab/nip-backend:main || true
+        docker rmi -f ghcr.io/unibo-prismlab/contracts:main || true
+        docker rmi -f nip-backend || true
+        docker rmi -f contracts || true
+      become: yes
+      become_user: "{{ deploy_user }}"
+      ignore_errors: yes
+
+    - name: Docker logout ghcr.io
+      ansible.builtin.command: "docker logout ghcr.io"
+      become: yes
+      become_user: "{{ deploy_user }}"
+      ignore_errors: yes
+
+    - name: Remove Bun installation directory
+      ansible.builtin.file:
+        path: "{{ bun_install_dir }}"
+        state: absent
+      become: yes
+      become_user: "{{ deploy_user }}"
+
+    - name: Remove Bun from PATH in .bashrc
+      ansible.builtin.lineinfile:
+        path: "/home/{{ deploy_user }}/.bashrc"
+        line: "export PATH=$HOME/.bun/bin:$PATH"
+        state: absent
+      become: yes
+      become_user: "{{ deploy_user }}"
+
+    - name: Remove cloned repo directory (and all contents, including secrets and configs)
+      ansible.builtin.file:
+        path: "{{ deploy_dir }}"
+        state: absent
+      become: yes
+      become_user: "{{ deploy_user }}"
+
+    - name: Remove public and anonymous identities from the user's home directory
+      ansible.builtin.file:
+        path: "/home/{{ deploy_user }}/{{ item }}"
+        state: absent
+      loop:
+        - anonymous-identities.txt
+        - public-identities.txt
+        - student-anonymous-identities.txt
+      become: yes
+      become_user: "{{ deploy_user }}"

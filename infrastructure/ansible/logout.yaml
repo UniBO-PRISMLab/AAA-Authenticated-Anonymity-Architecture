@@ -1,0 +1,11 @@
+---
+- name: Logout
+  hosts: machines
+  become: yes
+  vars:
+    deploy_user: "{{ username | default(ansible_user) }}"
+
+  tasks:
+    - name: Kill all sessions for the user
+      ansible.builtin.shell: |
+        pkill -KILL -u {{ deploy_user }} || true

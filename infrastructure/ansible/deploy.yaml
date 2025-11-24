@@ -1,0 +1,108 @@
+- name: AAA Deployment
+  hosts: machines
+  become: no
+
+  vars:
+    deploy_user: "{{ username | default(ansible_user) }}"
+    deploy_dir: "/home/{{ deploy_user }}/aaa"
+    ghcr_username: "{{ lookup('env', 'GHCR_USERNAME') }}"
+    bun_install_dir: "/home/{{ deploy_user }}/.bun/bin"
+    db_user_content: "{{ lookup('env', 'DB_USER_CONTENT') }}"
+    db_password_content: "{{ lookup('env', 'DB_PASSWORD_CONTENT') }}"
+    db_name_content: "{{ lookup('env', 'DB_NAME_CONTENT') }}"
+    gh_token: "{{ lookup('env', 'GH_TOKEN') }}"
+
+  tasks:
+    - name: Init Docker swarm (if not already initialized)
+      community.docker.docker_swarm:
+        state: present
+        advertise_addr: "{{ ansible_host | default(ansible_default_ipv4.address) }}"
+      become: yes
+      ignore_errors: true
+      run_once: true
+
+    - name: Clone the repo and ensure directory exists
+      ansible.builtin.git:
+        repo: "https://github.com/UniBO-PRISMLab/AAA-Authenticated-Anonymity-Architecture.git"
+        dest: "{{ deploy_dir }}"
+        version: main
+        force: yes
+        update: yes
+      become: yes
+      become_user: "{{ deploy_user }}"
+
+    - name: Login to ghcr.io
+      ansible.builtin.command: "echo {{ gh_token }} | docker login ghcr.io -u {{ ghcr_username }} --password-stdin"
+      no_log: true
+      changed_when: false
+      become: yes
+      become_user: "{{ deploy_user }}"
+
+    - name: Ensure Docker images are present
+      community.docker.docker_image:
+        name: "{{ item }}"
+        source: pull
+        state: present
+      loop:
+        - "ghcr.io/unibo-prismlab/nip-backend:main"
+        - "ghcr.io/unibo-prismlab/contracts:main"
+        - "postgres:15"
+      become: yes
+      become_user: "{{ deploy_user }}"
+
+    - name: Create db secrets files with base64 content
+      ansible.builtin.copy:
+        dest: "{{ deploy_dir }}/{{ item.name }}"
+        content: "{{ item.content }}"
+        owner: "{{ deploy_user }}"
+        group: "{{ deploy_user }}"
+        mode: "0600"
+      loop:
+        - { name: "db_user.txt", content: "bmlwYWRtaW4" }
+        - { name: "db_password.txt", content: "cGFzc3dvcmQ" }
+        - { name: "db_name.txt", content: "nip" }
+      become: yes
+
+    - name: Create backend configurations directory
+      ansible.builtin.file:
+        path: "{{ deploy_dir }}/nip-backend/configs"
+        state: directory
+        owner: "{{ deploy_user }}"
+        group: "{{ deploy_user }}"
+        mode: "0755"
+      become: yes
+
+    - name: Install Bun
+      ansible.builtin.shell: |
+        curl -fsSL https://bun.sh/install | /bin/bash
+      args:
+        executable: /bin/bash
+        creates: "{{ bun_install_dir }}/bun"
+      environment:
+        BUN_INSTALL: "/home/{{ deploy_user }}/.bun"
+      become: yes
+      become_user: "{{ deploy_user }}"
+
+    - name: Add Bun to PATH in .bashrc
+      ansible.builtin.lineinfile:
+        path: "/home/{{ deploy_user }}/.bashrc"
+        line: "export PATH=$HOME/.bun/bin:$PATH"
+        create: yes
+        state: present
+      become: yes
+      become_user: "{{ deploy_user }}"
+
+    - name: Run gen.sh to create initial configurations
+      ansible.builtin.command: "{{ deploy_dir }}/gen.sh 24"
+      args:
+        chdir: "{{ deploy_dir }}"
+        creates: "{{ deploy_dir }}/.env.instance24"
+      become: yes
+      become_user: "{{ deploy_user }}"
+
+    - name: Deploy Docker stack
+      ansible.builtin.command: "docker stack deploy -c docker-compose.yaml aaa-backend-stack --detach=false --prune"
+      args:
+        chdir: "{{ deploy_dir }}"
+      become: yes
+      become_user: "{{ deploy_user }}"

@@ -1,0 +1,39 @@
+- name: Health Check
+  hosts: machines
+  become: yes
+  gather_facts: no
+
+  tasks:
+    - name: Check backend load balancer
+      uri:
+        url: "http://127.0.0.1:8888"
+        status_code: 200
+      register: result
+      ignore_errors: yes
+
+    - name: Store status
+      set_fact:
+        is_up: "{{ result.status == 200 }}"
+
+    - name: Per-host result
+      debug:
+        msg: "Host {{ inventory_hostname }} is {{ 'UP' if is_up else 'DOWN' }}"
+
+    - name: Compute global summary
+      run_once: true
+      delegate_to: localhost
+      set_fact:
+        total_hosts: "{{ groups['machines'] | length }}"
+        hosts_up: >-
+          {{ groups['machines']
+             | map('extract', hostvars, 'is_up')
+             | map('default', false)
+             | select('equalto', true)
+             | list
+             | length }}
+
+    - name: Display summary
+      run_once: true
+      delegate_to: localhost
+      debug:
+        msg: "{{ hosts_up }} out of {{ total_hosts }} hosts are UP"
