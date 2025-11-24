@@ -58,9 +58,9 @@
         group: "{{ deploy_user }}"
         mode: "0600"
       loop:
-        - { name: "db_user.txt", content: "bmlwYWRtaW4" }
-        - { name: "db_password.txt", content: "cGFzc3dvcmQ" }
-        - { name: "db_name.txt", content: "nip" }
+        - { name: "db_user.txt", content: "{{ db_user_content }}" }
+        - { name: "db_password.txt", content: "{{ db_password_content }}" }
+        - { name: "db_name.txt", content: "{{ db_name_content }}" }
       become: yes
 
     - name: Create backend configurations directory
