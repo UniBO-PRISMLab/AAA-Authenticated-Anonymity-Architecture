@@ -29,9 +29,6 @@ contract AAA is UIPRegistry {
     /// @dev Mapping from PID to SID encrypted with user's public key.
     mapping(bytes32 => bytes) private pidToEncSid;
 
-    /// @dev Mapping from SID to SAC codes.
-    mapping(bytes32 => uint256[]) private sidToSac;
-
     /// @dev Determines the existence of SAC codes.
     mapping(bytes => bool) private sacCodes;
 

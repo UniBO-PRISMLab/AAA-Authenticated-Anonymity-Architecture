@@ -28,13 +28,27 @@ address[] nodeList
 
 _List of authorized UIP nodes._
 
-### selectedNodesByPID
+### selectedNodeIndex
 
 ```solidity
-mapping(bytes32 => address[]) selectedNodesByPID
+mapping(bytes32 => mapping(address => uint16)) selectedNodeIndex
 ```
 
-_Mapping from PID to selected UIP nodes._
+_selectedNodeIndex[pid][node] => index+1 (0 means not selected)_
+
+### selectedNodeAt
+
+```solidity
+mapping(bytes32 => mapping(uint16 => address)) selectedNodeAt
+```
+
+### selectedNodeCount
+
+```solidity
+mapping(bytes32 => uint16) selectedNodeCount
+```
+
+_selectedNodeCount[pid] => number of selected nodes_
 
 ### redundantNodesByPID
 

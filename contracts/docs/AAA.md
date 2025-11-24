@@ -259,7 +259,7 @@ function submitSACRecord(bytes sac, bytes32 pkHash) external
 
 Submits a SAC record linking a public key to a SAC code.
 
-_Requirements:
+_Requires:
 - The public key hash must not be empty.
 - The SAC code must be greater than zero.
 - The public key hash must not have been already stored.
