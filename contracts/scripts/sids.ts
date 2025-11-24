@@ -17,6 +17,10 @@ const ABI = [
 
 const PUBLIC_IDS_FILE = path.join(os.homedir(), "public-identities.txt");
 const OUTPUT_FILE = path.join(os.homedir(), "anonymous-identities.txt");
+const STUDENT_FILE = path.join(
+  os.homedir(),
+  "student-anonymous-identities.txt"
+);
 
 const provider = new ethers.JsonRpcProvider(RPC_URL);
 const wallet = new Wallet(PRIVATE_KEY, provider);
@@ -69,7 +73,6 @@ async function runForPID(pid: Buffer): Promise<{
   const sid: string = await new Promise((resolve) => {
     const listener = (evPid: string, encSID: string) => {
       const eventPid = Buffer.from(evPid.slice(2), "hex").toString("base64");
-
       if (eventPid === pid.toString("base64")) {
         contract.off("PhraseComplete", listener);
         resolve(encSID);
@@ -113,6 +116,7 @@ async function main() {
   console.log("Selected random indices:", indices);
 
   let count = 0;
+  const sids = [];
   for (const idx of indices) {
     const pid = pids[idx];
     try {
@@ -122,8 +126,13 @@ async function main() {
         publicKey,
         privateKey,
       } = await runForPID(pid);
+      sids.push(decryptedSID);
+      const output = `${count}: ${pidStr}\nSID: ${decryptedSID}\nPublic Key: ${Buffer.from(
+        publicKey
+      ).toString("base64")}\nPrivate Key: ${Buffer.from(privateKey).toString(
+        "base64"
+      )}\n\n`;
 
-      const output = `${count}\nPID: ${pidStr}\nSID: ${decryptedSID}\nPublic Key: ${publicKey} \nPrivate Key: ${privateKey}\n`;
       fs.appendFileSync(OUTPUT_FILE, output);
       count++;
     } catch (err) {
@@ -131,7 +140,15 @@ async function main() {
     }
     await new Promise((res) => setTimeout(res, 2000));
   }
+
+  const sidIndices = getRandomIndices(sids.length, 3);
+  let cc = 1;
+  for (const sidIdx of sidIndices) {
+    fs.appendFileSync(STUDENT_FILE, `${cc}: ${sids[sidIdx]}\n`);
+    cc++;
+  }
   console.log("\nOutput saved to:", OUTPUT_FILE);
+  console.log("\nGenerated challenge to:", STUDENT_FILE);
 }
 
 main().catch((err) => {
