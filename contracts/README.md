@@ -1,8 +1,11 @@
-# AAA
+# Contracts
 
-Smart contract in solidity for the Authenticated Anonimity Architecture (AAA).
+[![Push contracts to ghcr.io](https://github.com/UniBO-PRISMLab/AAA-Authenticated-Anonymity-Architecture/actions/workflows/contracts-ghcr.yaml/badge.svg)](https://github.com/UniBO-PRISMLab/AAA-Authenticated-Anonymity-Architecture/actions/workflows/contracts-ghcr.yaml)
+[![Contracts Tests](https://github.com/UniBO-PRISMLab/AAA-Authenticated-Anonymity-Architecture/actions/workflows/hardhat-test.yaml/badge.svg)](https://github.com/UniBO-PRISMLab/AAA-Authenticated-Anonymity-Architecture/actions/workflows/hardhat-test.yaml)
 
-## How to run locally
+Smart contracts written in Solidity to implement the AAA protocol.
+
+## Run
 
 Start a development blockchain using
 
@@ -16,7 +19,23 @@ Deploy the contract using the [deploy script](./scripts/deploy.js)
 npx hardhat compile && npx hardhat run scripts/deploy.js --network localhost
 ```
 
-## Test it
+## Run with Docker
+
+Build the image
+
+```bash
+docker build . -t contracts
+```
+
+Run it
+
+```bash
+docker run -p 8545:8545 contracts
+```
+
+This will start a container that use [anvil](https://getfoundry.sh/anvil/overview/) to provide a local development node (see [start.sh](./scripts/start.sh) for details).
+
+## Test
 
 Run tests with
 
@@ -24,13 +43,9 @@ Run tests with
 npm run test
 ```
 
-This will also produce the gas report under [../docs](../docs/).
-
-The script [seedPhrase.js](./scripts/seedPhrase.js) is a manual test script that request the initialization of the seed generation protocol.
-
 ## Documentation
 
-Documentation is automatically generated using [solidity-docgen](https://github.com/OpenZeppelin/solidity-docgen). To generated the documentation use the command.
+Documentation is automatically generated using [solidity-docgen](https://github.com/OpenZeppelin/solidity-docgen). To generated the documentation use the command
 
 ```bash
 npm run docs

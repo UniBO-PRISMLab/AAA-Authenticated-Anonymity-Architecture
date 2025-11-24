@@ -8,11 +8,8 @@
 
 The Authenticated Anonymity Architecture (AAA) is a blockchain-based solution designed to provide robust and ethical authenticated anonymous identities, enabling users to maintain anonymity while allowing for deanonymization in cases of criminal activity.
 
-## Glossary
+## Get Started
 
-- PID (Public Identity Data): anonymous token that identifies the user. The real identity of the user is carried by the PID.
-- NIP (National Identity Provider): national institution that releases a PID after verification of the real identity of a person.
-- UIP (Union of Identity Provide): the network of official national identity NIPs of each contry.
-- SID (Secret Identity Data): hash of the concatenation of the hashes of the N-words hash.
-- PAC (Public Authentication Code): one-time code used to authenticate the user.
-- SAC (Secret Authentication Code): one-time code used to authenticate an anonymous user.
+See [nip-backend](./nip-backend/README.md) and [contracts](./contracts/README.md) README.md files to start the system locally.
+
+To deploy it on remote servers see the [Ansible](./infrastructure/README.md) guide.

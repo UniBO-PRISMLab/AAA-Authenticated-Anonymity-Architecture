@@ -1,5 +1,5 @@
 [![go](https://img.shields.io/badge/Go-1.24-00ADD8?logo=Go)](https://go.dev/doc/go1.24)
-![swagger](https://img.shields.io/badge/Swagger%20Preview-85EA2D?logo=Swagger&logoColor=black)
+[![Push nip-backend image to ghcr.io](https://github.com/UniBO-PRISMLab/AAA-Authenticated-Anonymity-Architecture/actions/workflows/nip-backend-ghcr.yaml/badge.svg)](https://github.com/UniBO-PRISMLab/AAA-Authenticated-Anonymity-Architecture/actions/workflows/nip-backend-ghcr.yaml)
 
 NIP (National Identity Provider) server
 
@@ -7,7 +7,7 @@ NIP (National Identity Provider) server
 
 ### Setup the database
 
-Only need to specifiy the database name, a username and a password. Place them in `db_` file in the root directory.
+To get started you only need to specifiy a database name, and a username/password for a PostgreSQL user. From the `./nip-backend` directory run
 
 ```bash
 echo -n "<name>" > ../db_name.txt
@@ -15,11 +15,15 @@ echo -n "<password>" > ../db_password.txt
 echo -n "<user>" > ../db_user.txt
 ```
 
-The docker-compose file will read them and inject them as environment variables in the database container.
+so the files are placed under the root directory of the project. The docker-compose file will read them and inject them as environment variables in the database container.
 
 ### Instances Configurations
 
-Create a directory `./nip-backend/configs` and use the script `./gen.sh` (`./gen.sh <n>`) to generate `n` configuration files that will be placed under `./nip-backend/configs`. The script reads the files `/db_*.txt `, generate RSA keypairs using openssl and extract pairs (address, private key) from `/accounts.txt` producing `.env.instanceN`.
+The simulate the real backend of the AAA architecture we need many NIP instances.
+
+From the root directory of the project run `mkdir ./nip-backend/configs` and use the script `./gen.sh` (`./gen.sh <n>`). This will generate `n` configuration files that will be placed under `./nip-backend/configs/`. The script reads the database files you just created `/db_*.txt `, then it generates RSA keypairs using openssl and extract valid blockchain accounts (address, private key) from `/accounts.txt`.
+
+You can inspect the folder `ls -a ./nip-backend/configs/` and see the generated files. The configuration files will be injected automatically as a Docker volume in the nip-backend container thanks to `docker-compose.yaml`.
 
 ### Run
 
@@ -40,6 +44,8 @@ And deploy the backend stack
 ```bash
 docker stack deploy -c docker-compose.yaml aaa-backend-stack --detach=false --prune
 ```
+
+Check that everythin is working by navigating to [http://127.0.0.1:8888/swagger/index.html](http://127.0.0.1:8888/swagger/index.html) or ping it with `curl http://127.0.0.1:8888; echo`.
 
 ## Sequence Diagrams
 
