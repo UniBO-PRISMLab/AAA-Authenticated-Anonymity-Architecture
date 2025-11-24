@@ -161,8 +161,12 @@ contract AAA is UIPRegistry {
             WORDS
         );
 
-        for (uint i = 0; i < selected.length; i++) {
-            selectedNodesByPID[pid].push(selected[i]);
+        uint16 selCount = uint16(selected.length);
+        selectedNodeCount[pid] = selCount;
+
+        for (uint16 i = 0; i < selCount; i++) {
+            selectedNodeAt[pid][i] = selected[i];
+            selectedNodeIndex[pid][selected[i]] = i + 1;
             emit WordRequested(pid, selected[i], pk);
         }
 
@@ -191,17 +195,9 @@ contract AAA is UIPRegistry {
         require(!p.hasSubmitted[msg.sender], "already submitted");
         require(encryptedWord.length > 0, "empty");
 
-        bool isSelected;
-        uint wordIndex;
-        address[] memory selectedNodes = selectedNodesByPID[pid];
-        for (uint i = 0; i < selectedNodes.length; i++) {
-            if (selectedNodes[i] == msg.sender) {
-                isSelected = true;
-                wordIndex = i;
-                break;
-            }
-        }
-        require(isSelected, "not selected");
+        uint16 idx = selectedNodeIndex[pid][msg.sender];
+        require(idx != 0, "not selected");
+        uint256 wordIndex = uint256(idx - 1);
 
         p.words.push(Word({word: encryptedWord, index: wordIndex}));
         p.hasSubmitted[msg.sender] = true;

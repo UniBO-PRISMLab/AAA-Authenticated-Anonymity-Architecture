@@ -14,8 +14,13 @@ abstract contract UIPRegistry {
     /// @dev List of authorized UIP nodes.
     address[] public nodeList;
 
-    /// @dev Mapping from PID to selected UIP nodes.
-    mapping(bytes32 => address[]) public selectedNodesByPID;
+    /// @dev selectedNodeIndex[pid][node] => index+1 (0 means not selected)
+    mapping(bytes32 => mapping(address => uint16)) public selectedNodeIndex;
+
+    mapping(bytes32 => mapping(uint16 => address)) public selectedNodeAt;
+
+    /// @dev selectedNodeCount[pid] => number of selected nodes
+    mapping(bytes32 => uint16) public selectedNodeCount;
 
     /// @dev Mapping from PID to redundant UIP nodes .
     mapping(bytes32 => mapping(uint256 => address[]))
@@ -99,6 +104,11 @@ abstract contract UIPRegistry {
     function getSelectedNodes(
         bytes32 pid
     ) external view onlyOwner returns (address[] memory) {
-        return selectedNodesByPID[pid];
+        uint256 count = selectedNodeCount[pid];
+        address[] memory result = new address[](count);
+        for (uint256 i = 0; i < count; i++) {
+            result[i] = selectedNodeAt[pid][uint16(i)];
+        }
+        return result;
     }
 }

@@ -22,6 +22,8 @@ const STUDENT_FILE = path.join(
   "student-anonymous-identities.txt"
 );
 
+const HIGH_GAS_LIMIT = 50000000n;
+
 const provider = new ethers.JsonRpcProvider(RPC_URL);
 const wallet = new Wallet(PRIVATE_KEY, provider);
 const contract = new Contract(CONTRACT_ADDRESS, ABI, wallet);
@@ -65,7 +67,8 @@ async function runForPID(pid: Buffer): Promise<{
 
   const tx = await contract.seedPhraseGenerationProtocol(
     pid,
-    Buffer.from(publicKey)
+    Buffer.from(publicKey),
+    { gasLimit: HIGH_GAS_LIMIT }
   );
   await tx.wait();
   console.log("Tx:", tx.hash);
@@ -112,7 +115,7 @@ async function main() {
     return;
   }
 
-  const indices = getRandomIndices(pids.length, 50);
+  const indices = getRandomIndices(pids.length, 12);
   console.log("Selected random indices:", indices);
 
   let count = 0;

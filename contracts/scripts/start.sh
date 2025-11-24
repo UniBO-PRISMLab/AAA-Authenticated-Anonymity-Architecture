@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-anvil --host 0.0.0.0 --chain-id 31337 -a 36 &
+anvil --host 0.0.0.0 --chain-id 31337 -a 36 --gas-limit 100000000000 &
 ANVIL_PID=$!
 
 echo "Waiting for Anvil node to start..."
