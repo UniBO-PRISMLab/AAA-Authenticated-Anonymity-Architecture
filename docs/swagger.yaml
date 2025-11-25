@@ -1,0 +1,319 @@
+basePath: /
+definitions:
+  models.ErrorResponseModel:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
+  models.PACRequestModel:
+    properties:
+      pid:
+        example: DmIq8x2JNs+E2qGBr16LxP6lUK+i/5nJRLuzvYEymtY=
+        type: string
+      signed_pid:
+        example: Tn7dpsKMqbhC3j8/o7OH5juVrkejhhZYkDHNqVyp8Am8uRktEDKO5i09iH9GZO0NOQHRRKD6lpwD0wC5GEPiuHN6aAof3WtPO9bqEB8ZLup4FjnyDh3mMX1UlvlYjKi6eTLMD2J8dwObz0nkmZOVsjk51o8jMapJtfnzMkYhADh4vZVDLpWYWbtBsmmXhNHS4SuWc+K3ZKMLtCYE/MFK3JT+Zcyabmrd9jmqvHRgi9XT+kABZ6XnyUSp4VWo1M7pl767/hZM5CxqgXORUMk8z9M9lHCDOsLfjBOwi81ObMtd+4oVgXgAbzBBHXnicB6X5PEBb5Qyh0RNyWFFNOEvtA==
+        type: string
+    required:
+      - pid
+      - signed_pid
+    type: object
+  models.PACResponseModel:
+    properties:
+      expiration:
+        example: "2024-12-31T23:59:59Z"
+        type: string
+      pac:
+        example: 874532
+        type: integer
+    type: object
+  models.PACVerificationRequestModel:
+    properties:
+      pac:
+        example: 874532
+        type: integer
+      pid:
+        example: DmIq8x2JNs+E2qGBr16LxP6lUK+i/5nJRLuzvYEymtY=
+        type: string
+    required:
+      - pac
+      - pid
+    type: object
+  models.PACVerificationResponseModel:
+    properties:
+      expiration:
+        example: "2024-12-31T23:59:59Z"
+        type: string
+      valid:
+        example: true
+        type: boolean
+    type: object
+  models.PIDRequestModel:
+    properties:
+      public_key:
+        example: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUF1aVRTYzZMY3NmaFRZbEY0WDk2OApEcStXVzNrRmx3U21UR2NJQXJ5eFZ2OVhBQ2VFSXJuL0JYZE9McTFNSU52enc5WTZvNmhTd3hqUkp2SzlvdFpMCnlXYzFvc2RUNGdlTDJaT2xEMHUwakFvbEpqVU9hVWVyMmJKQTUzQzhXMjd1MHJyQzVvc3Z3THRNVWYxWnpTR0MKL2hrY0VOcjNjRGl6YWJibkw2dzVFUEdCVjlNU2RnaUdlelJXaXVEeGIzcldEOFNwSlpNa2c5b3ZSK3dOMlI2YwpOK2RwTkNjdDdWYjQxaWhXU0VXT1o2djhFdTREV3FjVW0vQzBpLzZ3eVJkWU93Y0E3NktkMmkxcnNZdHFlQS84CnZuMklTTEp2eGdkM3ZCdXY1ZnFkS0kzRm0rd3NIVDhHdHlkQUw5VjF4V3g4bnFlcFlwMlIvaXJMNHFUeGFnVzkKMXdJREFRQUIKLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg==
+        type: string
+    required:
+      - public_key
+    type: object
+  models.PIDResponseModel:
+    properties:
+      message:
+        example: PID successfully issued and saved
+        type: string
+      pid:
+        example: Nifl3y+2jmuAxF26jqpjogu0ZYnA6IxSikjmTnnjm7k=
+        type: string
+    type: object
+  models.SACRequestModel:
+    properties:
+      sid:
+        example: jEA4/2q3Z4DcSllWmXtCbOaRrzyYAn3VXDHW5AN5U/8=
+        type: string
+      signed_sid:
+        example: lOY7KkjuT3HV7R0/l66LR/0vR5URqy6i0cMH4nEHebks4ZSIHPO63FY+DCZX9QRu3VPt/eO21Fwm69pXk1lWbETll5vXbpChkKjaOAsuJfIRqWBX+bXHfiBCPvdjGr0f5YfWDx8xL1ndbXntNYF1WBt02Z/2JG06XsPsYwrT1FFDw6GiJiliJrBBJ7CYj4GhgdrgD70ZPdadKl7ChAgp9erc9s1nZ3Kdhnp9xmUR+aHcxi0RfikCvhgZvVvbHneSviI8tjp8zxT4VJhX2gbIJ/0fp4CVIaiHxHsMzCPB3rFdNNo5Pqr4TyDG/IP5k3QLD1yQXY+a9wlw6MGUBEiXrw==
+        type: string
+    required:
+      - sid
+      - signed_sid
+    type: object
+  models.SACResponseModel:
+    properties:
+      expiration:
+        example: "2024-12-31T23:59:59Z"
+        type: string
+      sac:
+        example: 7MWorstwntw=
+        type: string
+    type: object
+  models.SACVerificationRequestModel:
+    properties:
+      public_key:
+        example: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUF1aVRTYzZMY3NmaFRZbEY0WDk2OApEcStXVzNrRmx3U21UR2NJQXJ5eFZ2OVhBQ2VFSXJuL0JYZE9McTFNSU52enc5WTZvNmhTd3hqUkp2SzlvdFpMCnlXYzFvc2RUNGdlTDJaT2xEMHUwakFvbEpqVU9hVWVyMmJKQTUzQzhXMjd1MHJyQzVvc3Z3THRNVWYxWnpTR0MKL2hrY0VOcjNjRGl6YWJibkw2dzVFUEdCVjlNU2RnaUdlelJXaXVEeGIzcldEOFNwSlpNa2c5b3ZSK3dOMlI2YwpOK2RwTkNjdDdWYjQxaWhXU0VXT1o2djhFdTREV3FjVW0vQzBpLzZ3eVJkWU93Y0E3NktkMmkxcnNZdHFlQS84CnZuMklTTEp2eGdkM3ZCdXY1ZnFkS0kzRm0rd3NIVDhHdHlkQUw5VjF4V3g4bnFlcFlwMlIvaXJMNHFUeGFnVzkKMXdJREFRQUIKLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg==
+        type: string
+      sac:
+        example: 7MWorstwntw=
+        type: string
+      signed_sac:
+        example: Tn7dpsKMqbhC3j8/o7OH5juVrkejhhZYkDHNqVyp8Am8uRktEDKO5i09iH9GZO0NOQHRRKD6lpwD0wC5GEPiuHN6aAof3WtPO9bqEB8ZLup4FjnyDh3mMX1UlvlYjKi6eTLMD2J8dwObz0nkmZOVsjk51o8jMapJtfnzMkYhADh4vZVDLpWYWbtBsmmXhNHS4SuWc+K3ZKMLtCYE/MFK3JT+Zcyabmrd9jmqvHRgi9XT+kABZ6XnyUSp4VWo1M7pl767/hZM5CxqgXORUMk8z9M9lHCDOsLfjBOwi81ObMtd+4oVgXgAbzBBHXnicB6X5PEBb5Qyh0RNyWFFNOEvtA==
+        type: string
+    required:
+      - public_key
+      - sac
+      - signed_sac
+    type: object
+  models.SACVerificationResponseModel:
+    properties:
+      valid:
+        example: true
+        type: boolean
+    type: object
+host: localhost:8888
+info:
+  contact:
+    email: m.dinelli@unibo.it
+    name: Michele Dinelli
+  description:
+    API specification for the NIP server of the Authenticated Anonymity
+    Architecture (AAA).
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: National Identity Provider (NIP)
+  version: 0.0.1
+paths:
+  /v1/auth/pac:
+    post:
+      consumes:
+        - application/json
+      description:
+        "Public Authentication Code (PAC) is a one-time code that can be
+        used to authenticate a user without sharing information about real identity.
+        The API accepts a payload `PID` and `SIGN(PID, SK)`, namely the PID signed
+        with the private key of the public-private key pair used to obtain the PID.
+        The PID must be sent as base64 (as it was retrieved originally from the NIP).
+        The signature must be a RSA PKCS #1 v1.5 signature with SHA256 as the hash
+        function. Signature payload must be encoded using base64."
+      parameters:
+        - description: PAC Request Model
+          in: body
+          name: models.PACRequestModel
+          required: true
+          schema:
+            $ref: "#/definitions/models.PACRequestModel"
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: The Public Authentication Code
+          schema:
+            $ref: "#/definitions/models.PACResponseModel"
+        "400":
+          description: Bad request
+          schema:
+            $ref: "#/definitions/models.ErrorResponseModel"
+        "404":
+          description: Not found
+          schema:
+            $ref: "#/definitions/models.ErrorResponseModel"
+        "500":
+          description: An error occurred
+          schema:
+            $ref: "#/definitions/models.ErrorResponseModel"
+      summary: PAC issuance request
+      tags:
+        - auth
+  /v1/auth/sac:
+    post:
+      consumes:
+        - application/json
+      description:
+        The SAC (Secret Authentication Code) is a one-time code used to
+        authenticate the user as an anonymous user. The API accepts a payload `SID`,
+        `ENC(SID, SK)`, namely the SID and the SID signed with the private key associated
+        with the public key saved on the blockchain at the moment of seed phrase creation.
+        The SID must be retrieved from the blockchain and sent as base64 encoded (supposedly
+        from hex). The signed SID must be base64 encoded as well.
+      parameters:
+        - description: SAC Request Model
+          in: body
+          name: models.SACRequestModel
+          required: true
+          schema:
+            $ref: "#/definitions/models.SACRequestModel"
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: The Secret Authentication Code
+          schema:
+            $ref: "#/definitions/models.SACResponseModel"
+        "400":
+          description: Bad request
+          schema:
+            $ref: "#/definitions/models.ErrorResponseModel"
+        "500":
+          description: An error occurred
+          schema:
+            $ref: "#/definitions/models.ErrorResponseModel"
+      summary: SAC issuance request
+      tags:
+        - auth
+  /v1/auth/verify-pac:
+    post:
+      consumes:
+        - application/json
+      description:
+        Allows a user to verify a PAC (Public Authentication Code) for
+        services accepting an authenticated anonymous identity.
+      parameters:
+        - description: PAC Verification Request Model
+          in: body
+          name: models.PACVerificationRequestModel
+          required: true
+          schema:
+            $ref: "#/definitions/models.PACVerificationRequestModel"
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: The Public Authentication Code Verification Response
+          schema:
+            $ref: "#/definitions/models.PACVerificationResponseModel"
+        "400":
+          description: Bad request
+          schema:
+            $ref: "#/definitions/models.ErrorResponseModel"
+        "404":
+          description: Not found
+          schema:
+            $ref: "#/definitions/models.ErrorResponseModel"
+        "500":
+          description: An error occurred
+          schema:
+            $ref: "#/definitions/models.ErrorResponseModel"
+      summary: PAC verification request
+      tags:
+        - auth
+  /v1/auth/verify-sac:
+    post:
+      consumes:
+        - application/json
+      description:
+        Allows a user to verify a SAC (Public Authentication Code) simulating
+        a service that supports anonymous authentication. The API accepts `SAC, PK,
+        SIGN(SAC, SK)` namely the SAC, the public key that identifies the anonymous
+        account and the SAC signed with the private key associated with the public
+        key of the anonymous account.
+      parameters:
+        - description: SAC Verification Request Model
+          in: body
+          name: models.SACVerificationRequestModel
+          required: true
+          schema:
+            $ref: "#/definitions/models.SACVerificationRequestModel"
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: The Secret Authentication Code Verification Response
+          schema:
+            $ref: "#/definitions/models.SACVerificationResponseModel"
+        "400":
+          description: Bad request
+          schema:
+            $ref: "#/definitions/models.ErrorResponseModel"
+        "404":
+          description: Not found
+          schema:
+            $ref: "#/definitions/models.ErrorResponseModel"
+        "500":
+          description: An error occurred
+          schema:
+            $ref: "#/definitions/models.ErrorResponseModel"
+      summary: SAC verification request
+      tags:
+        - auth
+  /v1/identity/pid:
+    post:
+      consumes:
+        - application/json
+      description:
+        Public Identity Data (PID) is an anonymous token which can be released
+        only by the NIP and it identifies the user without explicitly sharing information.
+        PID is derived from user's public key and a random nonce, the server calculates
+        `HMAC_SHA256(SHA256(PK) || nonce, SK)` where `HMAC_SHA256` is a keyed-hash
+        message authentication code (HMAC) using SHA256 as the hash function PK is
+        the public key and SK is a secret key stored on the server. The resulting
+        PID is a 32 byte string encoded using base64. The API accepts 2048 bit RSA
+        PKCS#8 keys encoded in base64.
+      parameters:
+        - description: PID Request Model
+          in: body
+          name: models.PIDRequestModel
+          required: true
+          schema:
+            $ref: "#/definitions/models.PIDRequestModel"
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: The PID
+          schema:
+            $ref: "#/definitions/models.PIDResponseModel"
+        "400":
+          description: Bad request
+          schema:
+            $ref: "#/definitions/models.ErrorResponseModel"
+        "500":
+          description: An error occurred
+          schema:
+            $ref: "#/definitions/models.ErrorResponseModel"
+      summary: PID issuance request
+      tags:
+        - identity
+schemes:
+  - http
+  - https
+swagger: "2.0"
