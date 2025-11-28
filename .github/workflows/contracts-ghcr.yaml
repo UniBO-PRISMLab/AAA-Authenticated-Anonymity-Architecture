@@ -2,8 +2,8 @@ name: contracts image to ghcr.io
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - "v*"
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository_owner }}/contracts
