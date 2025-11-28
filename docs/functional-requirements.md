@@ -1,6 +1,6 @@
 # AAA - Functional Requirements
 
-`version 0.0.1`
+`version 1.0.0`
 
 - Authors [Michele Dinelli](mailto:m.dinelli@unibo.it), [Luca Sciullo](mailto:luca.sciullo2@unibo.it), [Lorenzo Gigli](mailto:lorenzo.gigli@unibo.it)
 - Date `21/05/2025`
